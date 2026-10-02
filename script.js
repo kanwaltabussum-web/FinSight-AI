@@ -1,4 +1,5 @@
-const API_URL = "http://127.0.0.1:8000";
+```javascript
+const API_URL = "https://finsight-ai.fastapicloud.dev";
 
 const uploadBox = document.getElementById("uploadBox");
 const fileInput = document.getElementById("fileInput");
@@ -913,3 +914,4 @@ function escapeHTML(value) {
         .replace(/'/g, "&#039;");
 
 }
+```
