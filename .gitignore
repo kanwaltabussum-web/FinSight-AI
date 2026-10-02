@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+normal_transactions.csv
+duplicate_transactions.csv
+normal_transactions.xlsx
