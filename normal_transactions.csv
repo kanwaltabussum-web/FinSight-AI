@@ -1,0 +1,7 @@
+transaction_id,date,entity,supplier_id,invoice_id,amount,category,payment_method
+TX101,9/1/2026,Company_A,SUP001,INV2001,1200,Office Supplies,Bank Transfer
+TX102,9/2/2026,Company_A,SUP002,INV2002,1350,Travel,Card
+TX103,9/3/2026,Company_A,SUP003,INV2003,1500,Equipment,Bank Transfer
+TX104,9/4/2026,Company_A,SUP001,INV2004,1250,Office Supplies,Bank Transfer
+TX105,9/5/2026,Company_A,SUP002,INV2005,1400,Travel,Card
+TX106,9/6/2026,Company_A,SUP004,INV2006,1300,Equipment,Bank Transfer
