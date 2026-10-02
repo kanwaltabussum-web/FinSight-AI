@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 import pandas as pd
 import io
 
@@ -18,14 +20,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/")
-def home():
-    return {
-        "message": "FinSight AI backend is running",
-        "status": "ready"
-    }
 
 
 @app.post("/analyze")
@@ -379,3 +373,19 @@ async def analyze_file(file: UploadFile = File(...)):
                 str(e)
 
         }
+
+
+# ================================
+# SERVE FRONTEND
+# ================================
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent
+
+app.mount(
+    "/",
+    StaticFiles(
+        directory=FRONTEND_DIR,
+        html=True
+    ),
+    name="frontend"
+)

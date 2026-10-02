@@ -1,4 +1,3 @@
-```javascript
 const API_URL = "https://finsight-ai.fastapicloud.dev";
 
 const uploadBox = document.getElementById("uploadBox");
@@ -6,25 +5,17 @@ const fileInput = document.getElementById("fileInput");
 
 let selectedFile = null;
 
-
 /* =========================================
    FILE INPUT
 ========================================= */
 
 fileInput.addEventListener("change", function () {
-
     if (this.files && this.files.length > 0) {
-
         selectedFile = this.files[0];
-
         showSelectedFile(selectedFile);
-
         analyzeFile();
-
     }
-
 });
-
 
 /* =========================================
    UPLOAD BUTTON
@@ -34,93 +25,63 @@ const uploadButton =
     uploadBox.querySelector(".upload-button");
 
 if (uploadButton) {
-
     uploadButton.addEventListener("click", function (event) {
-
         event.stopPropagation();
-
         fileInput.click();
-
     });
-
 }
-
 
 /* =========================================
    SHOW SELECTED FILE
 ========================================= */
 
 function showSelectedFile(file) {
-
     const fileInfo =
         uploadBox.querySelector(".file-info");
 
     if (fileInfo) {
-
         fileInfo.textContent =
             `${file.name} selected`;
-
     }
-
 }
-
 
 /* =========================================
    DRAG & DROP
 ========================================= */
 
 uploadBox.addEventListener("dragover", function (event) {
-
     event.preventDefault();
-
     uploadBox.classList.add("drag-over");
-
 });
-
 
 uploadBox.addEventListener("dragleave", function () {
-
     uploadBox.classList.remove("drag-over");
-
 });
 
-
 uploadBox.addEventListener("drop", function (event) {
-
     event.preventDefault();
-
     uploadBox.classList.remove("drag-over");
-
 
     if (
         event.dataTransfer.files &&
         event.dataTransfer.files.length > 0
     ) {
-
         selectedFile =
             event.dataTransfer.files[0];
 
         showSelectedFile(selectedFile);
-
         analyzeFile();
-
     }
-
 });
-
 
 /* =========================================
    ANALYZE FILE
 ========================================= */
 
 async function analyzeFile() {
-
     if (!selectedFile) {
-
         return;
-
     }
-
 
     const formData = new FormData();
 
@@ -129,9 +90,7 @@ async function analyzeFile() {
         selectedFile
     );
 
-
     try {
-
         const response = await fetch(
             `${API_URL}/analyze`,
             {
@@ -140,38 +99,27 @@ async function analyzeFile() {
             }
         );
 
-
         const data =
             await response.json();
 
-
         if (!data.success) {
-
             alert(
                 data.error ||
                 "Something went wrong while analyzing the file."
             );
-
             return;
-
         }
-
 
         displayResults(data);
 
-
     } catch (error) {
-
         console.error(error);
 
         alert(
             "Could not connect to FinSight AI backend. Make sure the backend server is running."
         );
-
     }
-
 }
-
 
 /* =========================================
    DISPLAY RESULTS
@@ -182,27 +130,20 @@ function displayResults(data) {
     const uploadSection =
         document.querySelector(".upload-section");
 
-
     const oldResults =
         document.getElementById(
             "resultsContainer"
         );
 
-
     if (oldResults) {
-
         oldResults.remove();
-
     }
-
 
     const resultsContainer =
         document.createElement("div");
 
-
     resultsContainer.id =
         "resultsContainer";
-
 
     /* =====================================
        SUMMARY CARDS
@@ -211,15 +152,12 @@ function displayResults(data) {
     const analysisResults =
         document.createElement("div");
 
-
     analysisResults.className =
         "analysis-results";
-
 
     analysisResults.innerHTML = `
 
         <div>
-
             <strong>
                 ${data.transaction_count}
             </strong>
@@ -227,12 +165,9 @@ function displayResults(data) {
             <span>
                 Transactions
             </span>
-
         </div>
 
-
         <div>
-
             <strong>
                 ${formatNumber(data.total_amount)}
             </strong>
@@ -240,12 +175,9 @@ function displayResults(data) {
             <span>
                 Total Amount
             </span>
-
         </div>
 
-
         <div>
-
             <strong>
                 ${formatNumber(data.average_amount)}
             </strong>
@@ -253,12 +185,9 @@ function displayResults(data) {
             <span>
                 Average Amount
             </span>
-
         </div>
 
-
         <div>
-
             <strong class="unusual-count-number">
                 ${data.anomaly_count}
             </strong>
@@ -266,16 +195,13 @@ function displayResults(data) {
             <span>
                 Unusual Transactions
             </span>
-
         </div>
 
     `;
 
-
     resultsContainer.appendChild(
         analysisResults
     );
-
 
     /* =====================================
        ANOMALIES
@@ -284,24 +210,19 @@ function displayResults(data) {
     const anomalySection =
         document.createElement("div");
 
-
     anomalySection.className =
         "anomaly-section";
-
 
     if (
         data.anomaly_count &&
         data.anomaly_count > 0
     ) {
 
-
         const anomalyHeader =
             document.createElement("div");
 
-
         anomalyHeader.className =
             "anomaly-header";
-
 
         anomalyHeader.innerHTML = `
 
@@ -310,7 +231,6 @@ function displayResults(data) {
             </div>
 
             <div>
-
                 <strong>
                     ${data.anomaly_count}
                     unusual transaction
@@ -321,16 +241,13 @@ function displayResults(data) {
                 <span>
                     These records deserve human review.
                 </span>
-
             </div>
 
         `;
 
-
         anomalySection.appendChild(
             anomalyHeader
         );
-
 
         /* =================================
            EACH ANOMALY
@@ -339,14 +256,11 @@ function displayResults(data) {
         data.anomalies.forEach(
             function (anomaly) {
 
-
                 const anomalyCard =
                     document.createElement("div");
 
-
                 anomalyCard.className =
                     "anomaly-card";
-
 
                 /* =========================
                    TRANSACTION + AMOUNT
@@ -355,15 +269,12 @@ function displayResults(data) {
                 const cardTop =
                     document.createElement("div");
 
-
                 cardTop.className =
                     "anomaly-card-top";
-
 
                 cardTop.innerHTML = `
 
                     <div>
-
                         <span>
                             TRANSACTION
                         </span>
@@ -373,12 +284,9 @@ function displayResults(data) {
                                 anomaly.transaction_id
                             )}
                         </strong>
-
                     </div>
 
-
                     <div>
-
                         <span>
                             AMOUNT
                         </span>
@@ -388,16 +296,13 @@ function displayResults(data) {
                                 anomaly.amount
                             )}
                         </strong>
-
                     </div>
 
                 `;
 
-
                 anomalyCard.appendChild(
                     cardTop
                 );
-
 
                 /* =========================
                    RISK SCORE
@@ -406,15 +311,12 @@ function displayResults(data) {
                 const riskScore =
                     document.createElement("div");
 
-
                 riskScore.className =
                     "risk-score-box";
-
 
                 riskScore.innerHTML = `
 
                     <div>
-
                         <span>
                             RISK SIGNAL SCORE
                         </span>
@@ -422,25 +324,19 @@ function displayResults(data) {
                         <strong>
                             ${anomaly.risk_score}
                         </strong>
-
                     </div>
 
-
                     <div class="risk-level">
-
                         ${escapeHTML(
                             anomaly.risk_level
                         )}
-
                     </div>
 
                 `;
 
-
                 anomalyCard.appendChild(
                     riskScore
                 );
-
 
                 /* =========================
                    CONNECTED RECORDS
@@ -449,10 +345,8 @@ function displayResults(data) {
                 const connected =
                     document.createElement("div");
 
-
                 connected.className =
                     "connected-records";
-
 
                 connected.innerHTML = `
 
@@ -468,12 +362,9 @@ function displayResults(data) {
 
                     </div>
 
-
                     <div class="connected-grid">
 
-
                         <div class="connected-item">
-
                             <span>
                                 INVOICE
                             </span>
@@ -483,12 +374,9 @@ function displayResults(data) {
                                     anomaly.invoice_id
                                 )}
                             </strong>
-
                         </div>
 
-
                         <div class="connected-item">
-
                             <span>
                                 SUPPLIER
                             </span>
@@ -498,12 +386,9 @@ function displayResults(data) {
                                     anomaly.supplier_id
                                 )}
                             </strong>
-
                         </div>
 
-
                         <div class="connected-item">
-
                             <span>
                                 CATEGORY
                             </span>
@@ -513,12 +398,9 @@ function displayResults(data) {
                                     anomaly.category
                                 )}
                             </strong>
-
                         </div>
 
-
                         <div class="connected-item">
-
                             <span>
                                 PAYMENT
                             </span>
@@ -528,19 +410,15 @@ function displayResults(data) {
                                     anomaly.payment_method
                                 )}
                             </strong>
-
                         </div>
-
 
                     </div>
 
                 `;
 
-
                 anomalyCard.appendChild(
                     connected
                 );
-
 
                 /* =========================
                    EXPLANATION
@@ -549,10 +427,8 @@ function displayResults(data) {
                 const explanation =
                     document.createElement("div");
 
-
                 explanation.className =
                     "ai-explanation";
-
 
                 explanation.innerHTML = `
 
@@ -568,7 +444,6 @@ function displayResults(data) {
 
                     </div>
 
-
                     <p>
                         ${escapeHTML(
                             anomaly.explanation
@@ -577,11 +452,9 @@ function displayResults(data) {
 
                 `;
 
-
                 anomalyCard.appendChild(
                     explanation
                 );
-
 
                 /* =========================
                    RISK REASONS
@@ -592,17 +465,13 @@ function displayResults(data) {
                     anomaly.risk_reasons.length > 0
                 ) {
 
-
                     const reasons =
                         document.createElement("div");
-
 
                     reasons.className =
                         "risk-reasons";
 
-
                     let reasonsHTML = "";
-
 
                     anomaly.risk_reasons.forEach(
                         function (reason) {
@@ -616,7 +485,6 @@ function displayResults(data) {
                         }
                     );
 
-
                     reasons.innerHTML = `
 
                         <strong>
@@ -629,13 +497,10 @@ function displayResults(data) {
 
                     `;
 
-
                     anomalyCard.appendChild(
                         reasons
                     );
-
                 }
-
 
                 /* =========================
                    REASON
@@ -644,15 +509,12 @@ function displayResults(data) {
                 const reason =
                     document.createElement("p");
 
-
                 reason.textContent =
                     anomaly.reason;
-
 
                 anomalyCard.appendChild(
                     reason
                 );
-
 
                 /* =========================
                    THRESHOLD
@@ -661,25 +523,20 @@ function displayResults(data) {
                 const threshold =
                     document.createElement("small");
 
-
                 threshold.textContent =
                     `Detection threshold: ${formatNumber(
                         anomaly.threshold
                     )}`;
 
-
                 anomalyCard.appendChild(
                     threshold
                 );
 
-
                 anomalySection.appendChild(
                     anomalyCard
                 );
-
             }
         );
-
 
         /* =================================
            HUMAN REVIEW
@@ -688,10 +545,8 @@ function displayResults(data) {
         const reviewNote =
             document.createElement("div");
 
-
         reviewNote.className =
             "review-note";
-
 
         reviewNote.innerHTML = `
 
@@ -706,19 +561,15 @@ function displayResults(data) {
 
         `;
 
-
         resultsContainer.appendChild(
             anomalySection
         );
-
 
         resultsContainer.appendChild(
             reviewNote
         );
 
-
     } else {
-
 
         /* =================================
            NO ANOMALY
@@ -727,10 +578,8 @@ function displayResults(data) {
         const noAnomaly =
             document.createElement("div");
 
-
         noAnomaly.className =
             "no-anomaly";
-
 
         noAnomaly.innerHTML = `
 
@@ -739,7 +588,6 @@ function displayResults(data) {
             </span>
 
             <div>
-
                 <strong>
                     No unusual transactions detected
                 </strong>
@@ -748,18 +596,14 @@ function displayResults(data) {
                     The uploaded records did not cross
                     the current anomaly detection threshold.
                 </small>
-
             </div>
 
         `;
 
-
         resultsContainer.appendChild(
             noAnomaly
         );
-
     }
-
 
     /* =====================================
        ANALYZE ANOTHER FILE
@@ -768,22 +612,17 @@ function displayResults(data) {
     const anotherButton =
         document.createElement("button");
 
-
     anotherButton.className =
         "primary-button";
-
 
     anotherButton.style.display =
         "block";
 
-
     anotherButton.style.margin =
         "25px auto 0";
 
-
     anotherButton.textContent =
         "Analyze Another File →";
-
 
     anotherButton.addEventListener(
         "click",
@@ -793,46 +632,34 @@ function displayResults(data) {
 
             fileInput.value = "";
 
-
             const fileInfo =
                 uploadBox.querySelector(
                     ".file-info"
                 );
 
-
             if (fileInfo) {
-
                 fileInfo.textContent =
                     "CSV or Excel files supported";
-
             }
-
 
             const oldResults =
                 document.getElementById(
                     "resultsContainer"
                 );
 
-
             if (oldResults) {
-
                 oldResults.remove();
-
             }
-
 
             uploadSection.scrollIntoView({
                 behavior: "smooth"
             });
-
         }
     );
-
 
     resultsContainer.appendChild(
         anotherButton
     );
-
 
     /* =====================================
        ADD TO PAGE
@@ -841,7 +668,6 @@ function displayResults(data) {
     uploadSection.appendChild(
         resultsContainer
     );
-
 
     /* =====================================
        SCROLL
@@ -858,9 +684,7 @@ function displayResults(data) {
         },
         200
     );
-
 }
-
 
 /* =========================================
    NUMBER FORMAT
@@ -873,11 +697,8 @@ function formatNumber(value) {
         value === undefined ||
         isNaN(value)
     ) {
-
         return "0";
-
     }
-
 
     return Number(value).toLocaleString(
         "en-US",
@@ -886,9 +707,7 @@ function formatNumber(value) {
             maximumFractionDigits: 2
         }
     );
-
 }
-
 
 /* =========================================
    HTML ESCAPE
@@ -900,11 +719,8 @@ function escapeHTML(value) {
         value === null ||
         value === undefined
     ) {
-
         return "";
-
     }
-
 
     return String(value)
         .replace(/&/g, "&amp;")
@@ -912,6 +728,4 @@ function escapeHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
-```
