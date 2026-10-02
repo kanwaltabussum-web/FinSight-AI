@@ -379,7 +379,7 @@ async def analyze_file(file: UploadFile = File(...)):
 # SERVE FRONTEND
 # ================================
 
-FRONTEND_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = Path(__file__).resolve().parent / "frontend"
 
 app.mount(
     "/",
