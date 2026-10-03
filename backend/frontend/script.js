@@ -123,10 +123,18 @@ async function analyzeFile() {
 
     const formData = new FormData();
 
-    formData.append(
-        "file",
-        selectedFile
-    );
+const dataType =
+    document.getElementById("dataType").value;
+
+formData.append(
+    "file",
+    selectedFile
+);
+
+formData.append(
+    "data_type",
+    dataType
+);
 
 
     try {
@@ -274,6 +282,81 @@ function displayResults(data) {
     resultsContainer.appendChild(
         analysisResults
     );
+const mappingSection =
+    document.createElement("div");
+
+mappingSection.className =
+    "column-mapping-section";
+
+const mappingTitle =
+    document.createElement("h3");
+
+mappingTitle.textContent =
+    "Detected Column Mapping";
+
+mappingSection.appendChild(
+    mappingTitle
+);
+
+const mappingGrid =
+    document.createElement("div");
+
+mappingGrid.className =
+    "column-mapping-grid";
+
+const mappingLabels = {
+    date: "Date",
+    transaction_id: "Transaction ID",
+    amount: "Amount",
+    debit: "Debit",
+    credit: "Credit",
+    description: "Description",
+    invoice_id: "Invoice ID",
+    supplier_id: "Supplier ID",
+    category: "Category",
+    payment_method: "Payment Method"
+};
+
+if (data.column_mapping) {
+
+    Object.keys(mappingLabels).forEach(
+        function (key) {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "column-mapping-item";
+
+            const detected =
+                data.column_mapping[key];
+
+            item.innerHTML = `
+                <span>
+                    ${mappingLabels[key]}
+                </span>
+
+                <strong>
+                    ${
+                        detected
+                        ? escapeHTML(detected)
+                        : "Not detected"
+                    }
+                </strong>
+            `;
+
+            mappingGrid.appendChild(item);
+        }
+    );
+}
+
+mappingSection.appendChild(
+    mappingGrid
+);
+
+resultsContainer.appendChild(
+    mappingSection
+);
 
 
     /* =====================================
