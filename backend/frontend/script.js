@@ -12,6 +12,7 @@ let selectedFile = null;
 
 if (fileInput) {
     fileInput.addEventListener("change", function (event) {
+
         const file = event.target.files[0];
 
         if (!file) return;
@@ -19,7 +20,9 @@ if (fileInput) {
         selectedFile = file;
 
         showSelectedFile(file);
-        analyzeFile();
+
+        // Do NOT automatically analyze.
+        // User will press Start Analysis.
     });
 }
 
@@ -30,9 +33,14 @@ if (fileInput) {
 
 const uploadButton = document.querySelector(".upload-button");
 
-if (uploadButton) {
-    uploadButton.addEventListener("click", function () {
+if (uploadButton && fileInput) {
+
+    uploadButton.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
         fileInput.click();
+
     });
 }
 
@@ -44,16 +52,23 @@ if (uploadButton) {
 if (uploadBox) {
 
     uploadBox.addEventListener("dragover", function (event) {
+
         event.preventDefault();
 
         uploadBox.classList.add("drag-over");
+
     });
+
 
     uploadBox.addEventListener("dragleave", function () {
+
         uploadBox.classList.remove("drag-over");
+
     });
 
+
     uploadBox.addEventListener("drop", function (event) {
+
         event.preventDefault();
 
         uploadBox.classList.remove("drag-over");
@@ -65,8 +80,9 @@ if (uploadBox) {
         selectedFile = file;
 
         showSelectedFile(file);
-        analyzeFile();
+
     });
+
 }
 
 
@@ -76,16 +92,71 @@ if (uploadBox) {
 
 function showSelectedFile(file) {
 
-    const fileInfo = document.querySelector(".file-info");
+    const fileInfo =
+        document.querySelector(".file-info");
 
     if (fileInfo) {
+
         fileInfo.innerHTML = `
             <strong>${escapeHTML(file.name)}</strong>
-            &nbsp; • &nbsp;
+            <span style="margin:0 6px;color:#9aa5b3;">•</span>
             ${(file.size / 1024).toFixed(1)} KB
         `;
+
     }
+
 }
+
+
+/* =========================================
+   START ANALYSIS BUTTON
+========================================= */
+
+const startButtons =
+    document.querySelectorAll(
+        ".start-analysis-button, .nav-button"
+    );
+
+
+startButtons.forEach(button => {
+
+    button.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        /*
+         * If a file is already selected,
+         * START ANALYSIS immediately.
+         */
+
+        if (selectedFile) {
+
+            analyzeFile();
+
+            return;
+
+        }
+
+        /*
+         * If no file is selected,
+         * take user to upload area.
+         */
+
+        const uploadSection =
+            document.querySelector(".upload-section");
+
+        if (uploadSection) {
+
+            uploadSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }
+
+    });
+
+});
 
 
 /* =========================================
@@ -94,116 +165,253 @@ function showSelectedFile(file) {
 
 async function analyzeFile() {
 
-    if (!selectedFile) return;
+    if (!selectedFile) {
 
-    const dataTypeElement = document.getElementById("dataType");
+        alert("Please select a financial file first.");
 
-    const dataType = dataTypeElement
-        ? dataTypeElement.value
-        : "bank_statement";
+        return;
+
+    }
+
+
+    const dataTypeElement =
+        document.getElementById("dataType");
+
+
+    const dataType =
+        dataTypeElement
+            ? dataTypeElement.value
+            : "bank_statement";
+
 
     const resultsContainer =
-        document.getElementById("resultsContainer");
+        getResultsContainer();
 
-    if (resultsContainer) {
 
-        resultsContainer.innerHTML = `
-            <div class="analysis-loading"
-                 style="
-                    max-width:1050px;
-                    margin:30px auto;
-                    padding:30px;
-                    text-align:center;
-                    background:white;
-                    border:1px solid #e3e9f1;
-                    border-radius:18px;
-                 ">
-                <div style="
-                    font-size:28px;
-                    margin-bottom:10px;
-                ">✦</div>
+    resultsContainer.innerHTML = `
 
-                <strong style="
-                    display:block;
-                    color:#10243e;
-                    font-size:16px;
-                    margin-bottom:5px;
-                ">
-                    Analyzing your financial data...
-                </strong>
+        <div class="analysis-loading"
+             style="
+                max-width:1050px;
+                margin:30px auto;
+                padding:35px;
+                text-align:center;
+                background:white;
+                border:1px solid #e3e9f1;
+                border-radius:18px;
+                box-shadow:0 8px 30px rgba(16,36,62,.05);
+             ">
 
-                <span style="
-                    color:#718096;
-                    font-size:11px;
-                ">
-                    Detecting patterns, anomalies and risk signals
-                </span>
+            <div style="
+                font-size:30px;
+                margin-bottom:12px;
+            ">
+                ⏳
             </div>
-        `;
-    }
+
+            <strong style="
+                display:block;
+                color:#10243e;
+                font-size:17px;
+                margin-bottom:6px;
+            ">
+                Analyzing your financial data...
+            </strong>
+
+            <span style="
+                color:#718096;
+                font-size:11px;
+            ">
+                Detecting transactions, patterns, anomalies and risk signals
+            </span>
+
+        </div>
+
+    `;
+
+
+    resultsContainer.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
 
     const formData = new FormData();
 
-    formData.append("file", selectedFile);
-    formData.append("data_type", dataType);
+    formData.append(
+        "file",
+        selectedFile
+    );
+
+    /*
+     * IMPORTANT:
+     * This tells the backend that the uploaded
+     * file is a Bank Statement / GL / Cash Book.
+     */
+
+    formData.append(
+        "data_type",
+        dataType || "bank_statement"
+    );
+
 
     try {
 
-        const response = await fetch(
-            `${API_URL}/analyze`,
-            {
-                method: "POST",
-                body: formData
-            }
+        console.log(
+            "Sending file for analysis:",
+            selectedFile.name
         );
+
+        console.log(
+            "Data type:",
+            dataType
+        );
+
+
+        const response =
+            await fetch(
+                `${API_URL}/analyze`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
 
         if (!response.ok) {
 
-            let errorMessage =
+            let message =
                 "Unable to analyze the file.";
 
             try {
-                const errorData = await response.json();
+
+                const errorData =
+                    await response.json();
 
                 if (errorData.detail) {
-                    errorMessage = errorData.detail;
+                    message =
+                        errorData.detail;
                 }
+
             } catch (_) {}
 
-            throw new Error(errorMessage);
+            throw new Error(message);
+
         }
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "FinSight analysis response:",
+            data
+        );
+
+
+        if (!data.success) {
+
+            throw new Error(
+                data.error ||
+                "The financial file could not be analyzed."
+            );
+
+        }
+
 
         displayResults(data);
 
+
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "FinSight analysis error:",
+            error
+        );
 
-        if (resultsContainer) {
 
-            resultsContainer.innerHTML = `
-                <div style="
-                    max-width:1050px;
-                    margin:30px auto;
-                    padding:22px;
-                    background:#fff0f2;
-                    border:1px solid #f1c3ca;
-                    border-radius:16px;
-                    color:#b92d3d;
+        resultsContainer.innerHTML = `
+
+            <div style="
+                max-width:1050px;
+                margin:30px auto;
+                padding:24px;
+                background:#fff0f2;
+                border:1px solid #f1c3ca;
+                border-radius:16px;
+                color:#b92d3d;
+            ">
+
+                <strong style="
+                    display:block;
+                    margin-bottom:7px;
+                    font-size:15px;
                 ">
-                    <strong style="display:block;margin-bottom:5px;">
-                        Analysis failed
-                    </strong>
+                    Analysis failed
+                </strong>
 
-                    <span style="font-size:11px;">
-                        ${escapeHTML(error.message)}
-                    </span>
-                </div>
-            `;
-        }
+                <span style="
+                    font-size:11px;
+                ">
+                    ${escapeHTML(error.message)}
+                </span>
+
+            </div>
+
+        `;
+
     }
+
+}
+
+
+/* =========================================
+   RESULTS CONTAINER
+========================================= */
+
+function getResultsContainer() {
+
+    let container =
+        document.getElementById(
+            "resultsContainer"
+        );
+
+
+    if (!container) {
+
+        container =
+            document.createElement("div");
+
+        container.id =
+            "resultsContainer";
+
+
+        const uploadSection =
+            document.querySelector(
+                ".upload-section"
+            );
+
+
+        if (uploadSection) {
+
+            uploadSection.appendChild(
+                container
+            );
+
+        } else {
+
+            document.body.appendChild(
+                container
+            );
+
+        }
+
+    }
+
+
+    return container;
+
 }
 
 
@@ -213,62 +421,124 @@ async function analyzeFile() {
 
 function displayResults(data) {
 
-    let resultsContainer =
-        document.getElementById("resultsContainer");
+    const resultsContainer =
+        getResultsContainer();
 
-    if (!resultsContainer) {
-
-        resultsContainer = document.createElement("div");
-
-        resultsContainer.id = "resultsContainer";
-
-        const uploadSection =
-            document.querySelector(".upload-section");
-
-        if (uploadSection) {
-            uploadSection.appendChild(resultsContainer);
-        } else {
-            document.body.appendChild(resultsContainer);
-        }
-    }
 
     resultsContainer.innerHTML = "";
 
 
     /* -----------------------------------------
-       BASIC VALUES
+       VALUES
     ----------------------------------------- */
 
     const transactionCount =
-        Number(data.transaction_count || 0);
+        Number(
+            data.transaction_count || 0
+        );
+
 
     const totalAmount =
-        Number(data.total_amount || 0);
+        Number(
+            data.total_amount || 0
+        );
+
 
     const averageAmount =
-        Number(data.average_amount || 0);
+        Number(
+            data.average_amount || 0
+        );
+
 
     const anomalyCount =
-        Number(data.anomaly_count || 0);
+        Number(
+            data.anomaly_count || 0
+        );
+
 
     const highRiskCount =
-        Number(data.high_risk_count || 0);
+        Number(
+            data.high_risk_count || 0
+        );
+
 
     const reviewCount =
-        Number(data.review_count || 0);
+        Number(
+            data.review_count || 0
+        );
 
 
-    /* -----------------------------------------
-       RESULT TITLE
-    ----------------------------------------- */
+    const duplicateCount =
+        Number(
+            data.duplicate_invoice_patterns || 0
+        );
+
+
+    const normalCount =
+        Math.max(
+            transactionCount -
+            anomalyCount,
+            0
+        );
+
+
+    /* =========================================
+       OVERALL RISK STATUS
+    ========================================= */
+
+    let overallStatus =
+        "LOW RISK";
+
+
+    let overallBackground =
+        "#eaf8f3";
+
+
+    let overallColor =
+        "#159b73";
+
+
+    if (highRiskCount > 0) {
+
+        overallStatus =
+            "HIGH RISK";
+
+        overallBackground =
+            "#fff0f2";
+
+        overallColor =
+            "#dc3f4f";
+
+    } else if (
+        anomalyCount > 0 ||
+        reviewCount > 0
+    ) {
+
+        overallStatus =
+            "REVIEW REQUIRED";
+
+        overallBackground =
+            "#fff5e5";
+
+        overallColor =
+            "#d88a21";
+
+    }
+
+
+    /* =========================================
+       TITLE
+    ========================================= */
 
     const titleSection =
         document.createElement("div");
+
 
     titleSection.style.cssText = `
         max-width:1050px;
         margin:35px auto 15px;
     `;
+
 
     titleSection.innerHTML = `
 
@@ -288,10 +558,11 @@ function displayResults(data) {
                     font-size:9px;
                     font-weight:800;
                     letter-spacing:1px;
-                    margin-bottom:4px;
+                    margin-bottom:5px;
                 ">
                     ANALYSIS COMPLETE
                 </span>
+
 
                 <h2 style="
                     color:#10243e;
@@ -302,31 +573,41 @@ function displayResults(data) {
                     Financial Intelligence Report
                 </h2>
 
+
                 <p style="
                     color:#718096;
                     font-size:10px;
-                    margin-top:4px;
+                    margin-top:5px;
                 ">
-                    ${escapeHTML(data.filename || selectedFile?.name || "Uploaded file")}
+                    ${escapeHTML(
+                        data.filename ||
+                        selectedFile?.name ||
+                        "Uploaded file"
+                    )}
                 </p>
 
             </div>
 
+
             <div style="
-                padding:8px 13px;
+                padding:9px 14px;
                 border-radius:20px;
-                background:#eaf8f3;
-                color:#159b73;
+                background:${overallBackground};
+                color:${overallColor};
                 font-size:9px;
                 font-weight:800;
             ">
-                ANALYSIS READY
+                ${overallStatus}
             </div>
 
         </div>
+
     `;
 
-    resultsContainer.appendChild(titleSection);
+
+    resultsContainer.appendChild(
+        titleSection
+    );
 
 
     /* =========================================
@@ -336,46 +617,429 @@ function displayResults(data) {
     const summary =
         document.createElement("div");
 
-    summary.className = "analysis-results";
+
+    summary.className =
+        "analysis-results";
+
 
     summary.innerHTML = `
 
         <div>
-            <strong>${formatNumber(transactionCount)}</strong>
-            <span>Transactions</span>
+            <strong>
+                ${formatNumber(transactionCount)}
+            </strong>
+
+            <span>
+                Transactions
+            </span>
         </div>
 
-        <div>
-            <strong>${formatNumber(totalAmount)}</strong>
-            <span>Total Amount</span>
-        </div>
 
         <div>
-            <strong>${formatNumber(averageAmount)}</strong>
-            <span>Average Amount</span>
+            <strong>
+                ${formatNumber(totalAmount)}
+            </strong>
+
+            <span>
+                Total Amount
+            </span>
         </div>
 
+
         <div>
-            <strong class="unusual-count-number">
+            <strong>
+                ${formatNumber(averageAmount)}
+            </strong>
+
+            <span>
+                Average Amount
+            </span>
+        </div>
+
+
+        <div>
+            <strong
+                class="unusual-count-number"
+                style="
+                    color:${anomalyCount > 0
+                        ? "#dc3f4f"
+                        : "#159b73"};
+                "
+            >
                 ${formatNumber(anomalyCount)}
             </strong>
-            <span>Unusual Transactions</span>
+
+            <span>
+                Risk Signals
+            </span>
         </div>
 
     `;
 
-    resultsContainer.appendChild(summary);
+
+    resultsContainer.appendChild(
+        summary
+    );
 
 
     /* =========================================
-       PATTERN ANALYSIS
+       TRANSACTION ANALYSIS
+    ========================================= */
+
+    const transactionSection =
+        document.createElement("div");
+
+
+    transactionSection.className =
+        "column-mapping-section";
+
+
+    transactionSection.innerHTML = `
+
+        <div style="
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap:15px;
+            flex-wrap:wrap;
+            margin-bottom:18px;
+        ">
+
+            <div>
+
+                <span style="
+                    display:block;
+                    color:#2f6fed;
+                    font-size:8px;
+                    font-weight:800;
+                    letter-spacing:1px;
+                    margin-bottom:4px;
+                ">
+                    TRANSACTION ANALYSIS
+                </span>
+
+
+                <h3 style="
+                    margin-bottom:3px;
+                ">
+                    Transaction Activity
+                </h3>
+
+
+                <p style="
+                    color:#718096;
+                    font-size:10px;
+                ">
+                    Analysis of the uploaded financial records
+                </p>
+
+            </div>
+
+
+            <div style="
+                padding:7px 10px;
+                border-radius:8px;
+                background:${anomalyCount > 0
+                    ? "#fff0f2"
+                    : "#eaf8f3"};
+                color:${anomalyCount > 0
+                    ? "#dc3f4f"
+                    : "#159b73"};
+                font-size:8px;
+                font-weight:800;
+            ">
+                ${anomalyCount > 0
+                    ? `${anomalyCount} RISK SIGNAL${anomalyCount > 1 ? "S" : ""}`
+                    : "NO RISK SIGNALS"}
+            </div>
+
+        </div>
+
+
+        <div style="
+            display:grid;
+            grid-template-columns:
+                repeat(4, minmax(0,1fr));
+            gap:12px;
+        ">
+
+            <div style="
+                padding:16px;
+                border-radius:12px;
+                background:#f8fafc;
+                border:1px solid #e3e9f1;
+            ">
+                <span style="
+                    display:block;
+                    color:#8a97a7;
+                    font-size:8px;
+                    font-weight:800;
+                    margin-bottom:7px;
+                ">
+                    TOTAL RECORDS
+                </span>
+
+                <strong style="
+                    color:#10243e;
+                    font-size:23px;
+                ">
+                    ${formatNumber(transactionCount)}
+                </strong>
+            </div>
+
+
+            <div style="
+                padding:16px;
+                border-radius:12px;
+                background:#eaf8f3;
+                border:1px solid #cce9de;
+            ">
+                <span style="
+                    display:block;
+                    color:#718096;
+                    font-size:8px;
+                    font-weight:800;
+                    margin-bottom:7px;
+                ">
+                    NORMAL
+                </span>
+
+                <strong style="
+                    color:#159b73;
+                    font-size:23px;
+                ">
+                    ${formatNumber(normalCount)}
+                </strong>
+            </div>
+
+
+            <div style="
+                padding:16px;
+                border-radius:12px;
+                background:${anomalyCount > 0
+                    ? "#fff0f2"
+                    : "#f8fafc"};
+                border:1px solid ${anomalyCount > 0
+                    ? "#f1c3ca"
+                    : "#e3e9f1"};
+            ">
+                <span style="
+                    display:block;
+                    color:#8a97a7;
+                    font-size:8px;
+                    font-weight:800;
+                    margin-bottom:7px;
+                ">
+                    UNUSUAL
+                </span>
+
+                <strong style="
+                    color:${anomalyCount > 0
+                        ? "#dc3f4f"
+                        : "#10243e"};
+                    font-size:23px;
+                ">
+                    ${formatNumber(anomalyCount)}
+                </strong>
+            </div>
+
+
+            <div style="
+                padding:16px;
+                border-radius:12px;
+                background:${duplicateCount > 0
+                    ? "#fff5e5"
+                    : "#f8fafc"};
+                border:1px solid ${duplicateCount > 0
+                    ? "#f1dfbd"
+                    : "#e3e9f1"};
+            ">
+                <span style="
+                    display:block;
+                    color:#8a97a7;
+                    font-size:8px;
+                    font-weight:800;
+                    margin-bottom:7px;
+                ">
+                    DUPLICATE INVOICES
+                </span>
+
+                <strong style="
+                    color:${duplicateCount > 0
+                        ? "#d88a21"
+                        : "#10243e"};
+                    font-size:23px;
+                ">
+                    ${formatNumber(duplicateCount)}
+                </strong>
+            </div>
+
+        </div>
+
+    `;
+
+
+    resultsContainer.appendChild(
+        transactionSection
+    );
+
+
+    /* =========================================
+       RISK OVERVIEW
+    ========================================= */
+
+    const riskOverview =
+        document.createElement("div");
+
+
+    riskOverview.style.cssText = `
+        max-width:1050px;
+        margin:20px auto;
+    `;
+
+
+    riskOverview.innerHTML = `
+
+        <div style="
+            padding:22px;
+            border-radius:16px;
+            background:${overallBackground};
+            border:1px solid ${highRiskCount > 0
+                ? "#f1c3ca"
+                : reviewCount > 0 || anomalyCount > 0
+                    ? "#f1dfbd"
+                    : "#cce9de"};
+        ">
+
+            <div style="
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:15px;
+                flex-wrap:wrap;
+            ">
+
+                <div>
+
+                    <span style="
+                        display:block;
+                        color:#8a97a7;
+                        font-size:8px;
+                        font-weight:800;
+                        letter-spacing:1px;
+                        margin-bottom:6px;
+                    ">
+                        RISK OVERVIEW
+                    </span>
+
+
+                    <strong style="
+                        display:block;
+                        color:${overallColor};
+                        font-size:24px;
+                    ">
+                        ${overallStatus}
+                    </strong>
+
+
+                    <span style="
+                        display:block;
+                        margin-top:5px;
+                        color:#718096;
+                        font-size:10px;
+                    ">
+                        ${highRiskCount > 0
+                            ? "High-risk transactions require immediate human review."
+                            : anomalyCount > 0
+                                ? "Unusual transactions were detected and should be reviewed."
+                                : "No transactions triggered the current risk rules."}
+                    </span>
+
+                </div>
+
+
+                <div style="
+                    display:flex;
+                    gap:10px;
+                    flex-wrap:wrap;
+                ">
+
+                    <div style="
+                        padding:11px 15px;
+                        background:white;
+                        border-radius:10px;
+                        text-align:center;
+                    ">
+                        <span style="
+                            display:block;
+                            color:#8a97a7;
+                            font-size:7px;
+                            font-weight:800;
+                        ">
+                            HIGH RISK
+                        </span>
+
+                        <strong style="
+                            color:${highRiskCount > 0
+                                ? "#dc3f4f"
+                                : "#10243e"};
+                            font-size:20px;
+                        ">
+                            ${highRiskCount}
+                        </strong>
+                    </div>
+
+
+                    <div style="
+                        padding:11px 15px;
+                        background:white;
+                        border-radius:10px;
+                        text-align:center;
+                    ">
+                        <span style="
+                            display:block;
+                            color:#8a97a7;
+                            font-size:7px;
+                            font-weight:800;
+                        ">
+                            REVIEW
+                        </span>
+
+                        <strong style="
+                            color:${reviewCount > 0
+                                ? "#d88a21"
+                                : "#10243e"};
+                            font-size:20px;
+                        ">
+                            ${reviewCount}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    resultsContainer.appendChild(
+        riskOverview
+    );
+
+
+    /* =========================================
+       PATTERN ANALYZER
     ========================================= */
 
     const patternSection =
         document.createElement("div");
 
+
     patternSection.className =
         "column-mapping-section";
+
 
     patternSection.innerHTML = `
 
@@ -400,24 +1064,33 @@ function displayResults(data) {
                     PATTERN ANALYZER
                 </span>
 
-                <h3 style="margin-bottom:3px;">
+
+                <h3 style="
+                    margin-bottom:3px;
+                ">
                     Transaction Risk Pattern
                 </h3>
+
 
                 <p style="
                     color:#718096;
                     font-size:10px;
                 ">
-                    Visual overview of detected transaction activity
+                    Visual overview of transaction activity and detected risk signals
                 </p>
 
             </div>
 
+
             <div style="
                 padding:7px 10px;
                 border-radius:8px;
-                background:${anomalyCount > 0 ? "#fff0f2" : "#eaf8f3"};
-                color:${anomalyCount > 0 ? "#dc3f4f" : "#159b73"};
+                background:${anomalyCount > 0
+                    ? "#fff0f2"
+                    : "#eaf8f3"};
+                color:${anomalyCount > 0
+                    ? "#dc3f4f"
+                    : "#159b73"};
                 font-size:8px;
                 font-weight:800;
                 white-space:nowrap;
@@ -429,6 +1102,7 @@ function displayResults(data) {
 
         </div>
 
+
         <div class="dynamic-pattern-chart">
 
             <div class="pattern-y-axis">
@@ -438,11 +1112,13 @@ function displayResults(data) {
                 <span>Normal</span>
             </div>
 
+
             <div class="pattern-chart-area">
 
                 <div class="pattern-grid-line line-high"></div>
                 <div class="pattern-grid-line line-medium"></div>
                 <div class="pattern-grid-line line-low"></div>
+
 
                 <div class="dynamic-bars">
                     ${buildPatternBars(data)}
@@ -451,6 +1127,7 @@ function displayResults(data) {
             </div>
 
         </div>
+
 
         <div style="
             display:flex;
@@ -478,6 +1155,7 @@ function displayResults(data) {
                 Normal activity
             </span>
 
+
             <span style="
                 display:flex;
                 align-items:center;
@@ -496,9 +1174,13 @@ function displayResults(data) {
             </span>
 
         </div>
+
     `;
 
-    resultsContainer.appendChild(patternSection);
+
+    resultsContainer.appendChild(
+        patternSection
+    );
 
 
     /* =========================================
@@ -508,22 +1190,30 @@ function displayResults(data) {
     const statusSection =
         document.createElement("div");
 
+
     statusSection.style.cssText = `
         max-width:1050px;
         margin:20px auto;
         display:grid;
-        grid-template-columns:repeat(3,1fr);
+        grid-template-columns:
+            repeat(3,1fr);
         gap:12px;
     `;
+
 
     statusSection.innerHTML = `
 
         <div style="
             padding:17px;
-            background:${highRiskCount > 0 ? "#fff0f2" : "#f8fafc"};
-            border:1px solid ${highRiskCount > 0 ? "#f1c3ca" : "#e3e9f1"};
+            background:${highRiskCount > 0
+                ? "#fff0f2"
+                : "#f8fafc"};
+            border:1px solid ${highRiskCount > 0
+                ? "#f1c3ca"
+                : "#e3e9f1"};
             border-radius:14px;
         ">
+
             <span style="
                 display:block;
                 color:#8a97a7;
@@ -535,21 +1225,30 @@ function displayResults(data) {
                 HIGH RISK
             </span>
 
+
             <strong style="
-                color:${highRiskCount > 0 ? "#dc3f4f" : "#10243e"};
+                color:${highRiskCount > 0
+                    ? "#dc3f4f"
+                    : "#10243e"};
                 font-size:24px;
             ">
                 ${highRiskCount}
             </strong>
+
         </div>
 
 
         <div style="
             padding:17px;
-            background:${reviewCount > 0 ? "#fff5e5" : "#f8fafc"};
-            border:1px solid ${reviewCount > 0 ? "#f1dfbd" : "#e3e9f1"};
+            background:${reviewCount > 0
+                ? "#fff5e5"
+                : "#f8fafc"};
+            border:1px solid ${reviewCount > 0
+                ? "#f1dfbd"
+                : "#e3e9f1"};
             border-radius:14px;
         ">
+
             <span style="
                 display:block;
                 color:#8a97a7;
@@ -561,12 +1260,16 @@ function displayResults(data) {
                 REVIEW
             </span>
 
+
             <strong style="
-                color:${reviewCount > 0 ? "#d88a21" : "#10243e"};
+                color:${reviewCount > 0
+                    ? "#d88a21"
+                    : "#10243e"};
                 font-size:24px;
             ">
                 ${reviewCount}
             </strong>
+
         </div>
 
 
@@ -576,6 +1279,7 @@ function displayResults(data) {
             border:1px solid #cce9de;
             border-radius:14px;
         ">
+
             <span style="
                 display:block;
                 color:#718096;
@@ -587,17 +1291,22 @@ function displayResults(data) {
                 NORMAL
             </span>
 
+
             <strong style="
                 color:#159b73;
                 font-size:24px;
             ">
-                ${Math.max(transactionCount - anomalyCount, 0)}
+                ${normalCount}
             </strong>
+
         </div>
 
     `;
 
-    resultsContainer.appendChild(statusSection);
+
+    resultsContainer.appendChild(
+        statusSection
+    );
 
 
     /* =========================================
@@ -607,18 +1316,30 @@ function displayResults(data) {
     const mappingSection =
         document.createElement("div");
 
+
     mappingSection.className =
         "column-mapping-section";
 
+
     mappingSection.innerHTML = `
-        <h3>Detected Column Mapping</h3>
+
+        <h3>
+            Detected Column Mapping
+        </h3>
+
 
         <div class="column-mapping-grid">
-            ${buildMappingHTML(data.column_mapping || {})}
+            ${buildMappingHTML(
+                data.column_mapping || {}
+            )}
         </div>
+
     `;
 
-    resultsContainer.appendChild(mappingSection);
+
+    resultsContainer.appendChild(
+        mappingSection
+    );
 
 
     /* =========================================
@@ -627,6 +1348,7 @@ function displayResults(data) {
 
     const anomalySection =
         document.createElement("div");
+
 
     anomalySection.className =
         "anomaly-section";
@@ -642,6 +1364,7 @@ function displayResults(data) {
                     !
                 </div>
 
+
                 <div>
 
                     <strong>
@@ -650,6 +1373,7 @@ function displayResults(data) {
                         detected
                     </strong>
 
+
                     <span>
                         These records deserve human review.
                     </span>
@@ -657,6 +1381,7 @@ function displayResults(data) {
                 </div>
 
             </div>
+
         `;
 
 
@@ -666,265 +1391,341 @@ function displayResults(data) {
                 : [];
 
 
-        anomalies.forEach((anomaly, index) => {
+        anomalies.forEach(
+            (anomaly, index) => {
 
-            const card =
-                document.createElement("div");
-
-            card.className = "anomaly-card";
-
-
-            const riskScore =
-                Number(
-                    anomaly.risk_score ||
-                    anomaly.risk_signal_score ||
-                    0
-                );
+                const card =
+                    document.createElement("div");
 
 
-            const riskLevel =
-                anomaly.risk_level ||
-                (riskScore >= 60
-                    ? "High Review"
-                    : "Review");
+                card.className =
+                    "anomaly-card";
 
 
-            const isHighRisk =
-                riskScore >= 60;
+                const riskScore =
+                    Number(
+                        anomaly.risk_score ||
+                        anomaly.risk_signal_score ||
+                        0
+                    );
 
 
-            const riskColor =
-                isHighRisk
-                    ? "#dc3f4f"
-                    : "#d88a21";
+                const riskLevel =
+                    anomaly.risk_level ||
+                    (
+                        riskScore >= 60
+                            ? "High Review"
+                            : "Review"
+                    );
 
 
-            const riskBackground =
-                isHighRisk
-                    ? "#fff0f2"
-                    : "#fff5e5";
+                const isHighRisk =
+                    riskScore >= 60;
 
 
-            card.innerHTML = `
-
-                <div class="anomaly-card-top">
-
-                    <div>
-
-                        <span>
-                            TRANSACTION
-                        </span>
-
-                        <strong>
-                            ${escapeHTML(
-                                anomaly.transaction_id ||
-                                anomaly.id ||
-                                `ANOMALY ${index + 1}`
-                            )}
-                        </strong>
-
-                    </div>
-
-                    <div>
-
-                        <span>
-                            AMOUNT
-                        </span>
-
-                        <strong>
-                            ${formatNumber(
-                                anomaly.amount || 0
-                            )}
-                        </strong>
-
-                    </div>
-
-                </div>
+                const riskColor =
+                    isHighRisk
+                        ? "#dc3f4f"
+                        : "#d88a21";
 
 
-                <div class="risk-score-box"
-                     style="
-                        background:${riskBackground};
-                        border-color:${isHighRisk ? "#f2d0d5" : "#f1dfbd"};
-                     ">
+                const riskBackground =
+                    isHighRisk
+                        ? "#fff0f2"
+                        : "#fff5e5";
 
-                    <div>
 
-                        <span>
-                            RISK SIGNAL SCORE
-                        </span>
+                card.innerHTML = `
 
-                        <strong style="
-                            color:${riskColor};
-                        ">
-                            ${riskScore}
-                        </strong>
+                    <div class="anomaly-card-top">
+
+                        <div>
+
+                            <span>
+                                TRANSACTION
+                            </span>
+
+
+                            <strong>
+                                ${escapeHTML(
+                                    anomaly.transaction_id ||
+                                    anomaly.id ||
+                                    `ANOMALY ${index + 1}`
+                                )}
+                            </strong>
+
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                AMOUNT
+                            </span>
+
+
+                            <strong>
+                                ${formatNumber(
+                                    anomaly.amount || 0
+                                )}
+                            </strong>
+
+                        </div>
 
                     </div>
 
-                    <div class="risk-level"
+
+                    <div class="risk-score-box"
                          style="
-                            color:${riskColor};
-                            background:${isHighRisk ? "#ffdfe3" : "#ffebc7"};
+                            background:${riskBackground};
+                            border-color:${isHighRisk
+                                ? "#f2d0d5"
+                                : "#f1dfbd"};
                          ">
-                        ${escapeHTML(riskLevel)}
-                    </div>
 
-                </div>
+                        <div>
+
+                            <span>
+                                RISK SIGNAL SCORE
+                            </span>
 
 
-                <div class="connected-records">
-
-                    <div class="connected-title">
-                        <span class="connected-icon">🔗</span>
-                        <strong>Connected Records</strong>
-                    </div>
-
-                    <div class="connected-grid">
-
-                        <div class="connected-item">
-
-                            <span>INVOICE</span>
-
-                            <strong>
-                                ${escapeHTML(
-                                    anomaly.invoice_id ||
-                                    "—"
-                                )}
+                            <strong style="
+                                color:${riskColor};
+                            ">
+                                ${riskScore}
                             </strong>
 
                         </div>
 
-                        <div class="connected-item">
 
-                            <span>SUPPLIER</span>
+                        <div class="risk-level"
+                             style="
+                                color:${riskColor};
+                                background:${isHighRisk
+                                    ? "#ffdfe3"
+                                    : "#ffebc7"};
+                             ">
 
-                            <strong>
-                                ${escapeHTML(
-                                    anomaly.supplier_id ||
-                                    "—"
-                                )}
-                            </strong>
-
-                        </div>
-
-                        <div class="connected-item">
-
-                            <span>CATEGORY</span>
-
-                            <strong>
-                                ${escapeHTML(
-                                    anomaly.category ||
-                                    "—"
-                                )}
-                            </strong>
-
-                        </div>
-
-                        <div class="connected-item">
-
-                            <span>PAYMENT</span>
-
-                            <strong>
-                                ${escapeHTML(
-                                    anomaly.payment_method ||
-                                    "—"
-                                )}
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="ai-explanation">
-
-                    <div class="ai-explanation-title">
-
-                        <span class="ai-icon">
-                            ✦
-                        </span>
-
-                        <strong>
-                            Why was this flagged?
-                        </strong>
-
-                    </div>
-
-                    <p>
-                        ${escapeHTML(
-                            anomaly.explanation ||
-                            anomaly.reason ||
-                            "This transaction shows an unusual financial pattern and should be reviewed."
-                        )}
-                    </p>
-
-                </div>
-
-
-                <div class="risk-reasons">
-
-                    <strong>
-                        RISK SIGNAL
-                    </strong>
-
-                    <ul>
-
-                        <li>
                             ${escapeHTML(
-                                anomaly.reason ||
-                                "Unusual transaction amount"
+                                riskLevel
                             )}
-                        </li>
 
-                    </ul>
+                        </div>
 
-                </div>
+                    </div>
 
 
-                ${
-                    anomaly.threshold !== undefined
-                    ? `
-                        <p>
+                    <div class="connected-records">
+
+                        <div class="connected-title">
+
+                            <span class="connected-icon">
+                                🔗
+                            </span>
+
                             <strong>
-                                Detection threshold:
+                                Connected Records
                             </strong>
 
-                            ${formatNumber(
-                                anomaly.threshold
+                        </div>
+
+
+                        <div class="connected-grid">
+
+                            <div class="connected-item">
+
+                                <span>
+                                    INVOICE
+                                </span>
+
+
+                                <strong>
+                                    ${escapeHTML(
+                                        anomaly.invoice_id ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="connected-item">
+
+                                <span>
+                                    SUPPLIER
+                                </span>
+
+
+                                <strong>
+                                    ${escapeHTML(
+                                        anomaly.supplier_id ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="connected-item">
+
+                                <span>
+                                    CATEGORY
+                                </span>
+
+
+                                <strong>
+                                    ${escapeHTML(
+                                        anomaly.category ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="connected-item">
+
+                                <span>
+                                    PAYMENT
+                                </span>
+
+
+                                <strong>
+                                    ${escapeHTML(
+                                        anomaly.payment_method ||
+                                        "—"
+                                    )}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-explanation">
+
+                        <div class="ai-explanation-title">
+
+                            <span class="ai-icon">
+                                ✦
+                            </span>
+
+
+                            <strong>
+                                Why was this flagged?
+                            </strong>
+
+                        </div>
+
+
+                        <p>
+                            ${escapeHTML(
+                                anomaly.explanation ||
+                                anomaly.reason ||
+                                "This transaction shows an unusual financial pattern and should be reviewed."
                             )}
                         </p>
-                    `
-                    : ""
-                }
+
+                    </div>
 
 
-                <small>
-                    Human review recommended before taking action.
-                </small>
+                    <div class="risk-reasons">
 
-            `;
+                        <strong>
+                            RISK SIGNAL
+                        </strong>
 
-            anomalySection.appendChild(card);
-        });
+
+                        <ul>
+
+                            ${
+                                Array.isArray(
+                                    anomaly.risk_reasons
+                                )
+                                    ? anomaly.risk_reasons
+                                        .map(reason =>
+                                            `<li>${escapeHTML(reason)}</li>`
+                                        )
+                                        .join("")
+                                    : `
+                                        <li>
+                                            ${escapeHTML(
+                                                anomaly.reason ||
+                                                "Unusual transaction amount"
+                                            )}
+                                        </li>
+                                    `
+                            }
+
+                        </ul>
+
+                    </div>
+
+
+                    ${
+                        anomaly.threshold !== undefined
+                            ? `
+                                <p>
+                                    <strong>
+                                        Detection threshold:
+                                    </strong>
+
+                                    ${formatNumber(
+                                        anomaly.threshold
+                                    )}
+                                </p>
+                            `
+                            : ""
+                    }
+
+
+                    <small>
+                        Human review recommended before taking action.
+                    </small>
+
+                `;
+
+
+                anomalySection.appendChild(
+                    card
+                );
+
+            }
+        );
 
 
         const reviewNote =
             document.createElement("div");
 
+
         reviewNote.className =
             "review-note";
 
+
         reviewNote.innerHTML = `
-            <strong>Human review recommended:</strong>
+
+            <strong>
+                Human review recommended:
+            </strong>
+
             Automated detection identifies unusual patterns;
             final decisions should be made by a qualified reviewer.
+
         `;
 
-        resultsContainer.appendChild(anomalySection);
-        resultsContainer.appendChild(reviewNote);
+
+        resultsContainer.appendChild(
+            anomalySection
+        );
+
+
+        resultsContainer.appendChild(
+            reviewNote
+        );
+
 
     } else {
 
@@ -936,11 +1737,13 @@ function displayResults(data) {
                     ✓
                 </span>
 
+
                 <div>
 
                     <strong>
                         No unusual transactions detected
                     </strong>
+
 
                     <small>
                         The analyzed records did not trigger the current anomaly detection rules.
@@ -949,9 +1752,14 @@ function displayResults(data) {
                 </div>
 
             </div>
+
         `;
 
-        resultsContainer.appendChild(anomalySection);
+
+        resultsContainer.appendChild(
+            anomalySection
+        );
+
     }
 
 
@@ -962,11 +1770,14 @@ function displayResults(data) {
     const anotherButton =
         document.createElement("button");
 
+
     anotherButton.className =
         "primary-button";
 
+
     anotherButton.innerHTML =
-        `Analyze Another File <span>↗</span>`;
+        `Analyze Another File <span>→</span>`;
+
 
     anotherButton.addEventListener(
         "click",
@@ -974,49 +1785,73 @@ function displayResults(data) {
 
             selectedFile = null;
 
-            fileInput.value = "";
+
+            if (fileInput) {
+                fileInput.value = "";
+            }
+
 
             const fileInfo =
-                document.querySelector(".file-info");
+                document.querySelector(
+                    ".file-info"
+                );
+
 
             if (fileInfo) {
+
                 fileInfo.textContent =
                     "CSV, XLSX or XLS";
+
             }
+
 
             resultsContainer.innerHTML = "";
 
+
             const uploadSection =
-                document.querySelector(".upload-section");
+                document.querySelector(
+                    ".upload-section"
+                );
+
 
             if (uploadSection) {
+
                 uploadSection.scrollIntoView({
                     behavior: "smooth"
                 });
+
             }
+
         }
     );
 
-    resultsContainer.appendChild(anotherButton);
+
+    resultsContainer.appendChild(
+        anotherButton
+    );
 
 
     /* =========================================
        SCROLL TO RESULTS
     ========================================= */
 
-    setTimeout(() => {
+    setTimeout(
+        function () {
 
-        resultsContainer.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+            resultsContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
 
-    }, 200);
+        },
+        200
+    );
+
 }
 
 
 /* =========================================
-   BUILD PATTERN BARS
+   PATTERN BARS
 ========================================= */
 
 function buildPatternBars(data) {
@@ -1026,42 +1861,81 @@ function buildPatternBars(data) {
             ? data.anomalies
             : [];
 
+
     const transactionCount =
-        Number(data.transaction_count || 0);
+        Number(
+            data.transaction_count || 0
+        );
+
 
     const anomalyCount =
-        Number(data.anomaly_count || 0);
-
-    /*
-       If backend gives anomaly amounts,
-       use them to create visually meaningful bars.
-    */
-
-    const anomalyAmounts =
-        anomalies
-            .map(item => Number(item.amount || 0))
-            .filter(amount => amount > 0);
+        Number(
+            data.anomaly_count || 0
+        );
 
 
     const normalCount =
-        Math.max(transactionCount - anomalyCount, 0);
+        Math.max(
+            transactionCount -
+            anomalyCount,
+            0
+        );
 
-
-    /*
-       Create a representative distribution.
-       Red bars correspond to detected anomalies.
-    */
-
-    const normalHeights = [
-        35, 48, 42, 57, 46, 64, 51, 43
-    ];
 
     let html = "";
 
 
-    normalHeights.forEach((height, index) => {
+    /*
+     * Show a representative number of normal
+     * transaction bars based on transaction count.
+     */
+
+    const normalBars =
+        Math.min(
+            Math.max(
+                normalCount,
+                4
+            ),
+            18
+        );
+
+
+    for (
+        let i = 0;
+        i < normalBars;
+        i++
+    ) {
+
+        const heights = [
+            32,
+            44,
+            38,
+            52,
+            46,
+            61,
+            42,
+            55,
+            37,
+            48,
+            58,
+            41,
+            50,
+            35,
+            57,
+            45,
+            53,
+            40
+        ];
+
+
+        const height =
+            heights[
+                i % heights.length
+            ];
+
 
         html += `
+
             <div
                 class="pattern-bar normal-pattern-bar"
                 style="height:${height}%"
@@ -1069,131 +1943,142 @@ function buildPatternBars(data) {
             >
                 <span></span>
             </div>
+
         `;
-    });
 
-
-    /*
-       Add red bars for detected anomalies.
-    */
-
-    anomalyAmounts.forEach((amount, index) => {
-
-        let height = 72;
-
-        if (data.average_amount) {
-
-            const ratio =
-                amount /
-                Number(data.average_amount);
-
-            height =
-                Math.min(
-                    95,
-                    Math.max(
-                        65,
-                        55 + ratio * 8
-                    )
-                );
-        }
-
-        html += `
-            <div
-                class="pattern-bar risk-pattern-bar"
-                style="height:${height}%"
-                title="Detected unusual transaction: ${formatNumber(amount)}"
-            >
-                <span></span>
-            </div>
-        `;
-    });
-
-
-    /*
-       If no anomaly exists,
-       add a few normal bars so chart never looks empty.
-    */
-
-    if (html === "") {
-
-        [
-            31,
-            43,
-            37,
-            52,
-            45,
-            58,
-            41,
-            48,
-            36,
-            55
-        ].forEach(height => {
-
-            html += `
-                <div
-                    class="pattern-bar normal-pattern-bar"
-                    style="height:${height}%"
-                    title="Normal transaction activity"
-                >
-                    <span></span>
-                </div>
-            `;
-        });
     }
 
 
+    /* -----------------------------------------
+       RED RISK BARS
+    ----------------------------------------- */
+
+    anomalies.forEach(
+        function (anomaly) {
+
+            const amount =
+                Number(
+                    anomaly.amount || 0
+                );
+
+
+            let height = 75;
+
+
+            if (
+                data.average_amount &&
+                amount > 0
+            ) {
+
+                const ratio =
+                    amount /
+                    Number(
+                        data.average_amount
+                    );
+
+
+                height =
+                    Math.min(
+                        96,
+                        Math.max(
+                            68,
+                            55 +
+                            ratio * 8
+                        )
+                    );
+
+            }
+
+
+            html += `
+
+                <div
+                    class="pattern-bar risk-pattern-bar"
+                    style="height:${height}%"
+                    title="Detected unusual transaction: ${formatNumber(amount)}"
+                >
+                    <span></span>
+                </div>
+
+            `;
+
+        }
+    );
+
+
     return html;
+
 }
 
 
 /* =========================================
-   BUILD COLUMN MAPPING
+   COLUMN MAPPING
 ========================================= */
 
 function buildMappingHTML(mapping) {
 
     const fields = [
+
         ["Date", "date"],
+
         ["Transaction ID", "transaction_id"],
+
         ["Amount", "amount"],
+
         ["Debit", "debit"],
+
         ["Credit", "credit"],
+
         ["Description", "description"],
+
         ["Invoice ID", "invoice_id"],
+
         ["Supplier ID", "supplier_id"],
+
         ["Category", "category"],
+
         ["Payment Method", "payment_method"]
+
     ];
 
 
-    return fields.map(([label, key]) => {
+    return fields.map(
+        function ([label, key]) {
 
-        const value =
-            mapping[key] ||
-            "Not detected";
-
-
-        const detected =
-            value !== "Not detected";
+            const value =
+                mapping[key] ||
+                "Not detected";
 
 
-        return `
-            <div class="column-mapping-item">
+            const detected =
+                value !==
+                "Not detected";
 
-                <span>
-                    ${label}
-                </span>
 
-                <strong style="
-                    color:${detected ? "#10243e" : "#9aa5b3"};
-                ">
-                    ${escapeHTML(value)}
-                </strong>
+            return `
 
-            </div>
-        `;
+                <div class="column-mapping-item">
 
-    }).join("");
+                    <span>
+                        ${label}
+                    </span>
+
+
+                    <strong style="
+                        color:${detected
+                            ? "#10243e"
+                            : "#9aa5b3"};
+                    ">
+                        ${escapeHTML(value)}
+                    </strong>
+
+                </div>
+
+            `;
+
+        }
+    ).join("");
+
 }
 
 
@@ -1206,9 +2091,11 @@ function formatNumber(value) {
     const number =
         Number(value);
 
+
     if (!Number.isFinite(number)) {
         return "0";
     }
+
 
     return number.toLocaleString(
         "en-US",
@@ -1216,6 +2103,7 @@ function formatNumber(value) {
             maximumFractionDigits: 2
         }
     );
+
 }
 
 
@@ -1225,24 +2113,53 @@ function formatNumber(value) {
 
 function escapeHTML(value) {
 
-    if (value === null || value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
         return "";
+
     }
 
+
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
 
 
 /* =========================================
-   DYNAMIC PATTERN CHART CSS
+   PATTERN CHART CSS
 ========================================= */
 
-const patternChartCSS = document.createElement("style");
+const patternChartCSS =
+    document.createElement("style");
+
 
 patternChartCSS.textContent = `
 
@@ -1253,6 +2170,7 @@ patternChartCSS.textContent = `
         margin-top:10px;
     }
 
+
     .pattern-y-axis {
         width:42px;
         height:100%;
@@ -1262,12 +2180,14 @@ patternChartCSS.textContent = `
         padding:5px 0 18px;
     }
 
+
     .pattern-y-axis span {
         color:#9aa5b3;
         font-size:8px;
         font-weight:600;
         text-align:right;
     }
+
 
     .pattern-chart-area {
         flex:1;
@@ -1284,6 +2204,7 @@ patternChartCSS.textContent = `
             );
     }
 
+
     .pattern-grid-line {
         position:absolute;
         left:0;
@@ -1292,17 +2213,21 @@ patternChartCSS.textContent = `
         z-index:1;
     }
 
+
     .line-high {
         top:20%;
     }
+
 
     .line-medium {
         top:45%;
     }
 
+
     .line-low {
         top:70%;
     }
+
 
     .dynamic-bars {
         position:absolute;
@@ -1313,17 +2238,19 @@ patternChartCSS.textContent = `
 
         display:flex;
         align-items:flex-end;
-        gap:9px;
+        gap:7px;
 
         z-index:3;
     }
+
 
     .pattern-bar {
         flex:1;
         min-width:8px;
         max-width:42px;
 
-        border-radius:5px 5px 2px 2px;
+        border-radius:
+            5px 5px 2px 2px;
 
         position:relative;
 
@@ -1331,6 +2258,7 @@ patternChartCSS.textContent = `
             transform .25s ease,
             opacity .25s ease;
     }
+
 
     .normal-pattern-bar {
         background:
@@ -1341,8 +2269,10 @@ patternChartCSS.textContent = `
             );
 
         box-shadow:
-            0 4px 10px rgba(47,111,237,.12);
+            0 4px 10px
+            rgba(47,111,237,.12);
     }
+
 
     .risk-pattern-bar {
         background:
@@ -1353,20 +2283,30 @@ patternChartCSS.textContent = `
             );
 
         box-shadow:
-            0 5px 12px rgba(220,63,79,.20);
+            0 5px 12px
+            rgba(220,63,79,.20);
     }
 
+
     .pattern-bar:hover {
-        transform:scaleY(1.04);
+        transform:
+            scaleY(1.04);
+
         opacity:.88;
     }
 
+
     .risk-pattern-bar::after {
+
         content:"!";
+
         position:absolute;
+
         top:-17px;
         left:50%;
-        transform:translateX(-50%);
+
+        transform:
+            translateX(-50%);
 
         width:13px;
         height:13px;
@@ -1384,11 +2324,13 @@ patternChartCSS.textContent = `
         font-weight:800;
     }
 
+
     @media(max-width:700px) {
 
         .dynamic-pattern-chart {
             height:190px;
         }
+
 
         .dynamic-bars {
             gap:5px;
@@ -1396,42 +2338,45 @@ patternChartCSS.textContent = `
             right:7px;
         }
 
+
         .pattern-bar {
             min-width:5px;
         }
+
     }
 
 `;
 
-document.head.appendChild(patternChartCSS);
+
+document.head.appendChild(
+    patternChartCSS
+);
 
 
 /* =========================================
-   TOP START ANALYSIS BUTTON
+   GLOBAL FUNCTIONS
 ========================================= */
 
-const startButtons =
-    document.querySelectorAll(
-        ".nav-button, .start-analysis-button"
-    );
+window.analyzeFile =
+    analyzeFile;
 
-startButtons.forEach(button => {
 
-    button.addEventListener("click", function (event) {
+window.scrollToUpload =
+    function () {
 
         const uploadSection =
-            document.querySelector(".upload-section");
+            document.querySelector(
+                ".upload-section"
+            );
+
 
         if (uploadSection) {
-
-            event.preventDefault();
 
             uploadSection.scrollIntoView({
                 behavior: "smooth",
                 block: "start"
             });
+
         }
 
-    });
-
-});
+    };
