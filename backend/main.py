@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import pandas as pd
 import io
+import math
 
 
 app = FastAPI(
@@ -41,23 +42,35 @@ def normalize_column_name(column):
 
 
 def find_column(df, possible_names):
-
     normalized_columns = {
         normalize_column_name(col): col
         for col in df.columns
     }
 
     for name in possible_names:
-
         normalized_name = normalize_column_name(name)
 
         if normalized_name in normalized_columns:
-
-            return normalized_columns[
-                normalized_name
-            ]
+            return normalized_columns[normalized_name]
 
     return None
+
+
+# ==========================================
+# SAFE VALUE
+# ==========================================
+
+def safe_value(value, default="Not available"):
+    if value is None:
+        return default
+
+    try:
+        if pd.isna(value):
+            return default
+    except Exception:
+        pass
+
+    return str(value)
 
 
 # ==========================================
@@ -79,27 +92,15 @@ async def analyze(
         # ==========================================
 
         allowed_types = {
-
-            "bank_statement":
-                "Bank Statement",
-
-            "general_ledger":
-                "General Ledger (GL)",
-
-            "cash_book":
-                "Cash Book"
-
+            "bank_statement": "Bank Statement",
+            "general_ledger": "General Ledger (GL)",
+            "cash_book": "Cash Book"
         }
 
-
         if data_type not in allowed_types:
-
             data_type = "bank_statement"
 
-
-        record_type = allowed_types[
-            data_type
-        ]
+        record_type = allowed_types[data_type]
 
 
         # ==========================================
@@ -107,7 +108,6 @@ async def analyze(
         # ==========================================
 
         filename = file.filename or ""
-
 
         if filename.lower().endswith(".csv"):
 
@@ -127,8 +127,19 @@ async def analyze(
 
             return {
                 "success": False,
-                "error":
-                    "Only CSV and Excel files are supported."
+                "error": "Only CSV and Excel files are supported."
+            }
+
+
+        # ==========================================
+        # BASIC VALIDATION
+        # ==========================================
+
+        if df.empty:
+
+            return {
+                "success": False,
+                "error": "The uploaded file contains no records."
             }
 
 
@@ -276,39 +287,25 @@ async def analyze(
                     "method"
                 ]
             )
-
         }
 
 
         # ==========================================
-        # FIND AMOUNT
+        # FIND AMOUNT COLUMNS
         # ==========================================
 
-        amount_col = column_mapping[
-            "amount"
-        ]
-
-
-        debit_col = column_mapping[
-            "debit"
-        ]
-
-
-        credit_col = column_mapping[
-            "credit"
-        ]
+        amount_col = column_mapping["amount"]
+        debit_col = column_mapping["debit"]
+        credit_col = column_mapping["credit"]
 
 
         # ==========================================
-        # CREATE STANDARD AMOUNT COLUMN
+        # CREATE STANDARD AMOUNT
         # ==========================================
 
         if amount_col is None:
 
-            if (
-                debit_col is not None
-                or credit_col is not None
-            ):
+            if debit_col is not None or credit_col is not None:
 
                 debit_values = pd.Series(
                     0,
@@ -321,7 +318,6 @@ async def analyze(
                     index=df.index,
                     dtype=float
                 )
-
 
                 if debit_col is not None:
 
@@ -336,7 +332,6 @@ async def analyze(
                         errors="coerce"
                     ).fillna(0)
 
-
                 if credit_col is not None:
 
                     credit_values = pd.to_numeric(
@@ -349,7 +344,6 @@ async def analyze(
                         ),
                         errors="coerce"
                     ).fillna(0)
-
 
                 df["_standard_amount"] = (
                     debit_values.abs()
@@ -365,13 +359,10 @@ async def analyze(
 
         transaction_count = len(df)
 
-
-        total_amount = 0
-
-        average_amount = 0
+        total_amount = 0.0
+        average_amount = 0.0
 
         anomaly_count = 0
-
         anomalies = []
 
 
@@ -382,7 +373,6 @@ async def analyze(
         valid_amounts = pd.Series(
             dtype=float
         )
-
 
         if amount_col is not None:
 
@@ -397,11 +387,9 @@ async def analyze(
                 errors="coerce"
             )
 
-
             valid_amounts = df[
                 amount_col
             ].dropna()
-
 
             if len(valid_amounts) > 0:
 
@@ -419,59 +407,53 @@ async def analyze(
         # ==========================================
 
         duplicate_count = 0
-
         duplicate_invoice_ids = []
 
-
-        invoice_col = column_mapping[
-            "invoice_id"
-        ]
-
+        invoice_col = column_mapping["invoice_id"]
 
         if invoice_col is not None:
 
-            duplicate_rows = df[
-                df.duplicated(
-                    subset=[invoice_col],
-                    keep=False
-                )
-            ]
-
-
-            duplicate_count = int(
-                duplicate_rows[
-                    invoice_col
-                ].nunique()
+            invoice_values = (
+                df[invoice_col]
+                .dropna()
+                .astype(str)
+                .str.strip()
             )
 
+            duplicate_mask = invoice_values.duplicated(
+                keep=False
+            )
 
-            duplicate_invoice_ids = [
-
-                str(x)
-
-                for x in duplicate_rows[
-                    invoice_col
-                ]
-                .dropna()
-                .unique()
-
+            duplicate_values = invoice_values[
+                duplicate_mask
             ]
+
+            duplicate_invoice_ids = list(
+                duplicate_values.unique()
+            )
+
+            duplicate_count = len(
+                duplicate_invoice_ids
+            )
 
 
         # ==========================================
         # ANOMALY DETECTION
         # ==========================================
 
+        threshold = None
+
+        anomaly_indexes = set()
+
         if len(valid_amounts) > 1:
 
-            mean_amount = (
+            mean_amount = float(
                 valid_amounts.mean()
             )
 
-            std_amount = (
+            std_amount = float(
                 valid_amounts.std()
             )
-
 
             if (
                 pd.notna(std_amount)
@@ -484,15 +466,16 @@ async def analyze(
                     (2 * std_amount)
                 )
 
-
                 anomaly_rows = df[
-                    df[amount_col]
-                    > threshold
+                    df[amount_col] > threshold
                 ]
-
 
                 anomaly_count = len(
                     anomaly_rows
+                )
+
+                anomaly_indexes = set(
+                    anomaly_rows.index.tolist()
                 )
 
 
@@ -500,27 +483,20 @@ async def analyze(
                 # PROCESS ANOMALIES
                 # ==========================================
 
-                for _, row in anomaly_rows.iterrows():
+                for index, row in anomaly_rows.iterrows():
 
                     transaction_col = (
-                        column_mapping[
-                            "transaction_id"
-                        ]
+                        column_mapping["transaction_id"]
                     )
 
-
                     transaction_id = (
-
                         row.get(
                             transaction_col,
                             "Unknown"
                         )
-
                         if transaction_col
-                        else "Unknown"
-
+                        else f"TX-{index + 1}"
                     )
-
 
                     amount = float(
                         row[amount_col]
@@ -528,75 +504,82 @@ async def analyze(
 
 
                     invoice_id = (
-
                         row.get(
                             invoice_col,
                             "Not available"
                         )
-
                         if invoice_col
                         else "Not available"
-
                     )
 
 
                     supplier_col = (
-                        column_mapping[
-                            "supplier_id"
-                        ]
+                        column_mapping["supplier_id"]
                     )
 
-
                     supplier_id = (
-
                         row.get(
                             supplier_col,
                             "Not available"
                         )
-
                         if supplier_col
                         else "Not available"
-
                     )
 
 
                     category_col = (
-                        column_mapping[
-                            "category"
-                        ]
+                        column_mapping["category"]
                     )
 
-
                     category = (
-
                         row.get(
                             category_col,
                             "Not available"
                         )
-
                         if category_col
                         else "Not available"
-
                     )
 
 
                     payment_col = (
-                        column_mapping[
-                            "payment_method"
-                        ]
+                        column_mapping["payment_method"]
                     )
 
-
                     payment_method = (
-
                         row.get(
                             payment_col,
                             "Not available"
                         )
-
                         if payment_col
                         else "Not available"
+                    )
 
+
+                    date_col = (
+                        column_mapping["date"]
+                    )
+
+                    transaction_date = (
+                        row.get(
+                            date_col,
+                            "Not available"
+                        )
+                        if date_col
+                        else "Not available"
+                    )
+
+
+                    description_col = (
+                        column_mapping["description"]
+                    )
+
+                    description = (
+                        row.get(
+                            description_col,
+                            "Not available"
+                        )
+                        if description_col
+                        else "Not available"
                     )
 
 
@@ -606,23 +589,18 @@ async def analyze(
 
                     risk_score = 30
 
-
                     risk_reasons = [
                         "Unusual transaction amount"
                     ]
 
 
                     if (
-
                         invoice_id is not None
-
                         and str(invoice_id)
                         in duplicate_invoice_ids
-
                     ):
 
                         risk_score += 35
-
 
                         risk_reasons.append(
                             "Duplicate invoice pattern"
@@ -635,15 +613,11 @@ async def analyze(
 
                     if risk_score >= 60:
 
-                        risk_level = (
-                            "High Review"
-                        )
+                        risk_level = "High Review"
 
                     else:
 
-                        risk_level = (
-                            "Review"
-                        )
+                        risk_level = "Review"
 
 
                     # ==========================================
@@ -651,31 +625,38 @@ async def analyze(
                     # ==========================================
 
                     explanation = (
-
                         f"Transaction "
-                        f"{transaction_id} "
-                        f"is unusual because its "
-                        f"amount of "
-                        f"{amount:,.2f} is above "
-                        f"the detected threshold "
-                        f"of {threshold:,.2f}. "
-                        f"It is linked to invoice "
-                        f"{invoice_id} from supplier "
-                        f"{supplier_id}, categorized "
-                        f"as {category}, and paid "
-                        f"using {payment_method}."
-
+                        f"{safe_value(transaction_id)} "
+                        f"has an unusual amount of "
+                        f"{amount:,.2f}, above the "
+                        f"detected threshold of "
+                        f"{threshold:,.2f}. "
+                        f"Invoice: "
+                        f"{safe_value(invoice_id)}. "
+                        f"Supplier: "
+                        f"{safe_value(supplier_id)}. "
+                        f"Category: "
+                        f"{safe_value(category)}. "
+                        f"Payment method: "
+                        f"{safe_value(payment_method)}."
                     )
 
 
-                    # ==========================================
-                    # ADD ANOMALY
-                    # ==========================================
-
                     anomalies.append({
 
+                        "row_index":
+                            int(index),
+
                         "transaction_id":
-                            str(transaction_id),
+                            safe_value(
+                                transaction_id,
+                                f"TX-{index + 1}"
+                            ),
+
+                        "date":
+                            safe_value(
+                                transaction_date
+                            ),
 
                         "amount":
                             round(
@@ -699,52 +680,359 @@ async def analyze(
                             risk_reasons,
 
                         "invoice_id":
-                            str(invoice_id),
+                            safe_value(
+                                invoice_id
+                            ),
 
                         "supplier_id":
-                            str(supplier_id),
+                            safe_value(
+                                supplier_id
+                            ),
 
                         "category":
-                            str(category),
+                            safe_value(
+                                category
+                            ),
 
                         "payment_method":
-                            str(payment_method),
+                            safe_value(
+                                payment_method
+                            ),
+
+                        "description":
+                            safe_value(
+                                description
+                            ),
 
                         "reason":
                             "Transaction amount is significantly higher than the observed pattern.",
 
                         "explanation":
                             explanation
-
                     })
 
 
         # ==========================================
-        # OVERALL RISK SIGNALS
+        # TRANSACTION-LEVEL DATA
+        # FOR PATTERN ANALYZER
+        # ==========================================
+
+        transactions = []
+
+        for index, row in df.iterrows():
+
+            transaction_col = (
+                column_mapping["transaction_id"]
+            )
+
+            date_col = (
+                column_mapping["date"]
+            )
+
+            description_col = (
+                column_mapping["description"]
+            )
+
+            invoice_col = (
+                column_mapping["invoice_id"]
+            )
+
+            supplier_col = (
+                column_mapping["supplier_id"]
+            )
+
+            category_col = (
+                column_mapping["category"]
+            )
+
+            payment_col = (
+                column_mapping["payment_method"]
+            )
+
+
+            transaction_id = (
+                row.get(transaction_col)
+                if transaction_col
+                else f"TX-{index + 1}"
+            )
+
+            transaction_date = (
+                row.get(date_col)
+                if date_col
+                else None
+            )
+
+            description = (
+                row.get(description_col)
+                if description_col
+                else None
+            )
+
+            invoice_id = (
+                row.get(invoice_col)
+                if invoice_col
+                else None
+            )
+
+            supplier_id = (
+                row.get(supplier_col)
+                if supplier_col
+                else None
+            )
+
+            category = (
+                row.get(category_col)
+                if category_col
+                else None
+            )
+
+            payment_method = (
+                row.get(payment_col)
+                if payment_col
+                else None
+            )
+
+
+            amount = None
+
+            if amount_col is not None:
+
+                raw_amount = row.get(
+                    amount_col
+                )
+
+                if pd.notna(raw_amount):
+
+                    try:
+                        amount = float(
+                            raw_amount
+                        )
+                    except Exception:
+                        amount = None
+
+
+            is_anomaly = (
+                index in anomaly_indexes
+            )
+
+
+            matching_anomaly = next(
+                (
+                    item
+                    for item in anomalies
+                    if item["row_index"] == index
+                ),
+                None
+            )
+
+
+            if matching_anomaly:
+
+                transaction_status = (
+                    "High Risk"
+                    if matching_anomaly[
+                        "risk_level"
+                    ] == "High Review"
+                    else "Review"
+                )
+
+                risk_score = (
+                    matching_anomaly[
+                        "risk_score"
+                    ]
+                )
+
+            else:
+
+                transaction_status = "Normal"
+                risk_score = 0
+
+
+            transactions.append({
+
+                "row_index":
+                    int(index),
+
+                "transaction_id":
+                    safe_value(
+                        transaction_id,
+                        f"TX-{index + 1}"
+                    ),
+
+                "date":
+                    safe_value(
+                        transaction_date
+                    ),
+
+                "amount":
+                    round(
+                        amount,
+                        2
+                    )
+                    if amount is not None
+                    else None,
+
+                "description":
+                    safe_value(
+                        description
+                    ),
+
+                "invoice_id":
+                    safe_value(
+                        invoice_id
+                    ),
+
+                "supplier_id":
+                    safe_value(
+                        supplier_id
+                    ),
+
+                "category":
+                    safe_value(
+                        category
+                    ),
+
+                "payment_method":
+                    safe_value(
+                        payment_method
+                    ),
+
+                "status":
+                    transaction_status,
+
+                "risk_score":
+                    risk_score,
+
+                "is_anomaly":
+                    is_anomaly
+            })
+
+
+        # ==========================================
+        # RISK COUNTS
         # ==========================================
 
         high_risk_count = sum(
-
             1
-
             for item in anomalies
-
-            if item["risk_level"]
-            == "High Review"
-
+            if item["risk_level"] == "High Review"
         )
-
 
         review_count = sum(
-
             1
-
             for item in anomalies
-
-            if item["risk_level"]
-            == "Review"
-
+            if item["risk_level"] == "Review"
         )
+
+
+        normal_count = max(
+            transaction_count
+            - high_risk_count
+            - review_count,
+            0
+        )
+
+
+        # ==========================================
+        # OVERALL RISK
+        # ==========================================
+
+        if high_risk_count > 0:
+
+            overall_risk = "HIGH RISK"
+
+        elif review_count > 0:
+
+            overall_risk = "REVIEW REQUIRED"
+
+        else:
+
+            overall_risk = "LOW RISK"
+
+
+        # ==========================================
+        # RISK SCORE
+        # ==========================================
+
+        if transaction_count > 0:
+
+            risk_score = round(
+                (
+                    (
+                        high_risk_count * 100
+                    )
+                    +
+                    (
+                        review_count * 60
+                    )
+                )
+                / transaction_count,
+                1
+            )
+
+        else:
+
+            risk_score = 0
+
+
+        # ==========================================
+        # PATTERN SUMMARY
+        # ==========================================
+
+        pattern_summary = {
+
+            "total_transactions":
+                transaction_count,
+
+            "normal_transactions":
+                normal_count,
+
+            "review_transactions":
+                review_count,
+
+            "high_risk_transactions":
+                high_risk_count,
+
+            "unusual_amount_transactions":
+                anomaly_count,
+
+            "duplicate_invoice_patterns":
+                duplicate_count,
+
+            "average_transaction_amount":
+                round(
+                    average_amount,
+                    2
+                ),
+
+            "maximum_transaction_amount":
+                round(
+                    float(
+                        valid_amounts.max()
+                    ),
+                    2
+                )
+                if len(valid_amounts) > 0
+                else 0,
+
+            "minimum_transaction_amount":
+                round(
+                    float(
+                        valid_amounts.min()
+                    ),
+                    2
+                )
+                if len(valid_amounts) > 0
+                else 0,
+
+            "detected_threshold":
+                round(
+                    float(threshold),
+                    2
+                )
+                if threshold is not None
+                else None
+        }
 
 
         # ==========================================
@@ -792,11 +1080,26 @@ async def analyze(
             "review_count":
                 review_count,
 
+            "normal_count":
+                normal_count,
+
+            "overall_risk":
+                overall_risk,
+
+            "risk_score":
+                risk_score,
+
             "column_mapping":
                 column_mapping,
 
             "anomalies":
-                anomalies
+                anomalies,
+
+            "transactions":
+                transactions,
+
+            "pattern_summary":
+                pattern_summary
 
         }
 
