@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -295,115 +294,48 @@
 
 
 
-                    <!-- Pattern summary -->
+                    <div class="pattern-summary">
 
-                    <div
-                        class="pattern-summary"
-                        style="
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:center;
-                            margin-bottom:12px;
-                            padding:10px 12px;
-                            border-radius:10px;
-                            background:#f8fafc;
-                            border:1px solid #e8edf3;
-                        "
-                    >
 
                         <div>
 
-                            <strong
-                                style="
-                                    display:block;
-                                    color:#10243e;
-                                    font-family:'Manrope',sans-serif;
-                                    font-size:18px;
-                                "
-                            >
+                            <strong>
                                 0
                             </strong>
 
-                            <span
-                                style="
-                                    color:#8491a1;
-                                    font-size:9px;
-                                    font-weight:700;
-                                    text-transform:uppercase;
-                                "
-                            >
+                            <span>
                                 Unusual
                             </span>
 
                         </div>
 
 
-                        <div
-                            style="
-                                width:1px;
-                                height:30px;
-                                background:#e3e9f1;
-                            "
-                        ></div>
+                        <div class="pattern-divider"></div>
 
 
                         <div>
 
-                            <strong
-                                style="
-                                    display:block;
-                                    color:#10243e;
-                                    font-family:'Manrope',sans-serif;
-                                    font-size:18px;
-                                "
-                            >
+                            <strong>
                                 0
                             </strong>
 
-                            <span
-                                style="
-                                    color:#8491a1;
-                                    font-size:9px;
-                                    font-weight:700;
-                                    text-transform:uppercase;
-                                "
-                            >
+                            <span>
                                 Normal
                             </span>
 
                         </div>
 
 
-                        <div
-                            style="
-                                width:1px;
-                                height:30px;
-                                background:#e3e9f1;
-                            "
-                        ></div>
+                        <div class="pattern-divider"></div>
 
 
                         <div>
 
-                            <strong
-                                style="
-                                    display:block;
-                                    color:#10243e;
-                                    font-family:'Manrope',sans-serif;
-                                    font-size:18px;
-                                "
-                            >
+                            <strong>
                                 0
                             </strong>
 
-                            <span
-                                style="
-                                    color:#8491a1;
-                                    font-size:9px;
-                                    font-weight:700;
-                                    text-transform:uppercase;
-                                "
-                            >
+                            <span>
                                 Total
                             </span>
 
@@ -626,6 +558,10 @@
 
 
 
+            <!-- =================================
+                 UPLOAD BOX
+            ================================== -->
+
             <div
                 class="upload-box"
                 id="uploadBox"
@@ -643,9 +579,52 @@
 
 
                 <p>
+                    Select the record type and upload your
+                    financial file for analysis.
+                </p>
 
-                    Drag & drop your CSV or Excel
-                    file here
+
+
+                <!-- =================================
+                     FINANCIAL RECORD TYPE
+                ================================== -->
+
+                <div class="record-type-field">
+
+
+                    <label for="dataType">
+                        Financial record type
+                    </label>
+
+
+                    <select id="dataType">
+
+                        <option value="bank_statement">
+                            Bank Statement
+                        </option>
+
+                        <option value="general_ledger">
+                            General Ledger (GL)
+                        </option>
+
+                        <option value="cash_book">
+                            Cash Book
+                        </option>
+
+                    </select>
+
+
+                </div>
+
+
+
+                <!-- =================================
+                     FILE UPLOAD
+                ================================== -->
+
+                <p class="upload-instruction">
+
+                    Drag & drop your CSV or Excel file here
 
                     <br>
 
@@ -666,9 +645,7 @@
                     class="upload-button"
                     onclick="document.getElementById('fileInput').click()"
                 >
-
                     Choose File
-
                 </button>
 
 
@@ -1067,10 +1044,23 @@
 
 
 
+    <!-- =====================================
+         FEEDBACK
+    ====================================== -->
+
+    <a
+        href="https://forms.gle/JtgkBSP4a4XJMAaL7"
+        target="_blank"
+        class="feedback-button"
+    >
+        💬 Give Feedback
+    </a>
+
+
+
     <script src="script.js"></script>
 
 
 </body>
 
 </html>
-```
