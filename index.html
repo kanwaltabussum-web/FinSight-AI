@@ -1,1078 +1,870 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080d1b" />
+  <title>FinSight AI — Intelligent Financial Intelligence</title>
+  <meta name="description" content="FinSight AI transforms financial data into clear insights, smarter decisions, and confident financial planning." />
 
-    <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+  <style>
+    :root {
+      --bg: #080d1b;
+      --panel: #10182a;
+      --panel2: #131e32;
+      --border: rgba(166, 190, 232, .13);
+      --text: #f3f6ff;
+      --muted: #96a4bd;
+      --blue: #6396ff;
+      --cyan: #58d8ed;
+      --purple: #9b8bff;
+      --green: #55dfb0;
+      --radius: 22px;
+    }
 
-    <title>
-        FinSight AI | Financial Intelligence
-    </title>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 78% 8%, rgba(48, 91, 179, .16), transparent 35%),
+        radial-gradient(ellipse at 4% 38%, rgba(46, 117, 162, .08), transparent 35%),
+        var(--bg);
+      font-family: "DM Sans", sans-serif;
+      line-height: 1.6;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: auto; }
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(8, 13, 27, .84);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-family: Manrope, sans-serif; font-weight: 800; letter-spacing: -.6px; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 14px;
+      display: grid; place-items: center;
+      color: white; font-size: 20px; font-weight: 800;
+      background: linear-gradient(145deg, #77b6ff, #5367ed 62%, #8f79ff);
+      box-shadow: 0 8px 30px rgba(83, 103, 237, .25);
+    }
+    .brand-name { font-size: 18px; }
+    .brand-name span { color: #80b6ff; }
+    .nav-links { display: flex; align-items: center; gap: 26px; color: var(--muted); font-size: 13px; }
+    .nav-links a:hover { color: white; }
+    .nav-button, .primary-button {
+      border: 0; color: white; font-weight: 700;
+      background: linear-gradient(110deg, #4d83f3, #7769f5);
+      box-shadow: 0 8px 28px rgba(83, 103, 237, .18);
+      border-radius: 12px; padding: 12px 18px;
+    }
+    .nav-button:hover, .primary-button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .mobile-menu { display: none; }
 
+    .hero { padding: 68px 0 48px; }
+    .hero-grid { display: grid; grid-template-columns: 1.03fr .97fr; align-items: center; gap: 38px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 7px 12px; border: 1px solid rgba(99,150,255,.25);
+      border-radius: 99px; background: rgba(99,150,255,.08);
+      color: #a9c9ff; font-size: 12px; font-weight: 700; letter-spacing: .5px;
+    }
+    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      font-family: Manrope, sans-serif; font-size: clamp(38px, 5.2vw, 64px);
+      line-height: 1.08; letter-spacing: -2.5px; margin: 22px 0 20px;
+    }
+    .gradient-text { color: #91baff; background: linear-gradient(90deg, #83b8ff, #9c9aff 70%, #67ddeb); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-copy { max-width: 540px; color: var(--muted); font-size: 16px; line-height: 1.9; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .secondary-button {
+      padding: 12px 18px; border: 1px solid var(--border); border-radius: 12px;
+      color: #dce7fb; background: rgba(255,255,255,.025); font-weight: 600;
+    }
+    .secondary-button:hover { background: rgba(255,255,255,.07); }
+    .trust-line { color: #8190a9; font-size: 12px; margin-top: 22px; }
+
+    .hero-visual {
+      position: relative; min-height: 430px; border: 1px solid var(--border);
+      border-radius: 30px; overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 40%, rgba(73,120,233,.19), transparent 55%),
+        linear-gradient(145deg, rgba(21,33,58,.95), rgba(10,16,30,.96));
+      box-shadow: 0 28px 80px rgba(0,0,0,.24);
+    }
+    .hero-visual::before, .hero-visual::after {
+      content: ""; position: absolute; border: 1px solid rgba(124,167,255,.11);
+      border-radius: 50%; width: 330px; height: 330px; left: 50%; top: 45%;
+      transform: translate(-50%,-50%);
+    }
+    .hero-visual::after { width: 250px; height: 250px; }
+    .visual-label { position: absolute; top: 20px; left: 22px; z-index: 4; color: #b9c7df; font-size: 12px; }
+    .live-status { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-size: 11px; }
+    .robot-stage { position: absolute; inset: 40px 0 75px; display: grid; place-items: center; }
+    .robot-glow { position: absolute; width: 210px; height: 190px; border-radius: 50%; background: rgba(67,125,255,.18); filter: blur(42px); }
+    .robot {
+      position: relative; width: 166px; height: 184px; z-index: 2;
+      animation: float 4s ease-in-out infinite;
+      filter: drop-shadow(0 22px 20px rgba(0,0,0,.32));
+    }
+    .robot-ear { position: absolute; top: 72px; width: 18px; height: 43px; border-radius: 9px; background: linear-gradient(90deg,#a6b8d2,#f8fbff,#899bb8); }
+    .robot-ear.left { left: 0; } .robot-ear.right { right: 0; }
+    .robot-head {
+      position: absolute; top: 10px; left: 10px; width: 146px; height: 136px;
+      border-radius: 45px 45px 40px 40px;
+      background: linear-gradient(135deg, #ffffff 0%, #dbe5f5 37%, #9eafc8 70%, #edf3ff 100%);
+      box-shadow: inset -7px -8px 15px rgba(50,70,110,.18), inset 5px 5px 12px white;
+    }
+    .robot-face {
+      position: absolute; top: 35px; left: 21px; width: 104px; height: 78px;
+      border-radius: 29px; background: linear-gradient(145deg,#111b31,#060b17);
+      border: 1px solid rgba(115,178,255,.48);
+      box-shadow: inset 0 0 20px rgba(51,125,255,.15), 0 0 22px rgba(73,142,255,.16);
+      display: flex; justify-content: center; align-items: center; gap: 20px;
+    }
+    .robot-eye { width: 12px; height: 19px; border-radius: 8px; background: #7fe7ff; box-shadow: 0 0 15px #48bfff, 0 0 28px rgba(72,191,255,.7); }
+    .robot-neck { position: absolute; bottom: 21px; left: 68px; width: 30px; height: 25px; background: linear-gradient(90deg,#b3c2d8,#fff,#9aaac4); }
+    .robot-body {
+      position: absolute; bottom: 0; left: 42px; width: 82px; height: 48px;
+      border-radius: 23px 23px 18px 18px; background: linear-gradient(140deg,#f7faff,#a6b7d0);
+      box-shadow: inset -5px -4px 10px rgba(35,50,80,.2);
+    }
+    .robot-body::after { content:""; position:absolute; width:12px;height:12px;border-radius:50%;background:#6bdcff;box-shadow:0 0 13px #6bdcff;top:14px;left:35px; }
+    .robot-shadow { position: absolute; bottom: 6px; width: 150px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.32); filter: blur(12px); }
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
+
+    .metric-card, .pattern-summary, .risk-alert {
+      position: absolute; z-index: 5; border: 1px solid rgba(157,185,233,.18);
+      background: rgba(14,23,41,.88); backdrop-filter: blur(14px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.18); border-radius: 14px;
+    }
+    .metric-card { top: 104px; left: 18px; padding: 12px 14px; width: 132px; }
+    .metric-card small, .pattern-summary small { display: block; color: #91a1bc; font-size: 10px; }
+    .metric-card strong { font-family: Manrope,sans-serif; font-size: 21px; }
+    .metric-change { color: var(--green); font-size: 10px; }
+    .pattern-summary { top: 78px; right: 16px; padding: 12px 13px; width: 132px; }
+    .pattern-summary strong { font-size: 19px; }
+    .period { color: #8190a9; font-size: 9px; }
+    .mini-bars { display: flex; align-items: end; gap: 5px; height: 35px; margin-top: 6px; }
+    .chart-bars { display: flex; align-items: end; gap: 5px; height: 100%; }
+    .chart-bars i { display: block; flex: 1; height: 45%; border-radius: 4px 4px 0 0; background: linear-gradient(#71cfff,#6478ff); }
+    .chart-bars i:nth-child(2) { height: 70%; }
+    .chart-bars i:nth-child(3) { height: 52%; }
+    .chart-bars i:nth-child(4) { height: 90%; }
+    .chart-bars i:nth-child(5) { height: 64%; }
+    .chart-bars i:nth-child(6) { height: 100%; }
+    .risk-alert { bottom: 20px; right: 18px; left: 18px; padding: 10px 13px; display: flex; align-items: center; gap: 10px; font-size: 11px; }
+    .risk-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; color: #ffc982; background: rgba(255,190,92,.12); }
+    .risk-alert strong { display: block; font-size: 11px; }
+    .risk-alert span { display: block; color: #94a2ba; font-size: 10px; }
+
+    section { scroll-margin-top: 95px; }
+    .section { padding: 54px 0; }
+    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 25px; }
+    .section-kicker { color: #83b3ff; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+    h2 { font-family: Manrope,sans-serif; font-size: clamp(26px,3vw,36px); letter-spacing: -1px; line-height: 1.2; margin: 8px 0; }
+    .section-description { color: var(--muted); font-size: 14px; max-width: 620px; margin: 0; }
+    .workspace-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+    .workspace-card {
+      text-align: left; color: var(--text); min-height: 165px; padding: 19px;
+      border: 1px solid var(--border); border-radius: 18px;
+      background: linear-gradient(145deg,rgba(19,30,50,.95),rgba(13,21,37,.96));
+      transition: transform .2s,border-color .2s,background .2s;
+    }
+    .workspace-card:hover { transform: translateY(-4px); border-color: rgba(105,157,255,.5); background: linear-gradient(145deg,#182846,#111b30); }
+    .workspace-icon {
+      display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 15px;
+      border-radius: 13px; font-size: 20px; color: #b5d3ff;
+      background: rgba(99,150,255,.13); border: 1px solid rgba(99,150,255,.14);
+    }
+    .workspace-card:nth-child(3n+2) .workspace-icon { color: #9de9ef; background: rgba(88,216,237,.09); }
+    .workspace-card:nth-child(3n) .workspace-icon { color: #c3b8ff; background: rgba(155,139,255,.12); }
+    .workspace-card h3 { font-size: 15px; margin: 0 0 5px; font-family: Manrope,sans-serif; }
+    .workspace-card p { color: var(--muted); font-size: 12px; line-height: 1.65; margin: 0; }
+    .open-workspace { display: block; margin-top: 12px; color: #8bb8ff; font-size: 11px; font-weight: 700; }
+
+    .workspace-view {
+      display: none; margin: 20px 0 0; padding: 26px;
+      border: 1px solid var(--border); border-radius: 22px;
+      background: linear-gradient(145deg,rgba(17,27,47,.98),rgba(12,19,34,.98));
+    }
+    .workspace-view.active { display: block; }
+    .workspace-view-header { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; }
+    .workspace-view-header h3 { font: 700 24px Manrope,sans-serif; margin: 0 0 7px; }
+    .workspace-view-header p { color:var(--muted); font-size:13px; }
+    .close-workspace { border:1px solid var(--border); color:#cbd8ed; background:transparent; border-radius:10px; padding:8px 12px; }
+    .tool-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:16px; }
+    .tool-item { border:1px solid var(--border); border-radius:13px; padding:15px; background:rgba(255,255,255,.025); }
+    .tool-item strong { display:block; font-size:13px; margin-bottom:5px; }
+    .tool-item span { display:block; color:var(--muted); font-size:11px; line-height:1.65; }
+    .tool-note { margin-top:16px; color:#9eb5d8; font-size:12px; }
+
+    .upload-layout { display:grid; grid-template-columns:.85fr 1.15fr; gap:22px; align-items:start; }
+    .upload-info, .upload-panel, .feature-card, .about-card {
+      border:1px solid var(--border); border-radius:var(--radius);
+      background:linear-gradient(145deg,rgba(18,29,49,.95),rgba(12,20,35,.96));
+    }
+    .upload-info { padding:26px; }
+    .upload-info h3 { font:700 22px Manrope,sans-serif; }
+    .upload-info p, .upload-info li { color:var(--muted); font-size:13px; }
+    .upload-info ul { padding-left:19px; }
+    .upload-panel { padding:24px; }
+    .upload-box {
+      border:1px dashed rgba(119,166,255,.42); border-radius:16px;
+      background:rgba(99,150,255,.045); text-align:center; padding:30px 16px;
+      transition:.2s;
+    }
+    .upload-box.dragover { border-color:var(--cyan); background:rgba(88,216,237,.08); }
+    .upload-symbol { margin:auto auto 12px; display:grid; place-items:center; width:48px; height:48px; border-radius:15px; background:rgba(99,150,255,.13); font-size:23px; }
+    .upload-box h3 { font-size:15px; margin-bottom:6px; }
+    .upload-box p { color:var(--muted); font-size:12px; margin-bottom:14px; }
+    .file-input { display:none; }
+    .upload-label { display:inline-block; border-radius:10px; padding:10px 15px; background:#253d68; color:#e5efff; font-size:12px; font-weight:700; cursor:pointer; }
+    .upload-label:hover { background:#31548b; }
+    .file-hint { color:#7f8ea8; font-size:10px; margin-top:13px; }
+    .field-label { display:block; color:#b7c5dc; font-size:12px; margin:16px 0 7px; }
+    .form-select, .form-input {
+      width:100%; padding:11px 12px; border:1px solid var(--border);
+      background:#0b1425; color:#eef4ff; border-radius:10px; outline:none;
+    }
+    .form-select:focus, .form-input:focus { border-color:var(--blue); }
+    .analyze-button { width:100%; margin-top:17px; }
+    .selected-file-info { margin-top:12px; }
+    #analysisResults { margin-top:25px; }
+    .hidden { display:none !important; }
+
+    .feature-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .feature-card { padding:21px; }
+    .feature-card .workspace-icon { margin-bottom:12px; }
+    .feature-card h3 { font:700 15px Manrope,sans-serif; margin-bottom:7px; }
+    .feature-card p { color:var(--muted); font-size:12px; margin:0; }
+
+    .about-card { padding:28px; display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+    .about-card p { color:var(--muted); font-size:13px; }
+    .feedback-form { display:grid; gap:10px; }
+    .feedback-form textarea { resize:vertical; min-height:100px; }
+    .footer { margin-top:42px; border-top:1px solid var(--border); padding:26px 0; color:#7e8da6; font-size:11px; }
+    .footer-inner { display:flex; align-items:center; justify-content:space-between; gap:15px; }
+
+    @media (max-width: 950px) {
+      .hero-grid { grid-template-columns:1fr; }
+      .hero-visual { min-height:410px; }
+      .workspace-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .upload-layout { grid-template-columns:1fr; }
+      .nav-links { gap:14px; }
+    }
+    @media (max-width: 650px) {
+      .shell { width:min(100% - 28px,1180px); }
+      .nav { min-height:66px; }
+      .nav-links { display:none; }
+      .mobile-menu { display:block; }
+      .nav-button { padding:10px 12px; font-size:12px; }
+      .hero { padding:44px 0 25px; }
+      h1 { letter-spacing:-1.6px; }
+      .hero-copy { font-size:14px; }
+      .hero-visual { min-height:385px; }
+      .robot { transform:scale(.83); }
+      .metric-card { left:10px; width:116px; top:92px; }
+      .pattern-summary { right:10px; width:112px; top:65px; }
+      .risk-alert { left:10px; right:10px; bottom:12px; }
+      .workspace-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+      .workspace-card { padding:14px; min-height:157px; }
+      .workspace-card h3 { font-size:13px; }
+      .workspace-card p { font-size:11px; }
+      .section { padding:37px 0; }
+      .section-heading { display:block; }
+      .tool-grid, .feature-grid { grid-template-columns:1fr; }
+      .workspace-view { padding:17px; }
+      .workspace-view-header h3 { font-size:20px; }
+      .about-card { grid-template-columns:1fr; padding:20px; }
+      .footer-inner { align-items:flex-start; flex-direction:column; }
+    }
+  </style>
 </head>
 
-
 <body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="#home" aria-label="FinSight AI home">
+        <span class="brand-mark">F</span>
+        <span class="brand-name">FinSight <span>AI</span></span>
+      </a>
 
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#workspaces">Workspaces</a>
+        <a href="#analyze">Analyze Data</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#about">About</a>
+      </nav>
 
-    <!-- =====================================
-         NAVIGATION
-    ====================================== -->
+      <button class="nav-button" onclick="scrollToUpload()">Start Analyzing ↗</button>
+    </div>
+  </header>
 
-    <header class="navbar">
-
-        <div class="logo">
-
-            <div class="logo-mark">
-                F
-            </div>
-
-            <div>
-
-                <div class="logo-name">
-                    FinSight<span>AI</span>
-                </div>
-
-                <div class="logo-tagline">
-                    FINANCIAL INTELLIGENCE
-                </div>
-
-            </div>
-
+  <main>
+    <section class="hero" id="home">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-dot"></span> YOUR FINANCIAL INTELLIGENCE PLATFORM</div>
+          <h1 id="welcomeHeading">Welcome to <span class="gradient-text">FinSight AI</span></h1>
+          <p class="hero-copy">
+            Turn complex financial data into clear insights. Analyze transactions,
+            uncover risks, understand performance, and make better-informed decisions
+            from one intelligent workspace.
+          </p>
+          <div class="hero-actions">
+            <button class="primary-button start-analysis-button" onclick="scrollToUpload()">Analyze Your Data ↗</button>
+            <button class="secondary-button" onclick="scrollToHowItWorks()">Explore Workspaces ↓</button>
+          </div>
+          <p class="trust-line">Built for finance professionals, analysts, and smarter business decisions.</p>
         </div>
 
+        <div class="hero-visual" aria-label="FinSight AI intelligent financial dashboard illustration">
+          <div class="visual-label">
+            <span class="live-status"><span class="eyebrow-dot"></span> Intelligence overview</span>
+          </div>
 
-        <nav>
-
-            <a href="#how-it-works">
-                How It Works
-            </a>
-
-            <a href="#technology">
-                Technology
-            </a>
-
-            <a href="#about">
-                About
-            </a>
-
-        </nav>
-
-
-        <button
-            class="nav-button"
-            onclick="scrollToUpload()"
-        >
-            Start Analysis
-        </button>
-
-    </header>
-
-
-
-    <!-- =====================================
-         MAIN
-    ====================================== -->
-
-    <main>
-
-
-        <!-- =================================
-             HERO
-        ================================== -->
-
-        <section class="hero">
-
-
-            <div class="hero-content">
-
-
-                <div class="eyebrow">
-
-                    <span class="status-dot"></span>
-
-                    AI-POWERED FINANCIAL INTELLIGENCE
-
+          <div class="robot-stage">
+            <div class="robot-glow"></div>
+            <div class="robot" aria-hidden="true">
+              <div class="robot-ear left"></div>
+              <div class="robot-ear right"></div>
+              <div class="robot-head">
+                <div class="robot-face">
+                  <span class="robot-eye"></span>
+                  <span class="robot-eye"></span>
                 </div>
-
-
-                <h1>
-
-                    From Financial Data
-
-                    <br>
-
-                    <span>
-                        to Intelligent Risk Signals.
-                    </span>
-
-                </h1>
-
-
-                <p class="hero-description">
-
-                    FinSight AI transforms fragmented
-                    financial records into connected,
-                    explainable insights that help people
-                    and businesses understand where to
-                    look first.
-
-                </p>
-
-
-                <div class="hero-actions">
-
-
-                    <button
-                        class="primary-button"
-                        onclick="scrollToUpload()"
-                    >
-
-                        Upload Financial Data
-
-                        <span>
-                            →
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        class="secondary-button"
-                        onclick="scrollToHowItWorks()"
-                    >
-
-                        Explore FinSight
-
-                    </button>
-
-
-                </div>
-
-
-                <div class="hero-note">
-
-                    <span>
-                        ✓
-                    </span>
-
-                    CSV & Excel supported
-
-                    <span class="separator">
-                        •
-                    </span>
-
-                    Human review remains in control
-
-                </div>
-
-
+              </div>
+              <div class="robot-neck"></div>
+              <div class="robot-body"></div>
             </div>
-
-
-
-            <!-- =================================
-                 HERO INTELLIGENCE PREVIEW
-            ================================== -->
-
-            <div class="hero-visual">
-
-
-                <div class="visual-header">
-
-
-                    <div>
-
-                        <span class="small-label">
-                            FINANCIAL INTELLIGENCE
-                        </span>
-
-                        <h3>
-                            Risk Overview
-                        </h3>
-
-                    </div>
-
-
-                    <div class="live-status">
-
-                        <span></span>
-
-                        ANALYSIS READY
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- =================================
-                     HERO METRICS
-                ================================== -->
-
-                <div class="metric-grid">
-
-
-                    <div class="metric-card">
-
-                        <span class="metric-label">
-                            TRANSACTIONS
-                        </span>
-
-                        <strong>
-                            2,481
-                        </strong>
-
-                        <small>
-                            Records analyzed
-                        </small>
-
-                    </div>
-
-
-                    <div class="metric-card">
-
-                        <span class="metric-label">
-                            RISK SIGNALS
-                        </span>
-
-                        <strong class="accent-number">
-                            17
-                        </strong>
-
-                        <small>
-                            Require review
-                        </small>
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- =================================
-                     PATTERN ANALYSIS
-                ================================== -->
-
-                <div class="analysis-card">
-
-
-                    <div class="analysis-top">
-
-
-                        <div>
-
-                            <span class="small-label">
-                                TRANSACTION ACTIVITY
-                            </span>
-
-                            <h4>
-                                Pattern Analysis
-                            </h4>
-
-                        </div>
-
-
-                        <span class="period">
-                            Last 30 days
-                        </span>
-
-
-                    </div>
-
-
-
-                    <!-- Pattern summary -->
-
-                    <div
-                        class="pattern-summary"
-                        style="
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:center;
-                            margin-bottom:12px;
-                            padding:10px 12px;
-                            border-radius:10px;
-                            background:#f8fafc;
-                            border:1px solid #e8edf3;
-                        "
-                    >
-
-                        <div>
-
-                            <strong
-                                style="
-                                    display:block;
-                                    color:#10243e;
-                                    font-family:'Manrope',sans-serif;
-                                    font-size:18px;
-                                "
-                            >
-                                1
-                            </strong>
-
-                            <span
-                                style="
-                                    color:#8491a1;
-                                    font-size:9px;
-                                    font-weight:700;
-                                    text-transform:uppercase;
-                                "
-                            >
-                                Unusual
-
-                            </span>
-
-                        </div>
-
-
-                        <div
-                            style="
-                                width:1px;
-                                height:30px;
-                                background:#e3e9f1;
-                            "
-                        ></div>
-
-
-                        <div>
-
-                            <strong
-                                style="
-                                    display:block;
-                                    color:#10243e;
-                                    font-family:'Manrope',sans-serif;
-                                    font-size:18px;
-                                "
-                            >
-                                5
-                            </strong>
-
-                            <span
-                                style="
-                                    color:#8491a1;
-                                    font-size:9px;
-                                    font-weight:700;
-                                    text-transform:uppercase;
-                                "
-                            >
-                                Normal
-
-                            </span>
-
-                        </div>
-
-
-                        <div
-                            style="
-                                width:1px;
-                                height:30px;
-                                background:#e3e9f1;
-                            "
-                        ></div>
-
-
-                        <div>
-
-                            <strong
-                                style="
-                                    display:block;
-                                    color:#10243e;
-                                    font-family:'Manrope',sans-serif;
-                                    font-size:18px;
-                                "
-                            >
-                                6
-                            </strong>
-
-                            <span
-                                style="
-                                    color:#8491a1;
-                                    font-size:9px;
-                                    font-weight:700;
-                                    text-transform:uppercase;
-                                "
-                            >
-                                Total
-
-                            </span>
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <!-- Chart -->
-
-                    <div class="chart">
-
-
-                        <div class="chart-line line-1"></div>
-
-                        <div class="chart-line line-2"></div>
-
-                        <div class="chart-line line-3"></div>
-
-
-                        <div class="chart-bars">
-
-                            <i style="height:32%"></i>
-
-                            <i style="height:45%"></i>
-
-                            <i style="height:38%"></i>
-
-                            <i style="height:58%"></i>
-
-                            <i style="height:48%"></i>
-
-                            <i style="height:65%"></i>
-
-                            <i style="height:55%"></i>
-
-                            <i style="height:78%"></i>
-
-                            <i style="height:62%"></i>
-
-                            <i
-                                style="height:91%"
-                                class="risk-bar"
-                            ></i>
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- =================================
-                     RISK ALERT
-                ================================== -->
-
-                <div class="risk-alert">
-
-
-                    <div class="risk-icon">
-                        !
-                    </div>
-
-
-                    <div class="risk-text">
-
-                        <strong>
-                            1 unusual transaction detected
-                        </strong>
-
-                        <span>
-                            Amount significantly differs
-                            from observed pattern
-                        </span>
-
-                    </div>
-
-
-                    <div class="risk-arrow">
-                        →
-                    </div>
-
-
-                </div>
-
-
+            <div class="robot-shadow"></div>
+          </div>
+
+          <div class="metric-card">
+            <small>Transactions reviewed</small>
+            <strong>1,284</strong>
+            <div class="metric-change">Analysis preview</div>
+          </div>
+
+          <div class="pattern-summary">
+            <small>Performance trend</small>
+            <strong>+12.8%</strong>
+            <div class="period">Illustrative dashboard</div>
+            <div class="mini-bars chart-bars">
+              <i></i><i></i><i></i><i></i><i></i><i></i>
             </div>
+          </div>
 
-
-        </section>
-
-
-
-        <!-- =====================================
-             CONCEPT STRIP
-        ====================================== -->
-
-        <section class="concept-strip">
-
-
+          <div class="risk-alert">
+            <div class="risk-icon">✦</div>
             <div>
-
-                <span>
-                    01
-                </span>
-
-                <strong>
-                    CONNECT
-                </strong>
-
-                <p>
-                    Bring fragmented records together.
-                </p>
-
+              <strong>AI-assisted financial insights</strong>
+              <span>Upload your own data to generate analysis</span>
             </div>
-
-
-            <div>
-
-                <span>
-                    02
-                </span>
-
-                <strong>
-                    DETECT
-                </strong>
-
-                <p>
-                    Identify unusual financial patterns.
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <span>
-                    03
-                </span>
-
-                <strong>
-                    EXPLAIN
-                </strong>
-
-                <p>
-                    Turn signals into understandable evidence.
-                </p>
-
-            </div>
-
-
-            <div>
-
-                <span>
-                    04
-                </span>
-
-                <strong>
-                    REVIEW
-                </strong>
-
-                <p>
-                    Keep humans in control of decisions.
-                </p>
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =====================================
-             UPLOAD SECTION
-        ====================================== -->
-
-        <section
-            class="upload-section"
-            id="upload"
-        >
-
-
-            <div class="section-heading">
-
-
-                <div class="eyebrow">
-
-                    <span class="status-dot"></span>
-
-                    START YOUR ANALYSIS
-
-                </div>
-
-
-                <h2>
-
-                    Put your financial data
-
-                    <span>
-                        under the lens.
-                    </span>
-
-                </h2>
-
-
-                <p>
-
-                    Upload your transaction records
-                    and let FinSight identify patterns
-                    that deserve a closer look.
-
-                </p>
-
-
-            </div>
-
-
-
-            <div
-                class="upload-box"
-                id="uploadBox"
-            >
-
-
-                <div class="upload-icon">
-                    ↑
-                </div>
-
-
-                <h3>
-                    Upload financial records
-                </h3>
-
-
-                <p>
-
-                    Drag & drop your CSV or Excel
-                    file here
-
-                    <br>
-
-                    or choose a file from your computer.
-
-                </p>
-
-
-                <input
-                    type="file"
-                    id="fileInput"
-                    accept=".csv,.xlsx,.xls"
-                    hidden
-                >
-
-
-                <button
-                    class="upload-button"
-                    onclick="document.getElementById('fileInput').click()"
-                >
-
-                    Choose File
-
-                </button>
-
-
-                <div class="file-info">
-
-                    Supported formats:
-                    CSV, XLSX, XLS
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =====================================
-             HOW IT WORKS
-        ====================================== -->
-
-        <section
-            class="how-section"
-            id="how-it-works"
-        >
-
-
-            <div class="section-heading centered">
-
-
-                <div class="eyebrow">
-                    HOW FINSIGHT WORKS
-                </div>
-
-
-                <h2>
-
-                    Financial data becomes
-
-                    <span>
-                        actionable intelligence.
-                    </span>
-
-                </h2>
-
-
-            </div>
-
-
-
-            <div class="steps">
-
-
-                <div class="step-card">
-
-                    <div class="step-number">
-                        01
-                    </div>
-
-                    <h3>
-                        Upload
-                    </h3>
-
-                    <p>
-
-                        Bring your financial records
-                        into one analysis environment.
-
-                    </p>
-
-                </div>
-
-
-                <div class="step-connector"></div>
-
-
-                <div class="step-card">
-
-                    <div class="step-number">
-                        02
-                    </div>
-
-                    <h3>
-                        Analyze
-                    </h3>
-
-                    <p>
-
-                        FinSight examines transactions
-                        and searches for unusual patterns.
-
-                    </p>
-
-                </div>
-
-
-                <div class="step-connector"></div>
-
-
-                <div class="step-card">
-
-                    <div class="step-number">
-                        03
-                    </div>
-
-                    <h3>
-                        Connect
-                    </h3>
-
-                    <p>
-
-                        Related records and evidence
-                        are connected to strengthen context.
-
-                    </p>
-
-                </div>
-
-
-                <div class="step-connector"></div>
-
-
-                <div class="step-card">
-
-                    <div class="step-number">
-                        04
-                    </div>
-
-                    <h3>
-                        Explain
-                    </h3>
-
-                    <p>
-
-                        AI translates detected signals
-                        into clear, reviewable explanations.
-
-                    </p>
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =====================================
-             TECHNOLOGY
-        ====================================== -->
-
-        <section
-            class="technology-section"
-            id="technology"
-        >
-
-
-            <div class="tech-content">
-
-
-                <div class="eyebrow">
-                    BUILT FOR FINANCIAL DATA
-                </div>
-
-
-                <h2>
-
-                    Intelligence without
-
-                    <span>
-                        losing human judgment.
-                    </span>
-
-                </h2>
-
-
-                <p>
-
-                    FinSight AI is designed to surface
-                    signals, organize evidence and
-                    support financial review. It does
-                    not replace the human decision-maker.
-
-                </p>
-
-
-            </div>
-
-
-
-            <div class="tech-grid">
-
-
-                <div class="tech-card">
-
-                    <span class="tech-icon">
-                        ◈
-                    </span>
-
-                    <h3>
-                        Anomaly Detection
-                    </h3>
-
-                    <p>
-                        Identify transactions that differ
-                        from observed patterns.
-                    </p>
-
-                </div>
-
-
-                <div class="tech-card">
-
-                    <span class="tech-icon">
-                        ◎
-                    </span>
-
-                    <h3>
-                        Relationship Analysis
-                    </h3>
-
-                    <p>
-                        Connect transactions, invoices
-                        and entities to reveal context.
-                    </p>
-
-                </div>
-
-
-                <div class="tech-card">
-
-                    <span class="tech-icon">
-                        ✦
-                    </span>
-
-                    <h3>
-                        Explainable AI
-                    </h3>
-
-                    <p>
-                        Understand why a financial record
-                        was flagged.
-                    </p>
-
-                </div>
-
-
-                <div class="tech-card">
-
-                    <span class="tech-icon">
-                        ✓
-                    </span>
-
-                    <h3>
-                        Human Review
-                    </h3>
-
-                    <p>
-                        Keep financial decisions with
-                        the people responsible for them.
-                    </p>
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =====================================
-             ABOUT
-        ====================================== -->
-
-        <section
-            class="about-section"
-            id="about"
-        >
-
-
-            <div class="about-card">
-
-
-                <div class="about-left">
-
-
-                    <div class="eyebrow">
-                        ABOUT FINSIGHT AI
-                    </div>
-
-
-                    <h2>
-
-                        See the signal.
-
-                        <br>
-
-                        Understand the evidence.
-
-                    </h2>
-
-
-                </div>
-
-
-
-                <div class="about-right">
-
-
-                    <p>
-
-                        Financial information is often
-                        scattered across transactions,
-                        invoices, suppliers and budgets.
-                        FinSight AI brings these records
-                        into a single analytical workflow
-                        to help surface unusual patterns
-                        and make financial review more focused.
-
-                    </p>
-
-
-                    <div class="disclaimer">
-
-                        <strong>
-                            Important:
-                        </strong>
-
-                        A risk signal is not proof of fraud.
-                        FinSight AI supports human investigation
-                        and review.
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-
-    </main>
-
-
-
-    <!-- =====================================
-         FOOTER
-    ====================================== -->
-
-    <footer>
-
-
-        <div class="footer-logo">
-
-
-            <div class="logo-mark">
-                F
-            </div>
-
-
-            <div>
-
-                <strong>
-                    FinSight<span>AI</span>
-                </strong>
-
-                <small>
-                    Financial Intelligence Platform
-                </small>
-
-            </div>
-
-
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="workspaces">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">One platform, connected tools</div>
+            <h2>Your financial workspaces</h2>
+            <p class="section-description">Choose a workspace to explore its tools and workflows. Each area is organized around a different finance responsibility.</p>
+          </div>
         </div>
 
+        <div class="workspace-grid">
+          <button class="workspace-card" data-workspace="finance">
+            <span class="workspace-icon">◈</span>
+            <h3>Finance</h3>
+            <p>Financial statements, cash flow, budgeting, forecasting, and performance.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
-        <p>
-            From financial data to intelligent risk signals.
-        </p>
+          <button class="workspace-card" data-workspace="accounting">
+            <span class="workspace-icon">▤</span>
+            <h3>Accounting</h3>
+            <p>Transaction review, reconciliations, ledgers, and accounting workflows.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
+          <button class="workspace-card" data-workspace="costing">
+            <span class="workspace-icon">⌗</span>
+            <h3>Costing</h3>
+            <p>Cost allocation, product costing, margins, and cost variance analysis.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
-        <span class="copyright">
-            © 2026 FinSight AI
-        </span>
+          <button class="workspace-card" data-workspace="insights">
+            <span class="workspace-icon">⌁</span>
+            <h3>Insights</h3>
+            <p>Trends, KPIs, patterns, anomalies, and decision-ready summaries.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
+          <button class="workspace-card" data-workspace="risk">
+            <span class="workspace-icon">⬡</span>
+            <h3>Risk</h3>
+            <p>Flag unusual transactions, monitor exposure, and investigate exceptions.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
-    </footer>
+          <button class="workspace-card" data-workspace="audit">
+            <span class="workspace-icon">◎</span>
+            <h3>Audit</h3>
+            <p>Audit preparation, evidence organization, testing, and issue tracking.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
+          <button class="workspace-card" data-workspace="tax">
+            <span class="workspace-icon">%</span>
+            <h3>Tax</h3>
+            <p>Tax data organization, tax-period analysis, and compliance preparation.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
+          <button class="workspace-card" data-workspace="planning">
+            <span class="workspace-icon">↗</span>
+            <h3>Planning</h3>
+            <p>Budgets, scenarios, forecasts, assumptions, and financial plans.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
-    <script src="script.js"></script>
+          <button class="workspace-card" data-workspace="reports">
+            <span class="workspace-icon">▥</span>
+            <h3>Reports</h3>
+            <p>Organize findings into financial summaries and management reports.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
+          <button class="workspace-card" data-workspace="assistant">
+            <span class="workspace-icon">✧</span>
+            <h3>AI Assistant</h3>
+            <p>Get help interpreting finance concepts, data, and analysis results.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
 
+          <button class="workspace-card" data-workspace="compliance">
+            <span class="workspace-icon">⛨</span>
+            <h3>Standards &amp; Compliance</h3>
+            <p>Reporting frameworks, regulatory updates, standards, and version history.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
+
+          <button class="workspace-card" data-workspace="settings">
+            <span class="workspace-icon">⚙</span>
+            <h3>Company &amp; Settings</h3>
+            <p>Company profile, reporting preferences, users, permissions, and security.</p>
+            <span class="open-workspace">Open workspace ↗</span>
+          </button>
+        </div>
+
+        <div class="workspace-view" id="workspaceView" aria-live="polite">
+          <div class="workspace-view-header">
+            <div>
+              <div class="section-kicker">Workspace</div>
+              <h3 id="workspaceTitle">Workspace</h3>
+              <p id="workspaceDescription"></p>
+            </div>
+            <button class="close-workspace" id="closeWorkspace">Close ×</button>
+          </div>
+          <div class="tool-grid" id="workspaceTools"></div>
+          <p class="tool-note" id="workspaceNote"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="analyze">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Phase 1 · Data analysis</div>
+            <h2>Bring your financial data to life</h2>
+            <p class="section-description">Upload a supported data file to start the existing FinSight AI analysis workflow.</p>
+          </div>
+        </div>
+
+        <div class="upload-layout">
+          <div class="upload-info">
+            <div class="workspace-icon">↥</div>
+            <h3>From raw data to useful insights</h3>
+            <p>Use the analysis workflow to review transaction data and surface potential patterns or unusual activity.</p>
+            <ul>
+              <li>Upload a supported CSV or Excel file.</li>
+              <li>Select the type of data you are submitting.</li>
+              <li>Run analysis and review the returned results.</li>
+              <li>Check findings carefully before making business decisions.</li>
+            </ul>
+            <p><strong>Important:</strong> The dashboard preview above is illustrative. Actual results depend on the file you upload and the analysis returned by the backend.</p>
+          </div>
+
+          <div class="upload-panel">
+            <div class="upload-box" id="uploadBox">
+              <div class="upload-symbol">⇧</div>
+              <h3>Upload your financial file</h3>
+              <p>Drag and drop your file here, or choose it from your computer.</p>
+              <label for="fileInput" class="upload-label">Choose file</label>
+              <input class="file-input" type="file" id="fileInput" accept=".csv,.xlsx,.xls" />
+              <div class="file-hint">CSV or Excel formats, depending on backend support</div>
+            </div>
+
+            <label class="field-label" for="dataType">Data type</label>
+            <select class="form-select" id="dataType" name="data_type">
+              <option value="transactions">Financial transactions</option>
+              <option value="financial">Financial data</option>
+              <option value="expenses">Expenses</option>
+              <option value="sales">Sales data</option>
+            </select>
+
+            <button class="primary-button analyze-button" id="analyzeButton" onclick="analyzeFile()">Analyze file →</button>
+            <div id="analysisResults"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="capabilities">
+      <div class="shell">
+        <div class="section-heading">
+          <div>
+            <div class="section-kicker">Designed for finance teams</div>
+            <h2>Clarity for every decision</h2>
+            <p class="section-description">A connected finance experience that brings important workflows into one place.</p>
+          </div>
+        </div>
+
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="workspace-icon">⌁</div>
+            <h3>Understand performance</h3>
+            <p>Organize financial indicators, review trends, and understand changes across reporting periods.</p>
+          </div>
+          <div class="feature-card">
+            <div class="workspace-icon">◉</div>
+            <h3>Identify exceptions</h3>
+            <p>Review unusual records and potential risks surfaced by supported analysis workflows.</p>
+          </div>
+          <div class="feature-card">
+            <div class="workspace-icon">▥</div>
+            <h3>Support planning</h3>
+            <p>Bring budgeting, forecasting, and management reporting tasks into a clearer workflow.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="shell">
+        <div class="about-card">
+          <div>
+            <div class="section-kicker">About FinSight AI</div>
+            <h2>Better financial understanding starts with better visibility.</h2>
+            <p>FinSight AI is designed to help people work with financial information more clearly. The aim is to make analysis more approachable, organize finance workflows, and support informed decisions.</p>
+            <p>AI-generated insights should be reviewed against the underlying records and applicable professional requirements.</p>
+          </div>
+
+          <div>
+            <div class="section-kicker">Feedback</div>
+            <h2>Help improve FinSight AI</h2>
+            <p>Share a suggestion or describe a problem you experienced. This form opens your default email application; it does not send feedback automatically.</p>
+            <form class="feedback-form" id="feedbackForm">
+              <input class="form-input" type="text" id="feedbackName" placeholder="Your name (optional)" />
+              <input class="form-input" type="email" id="feedbackEmail" placeholder="Your email (optional)" />
+              <textarea class="form-input" id="feedbackMessage" placeholder="Your feedback or suggestion" required></textarea>
+              <button class="primary-button" type="submit">Prepare feedback email ↗</button>
+              <p id="feedbackStatus" class="file-hint"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <a class="brand" href="#home">
+        <span class="brand-mark">F</span>
+        <span class="brand-name">FinSight <span>AI</span></span>
+      </a>
+      <span>Financial intelligence, made clearer.</span>
+      <span>© <span id="currentYear"></span> FinSight AI</span>
+    </div>
+  </footer>
+
+  <script>
+    // Greeting uses the visitor's local browser time. No personal name is hardcoded.
+    (function () {
+      const hour = new Date().getHours();
+      let greeting = "Good evening";
+      if (hour >= 5 && hour < 12) greeting = "Good morning";
+      else if (hour >= 12 && hour < 17) greeting = "Good afternoon";
+
+      const heading = document.getElementById("welcomeHeading");
+      heading.innerHTML = greeting + "! Welcome to <span class='gradient-text'>FinSight AI</span>";
+      document.getElementById("currentYear").textContent = new Date().getFullYear();
+    })();
+
+    // Workspace descriptions and tool categories.
+    const workspaceData = {
+      finance: {
+        title: "Finance",
+        description: "Review financial performance and organize core finance workflows.",
+        note: "Upload relevant financial data in the analysis section to use the currently available backend workflow.",
+        tools: [
+          ["Financial statements", "Review and organize statement-related data."],
+          ["Financial reporting", "Prepare structured summaries for review."],
+          ["Budgeting", "Organize budgets and planned spending."],
+          ["Forecasting", "Review assumptions and future projections."],
+          ["Variance analysis", "Compare actual results with budgets or forecasts."],
+          ["Cash flow & working capital", "Review cash movement and working-capital indicators."]
+        ]
+      },
+      accounting: {
+        title: "Accounting",
+        description: "Organize transaction-level work and accounting review tasks.",
+        note: "The actual functions available here depend on the connected backend. Do not treat the workspace labels as proof that every feature is already implemented.",
+        tools: [
+          ["Transaction review", "Inspect records and investigate unusual entries."],
+          ["Reconciliation", "Organize records for reconciliation checks."],
+          ["General ledger", "Review ledger-related data and classifications."],
+          ["Journal entries", "Organize entries for accounting review."],
+          ["Account mapping", "Review how fields and accounts are classified."],
+          ["Period close", "Prepare a checklist for closing activities."]
+        ]
+      },
+      costing: {
+        title: "Costing",
+        description: "Understand cost structure, allocation, and profitability.",
+        note: "Costing is a dedicated workspace with equal visual importance to the other workspaces.",
+        tools: [
+          ["Product costing", "Organize direct and indirect product costs."],
+          ["Cost allocation", "Review cost allocation bases and methods."],
+          ["Cost centre analysis", "Compare costs by department or cost centre."],
+          ["Variance analysis", "Review actual costs against standards or budgets."],
+          ["Contribution margin", "Organize sales, variable costs, and contribution."],
+          ["Profitability analysis", "Compare margins across products or services."]
+        ]
+      },
+      insights: {
+        title: "Insights",
+        description: "Explore patterns and turn analysis results into understandable findings.",
+        note: "Only findings returned by a connected analysis workflow should be represented as actual results.",
+        tools: [
+          ["Trend analysis", "Review changes over time."],
+          ["KPI overview", "Organize key performance indicators."],
+          ["Pattern detection", "Explore recurring patterns in data."],
+          ["Anomaly review", "Investigate records flagged by analysis."],
+          ["Executive summary", "Structure concise management takeaways."],
+          ["Data quality", "Review missing, inconsistent, or unexpected values."]
+        ]
+      },
+      risk: {
+        title: "Risk",
+        description: "Organize financial risk review and exception investigation.",
+        note: "Risk indicators are decision-support signals and should be verified against source records.",
+        tools: [
+          ["Transaction exceptions", "Review records that require attention."],
+          ["Risk register", "Organize identified risks and responses."],
+          ["Control monitoring", "Track checks and control observations."],
+          ["Exposure overview", "Structure risk exposure information."],
+          ["Investigation notes", "Record observations for follow-up."],
+          ["Issue tracking", "Organize owners, actions, and resolution status."]
+        ]
+      },
+      audit: {
+        title: "Audit",
+        description: "Organize audit preparation, evidence, and review activities.",
+        note: "This is an organizing workspace, not a substitute for professional audit judgment or required audit procedures.",
+        tools: [
+          ["Audit planning", "Organize objectives, timelines, and scope."],
+          ["Evidence register", "Track evidence references and documentation."],
+          ["Sample review", "Organize records selected for testing."],
+          ["Findings log", "Track observations and proposed actions."],
+          ["Control testing", "Organize control tests and results."],
+          ["Audit trail", "Record review notes and follow-up items."]
+        ]
+      },
+      tax: {
+        title: "Tax",
+        description: "Organize tax-related data and compliance preparation.",
+        note: "Tax rules depend on jurisdiction and period. Verify calculations and deadlines with authoritative sources or a qualified professional.",
+        tools: [
+          ["Tax data preparation", "Organize records needed for tax review."],
+          ["Tax-period summary", "Group relevant information by period."],
+          ["Tax adjustments", "Track proposed adjustments for review."],
+          ["Indirect tax review", "Organize relevant sales and purchase data."],
+          ["Tax calendar", "Track deadlines entered by your team."],
+          ["Tax documentation", "Organize supporting records."]
+        ]
+      },
+      planning: {
+        title: "Planning",
+        description: "Organize budgets, forecasts, scenarios, and financial assumptions.",
+        note: "Planning outputs depend on the assumptions and data supplied by your team.",
+        tools: [
+          ["Annual budget", "Organize budget lines and assumptions."],
+          ["Rolling forecast", "Structure forecasts across future periods."],
+          ["Scenario planning", "Compare alternative assumptions."],
+          ["Cash planning", "Organize projected receipts and payments."],
+          ["Headcount planning", "Track workforce-related assumptions."],
+          ["Forecast vs actual", "Compare plans with recorded outcomes."]
+        ]
+      },
+      reports: {
+        title: "Reports",
+        description: "Structure financial findings for review and communication.",
+        note: "Report export and generation options depend on the backend and the data available.",
+        tools: [
+          ["Management reports", "Organize key information for managers."],
+          ["Financial summaries", "Structure important financial figures."],
+          ["KPI reports", "Group indicators and reporting periods."],
+          ["Exception reports", "Collect items requiring further investigation."],
+          ["Period comparisons", "Compare selected periods."],
+          ["Reporting checklist", "Track preparation and review steps."]
+        ]
+      },
+      assistant: {
+        title: "AI Assistant",
+        description: "An entry point for finance-related help and analysis guidance.",
+        note: "This homepage does not create a new AI chat API. Connect an assistant endpoint before enabling live conversational responses.",
+        tools: [
+          ["Explain a finance concept", "Prepare questions about finance terminology."],
+          ["Interpret analysis", "Review findings returned by the existing analysis workflow."],
+          ["Formula guidance", "Explore common finance and accounting formulas."],
+          ["Report-writing help", "Organize a draft summary from verified findings."],
+          ["Data preparation", "Get guidance on structuring data for upload."],
+          ["Review checklist", "Create a list of items to verify."]
+        ]
+      },
+      compliance: {
+        title: "Standards & Compliance",
+        description: "Organize reporting frameworks, regulatory information, and compliance monitoring.",
+        note: "A live regulatory update feed, automatic monitoring, and version history require a verified data source and backend implementation.",
+        tools: [
+          ["Reporting frameworks", "IFRS, US GAAP, Local/National GAAP, and Other."],
+          ["Regulatory updates", "Organize updates by authority, date, and jurisdiction."],
+          ["Tax updates", "Track tax changes for review and validation."],
+          ["Audit standards", "Organize relevant auditing standards and references."],
+          ["Version history", "Record framework versions and change notes."],
+          ["Update monitoring", "Plan review frequency, owners, and follow-up."]
+        ]
+      },
+      settings: {
+        title: "Company & Settings",
+        description: "Prepare the organization profile and preferences for a multi-company finance environment.",
+        note: "These settings are a visual workspace only until persistent storage, authentication, and permissions are connected to the backend.",
+        tools: [
+          ["Company profile", "Company name, industry, country, and organization details."],
+          ["Currency & fiscal year", "Default currency, fiscal-year start, and reporting period."],
+          ["Reporting framework", "Select IFRS, US GAAP, Local/National GAAP, or Other."],
+          ["Users & roles", "Organize user roles and access requirements."],
+          ["Permissions", "Plan role-based access to data and functions."],
+          ["Data sources & security", "Organize connected sources and security preferences."]
+        ]
+      }
+    };
+
+    const workspaceView = document.getElementById("workspaceView");
+    const workspaceTitle = document.getElementById("workspaceTitle");
+    const workspaceDescription = document.getElementById("workspaceDescription");
+    const workspaceTools = document.getElementById("workspaceTools");
+    const workspaceNote = document.getElementById("workspaceNote");
+
+    document.querySelectorAll(".workspace-card").forEach(function (card) {
+      card.addEventListener("click", function () {
+        const item = workspaceData[card.dataset.workspace];
+        if (!item) return;
+
+        workspaceTitle.textContent = item.title;
+        workspaceDescription.textContent = item.description;
+        workspaceNote.textContent = item.note;
+        workspaceTools.replaceChildren();
+
+        item.tools.forEach(function (tool) {
+          const article = document.createElement("div");
+          article.className = "tool-item";
+
+          const title = document.createElement("strong");
+          title.textContent = tool[0];
+
+          const description = document.createElement("span");
+          description.textContent = tool[1];
+
+          article.append(title, description);
+          workspaceTools.appendChild(article);
+        });
+
+        workspaceView.classList.add("active");
+        workspaceView.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    document.getElementById("closeWorkspace").addEventListener("click", function () {
+      workspaceView.classList.remove("active");
+      document.getElementById("workspaces").scrollIntoView({ behavior: "smooth" });
+    });
+
+    // Navigation helpers retained for the existing frontend script.
+    function scrollToUpload() {
+      document.getElementById("analyze").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function scrollToHowItWorks() {
+      document.getElementById("workspaces").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Feedback opens an email draft instead of silently pretending to submit.
+    document.getElementById("feedbackForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const name = document.getElementById("feedbackName").value.trim();
+      const email = document.getElementById("feedbackEmail").value.trim();
+      const message = document.getElementById("feedbackMessage").value.trim();
+
+      if (!message) {
+        document.getElementById("feedbackStatus").textContent = "Please enter your feedback first.";
+        return;
+      }
+
+      const subject = encodeURIComponent("FinSight AI Feedback");
+      const body = encodeURIComponent(
+        "Feedback for FinSight AI\n\n" +
+        "Name: " + (name || "Not provided") + "\n" +
+        "Email: " + (email || "Not provided") + "\n\n" +
+        message
+      );
+
+      document.getElementById("feedbackStatus").textContent =
+        "Your email application should open with the feedback draft. Please review and send it there.";
+      window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+    });
+  </script>
+
+  <!-- Keep your existing backend-connected script. -->
+  <script src="/script.js"></script>
 </body>
-
 </html>
+```
