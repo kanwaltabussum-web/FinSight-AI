@@ -7,6 +7,11 @@ import io
 import math
 
 
+try:
+    from .document_routes import router as document_router
+except ImportError:
+    from document_routes import router as document_router
+
 app = FastAPI(
     title="FinSight AI API",
     description="Financial intelligence and risk signal detection API",
@@ -17,6 +22,8 @@ app = FastAPI(
 # ==========================================
 # CORS
 # ==========================================
+app.include_router(document_router)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -94,7 +101,8 @@ async def analyze(
         allowed_types = {
             "bank_statement": "Bank Statement",
             "general_ledger": "General Ledger (GL)",
-            "cash_book": "Cash Book"
+            "cash_book": "Cash Book",
+            "other_financial_data": "Other Financial Transactions"
         }
 
         if data_type not in allowed_types:
