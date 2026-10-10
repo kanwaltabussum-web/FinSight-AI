@@ -1,870 +1,951 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#080d1b" />
-  <title>FinSight AI — Intelligent Financial Intelligence</title>
-  <meta name="description" content="FinSight AI transforms financial data into clear insights, smarter decisions, and confident financial planning." />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b18">
+  <meta name="description" content="FinSight AI — a 3D financial intelligence companion for analysis, risk signals and clearer financial decisions.">
+  <title>FinSight AI — Financial Intelligence Companion</title>
   <style>
     :root {
-      --bg: #080d1b;
-      --panel: #10182a;
-      --panel2: #131e32;
-      --border: rgba(166, 190, 232, .13);
-      --text: #f3f6ff;
-      --muted: #96a4bd;
-      --blue: #6396ff;
-      --cyan: #58d8ed;
-      --purple: #9b8bff;
-      --green: #55dfb0;
-      --radius: 22px;
+      --ink:#090b18; --ink-2:#101327; --panel:#151a31; --panel-2:#1b2140;
+      --line:rgba(188,201,255,.15); --text:#f5f6ff; --muted:#a5abc4;
+      --blue:#82d9ff; --cyan:#9cf7eb; --violet:#a28cff; --pink:#df9eff;
+      --green:#68e2bd; --gold:#f2c77a; --radius:22px;
     }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:90px; }
+    body { margin:0; color:var(--text); background:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif; line-height:1.55; overflow-x:hidden; }
+    body::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; background:radial-gradient(ellipse at 72% 10%,rgba(96,78,179,.16),transparent 34%),radial-gradient(ellipse at 8% 42%,rgba(47,139,186,.10),transparent 30%),linear-gradient(180deg,#090b18 0%,#0b0d1c 52%,#090b18 100%); }
+    a { color:inherit; text-decoration:none; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    .container { width:min(1220px,92%); margin-inline:auto; }
+    .muted { color:var(--muted); }
+    .eyebrow { font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; color:var(--cyan); }
+    .section { padding:86px 0; position:relative; }
+    .section-heading { margin-bottom:30px; max-width:760px; }
+    .section-heading h2 { margin:9px 0 12px; font-size:clamp(30px,4vw,46px); letter-spacing:-.045em; line-height:1.12; }
+    .section-heading p { margin:0; color:var(--muted); max-width:690px; }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      color: var(--text);
-      background:
-        radial-gradient(ellipse at 78% 8%, rgba(48, 91, 179, .16), transparent 35%),
-        radial-gradient(ellipse at 4% 38%, rgba(46, 117, 162, .08), transparent 35%),
-        var(--bg);
-      font-family: "DM Sans", sans-serif;
-      line-height: 1.6;
-    }
-    button, input, select { font: inherit; }
-    button { cursor: pointer; }
-    a { color: inherit; text-decoration: none; }
-    .shell { width: min(1180px, calc(100% - 40px)); margin: auto; }
+    /* Navigation */
+    .site-header { position:sticky; top:0; z-index:50; border-bottom:1px solid rgba(188,201,255,.10); background:rgba(9,11,24,.82); backdrop-filter:blur(22px); }
+    .nav-wrap { min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:11px; flex-shrink:0; }
+    .brand-mark { width:39px; height:39px; position:relative; border-radius:14px; display:grid; place-items:center; font-weight:900; color:#0b1021; background:linear-gradient(145deg,#a3f5ff,#8d8dff 60%,#d6a8ff); box-shadow:0 0 30px rgba(132,134,255,.24),inset 0 1px 2px #fff; }
+    .brand-mark::after { content:""; width:14px; height:14px; border:2px solid #17203b; border-radius:5px 5px 8px 8px; position:absolute; transform:rotate(45deg); }
+    .brand-title { font-weight:850; letter-spacing:-.035em; line-height:1.1; }
+    .brand-sub { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#9299b6; margin-top:4px; }
+    .nav-links { display:flex; align-items:center; justify-content:flex-end; gap:5px; }
+    .nav-links a { font-size:13px; color:#c0c5dc; padding:10px 13px; border-radius:999px; transition:background .2s,color .2s; white-space:nowrap; }
+    .nav-links a:hover,.nav-links a:focus-visible { color:white; background:rgba(153,160,255,.12); outline:none; }
+    .nav-links a[aria-current], .nav-links a.active { color:#c0c5dc; background:transparent; box-shadow:none; }
+    .mobile-menu { display:none; color:white; background:transparent; border:1px solid var(--line); border-radius:12px; padding:9px 12px; }
 
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(8, 13, 27, .84);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav {
-      min-height: 76px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; font-family: Manrope, sans-serif; font-weight: 800; letter-spacing: -.6px; }
-    .brand-mark {
-      width: 42px; height: 42px; border-radius: 14px;
-      display: grid; place-items: center;
-      color: white; font-size: 20px; font-weight: 800;
-      background: linear-gradient(145deg, #77b6ff, #5367ed 62%, #8f79ff);
-      box-shadow: 0 8px 30px rgba(83, 103, 237, .25);
-    }
-    .brand-name { font-size: 18px; }
-    .brand-name span { color: #80b6ff; }
-    .nav-links { display: flex; align-items: center; gap: 26px; color: var(--muted); font-size: 13px; }
-    .nav-links a:hover { color: white; }
-    .nav-button, .primary-button {
-      border: 0; color: white; font-weight: 700;
-      background: linear-gradient(110deg, #4d83f3, #7769f5);
-      box-shadow: 0 8px 28px rgba(83, 103, 237, .18);
-      border-radius: 12px; padding: 12px 18px;
-    }
-    .nav-button:hover, .primary-button:hover { filter: brightness(1.1); transform: translateY(-1px); }
-    .mobile-menu { display: none; }
+    /* 3D hero, not a generic dashboard template */
+    .hero { position:relative; min-height:660px; display:flex; align-items:center; padding:54px 0 70px; overflow:hidden; }
+    .hero::after { content:""; position:absolute; width:760px; height:760px; right:-200px; top:-120px; border-radius:50%; background:radial-gradient(circle,rgba(118,92,215,.13),rgba(69,145,205,.04) 42%,transparent 70%); pointer-events:none; }
+    .hero-grid { position:relative; z-index:1; display:grid; grid-template-columns: .94fr 1.06fr; align-items:center; gap:24px; }
+    .hero-copy { padding:30px 0 28px; position:relative; z-index:3; }
+    .hero-label { display:inline-flex; align-items:center; gap:9px; padding:7px 12px; border:1px solid rgba(160,173,255,.20); border-radius:999px; color:#ced4ee; background:rgba(23,27,54,.62); font-size:11px; letter-spacing:.08em; }
+    .pulse-dot { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 12px var(--green); }
+    h1 { font-size:clamp(45px,6.4vw,78px); line-height:.99; letter-spacing:-.07em; margin:22px 0 23px; font-weight:850; max-width:650px; }
+    .gradient { background:linear-gradient(105deg,#f2f5ff 5%,#92e8ff 48%,#b7a3ff 92%); color:transparent; -webkit-background-clip:text; background-clip:text; }
+    .hero-copy p { max-width:570px; color:#b5bad1; font-size:16px; line-height:1.85; margin:0; }
+    /* Two equally prominent hero pathways: analyze data OR explore a workspace. */
+    .hero-actions { display:flex; align-items:stretch; gap:14px; flex-wrap:wrap; margin-top:30px; }
+    .btn { border:1px solid transparent; padding:13px 18px; display:inline-flex; align-items:center; justify-content:center; gap:10px; border-radius:13px; font-weight:750; font-size:13px; transition:transform .18s,box-shadow .18s,background .18s,border-color .18s,filter .18s; }
+    .btn:hover { transform:translateY(-2px); }
+    .btn-primary { color:#0c1024; background:linear-gradient(115deg,#9ef4f2,#9fc4ff 65%,#c2a8ff); box-shadow:0 10px 36px rgba(117,174,255,.15); }
+    .btn-ghost { color:#e9ebff; border-color:var(--line); background:rgba(255,255,255,.035); }
+    .hero-actions .btn { min-width:198px; min-height:54px; padding:14px 18px; justify-content:space-between; gap:12px; border-radius:15px; font-size:13px; font-weight:800; position:relative; isolation:isolate; overflow:hidden; }
+    .hero-actions .btn::before { content:""; position:absolute; inset:1px; border-radius:13px; pointer-events:none; z-index:-1; opacity:.6; background:linear-gradient(105deg,rgba(255,255,255,.15),transparent 46%,rgba(255,255,255,.06)); }
+    .hero-actions .btn span { font-size:17px; line-height:1; flex-shrink:0; }
+    .hero-actions .btn-primary { color:#0c1024; border-color:rgba(222,251,255,.72); background:linear-gradient(115deg,#a6fff0 0%,#9fc4ff 58%,#c2a8ff 100%); box-shadow:0 10px 34px rgba(117,174,255,.24),0 0 0 1px rgba(158,244,242,.10),inset 0 1px 0 rgba(255,255,255,.8); }
+    .hero-actions .btn-ghost { color:#f4f5ff; border:1px solid rgba(143,218,255,.68); background:linear-gradient(125deg,rgba(60,119,201,.52),rgba(91,76,162,.47) 56%,rgba(57,163,174,.38)); box-shadow:0 10px 34px rgba(85,142,231,.22),0 0 0 1px rgba(162,197,255,.09),inset 0 1px 0 rgba(255,255,255,.18); }
+    .hero-actions .btn-primary:hover { filter:brightness(1.04); box-shadow:0 15px 40px rgba(117,174,255,.34),0 0 0 2px rgba(158,244,242,.11); }
+    .hero-actions .btn-ghost:hover { filter:brightness(1.13); border-color:rgba(171,246,255,.95); box-shadow:0 15px 40px rgba(85,142,231,.34),0 0 0 2px rgba(117,214,255,.12); }
+    .hero-actions .btn:focus-visible { outline:3px solid #b7fbff; outline-offset:4px; }
+    .hero-footnote { margin-top:20px; color:#777f9e; font-size:11px; letter-spacing:.03em; }
 
-    .hero { padding: 68px 0 48px; }
-    .hero-grid { display: grid; grid-template-columns: 1.03fr .97fr; align-items: center; gap: 38px; }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 9px;
-      padding: 7px 12px; border: 1px solid rgba(99,150,255,.25);
-      border-radius: 99px; background: rgba(99,150,255,.08);
-      color: #a9c9ff; font-size: 12px; font-weight: 700; letter-spacing: .5px;
-    }
-    .eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); }
-    h1, h2, h3, p { margin-top: 0; }
-    h1 {
-      font-family: Manrope, sans-serif; font-size: clamp(38px, 5.2vw, 64px);
-      line-height: 1.08; letter-spacing: -2.5px; margin: 22px 0 20px;
-    }
-    .gradient-text { color: #91baff; background: linear-gradient(90deg, #83b8ff, #9c9aff 70%, #67ddeb); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero-copy { max-width: 540px; color: var(--muted); font-size: 16px; line-height: 1.9; }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
-    .secondary-button {
-      padding: 12px 18px; border: 1px solid var(--border); border-radius: 12px;
-      color: #dce7fb; background: rgba(255,255,255,.025); font-weight: 600;
-    }
-    .secondary-button:hover { background: rgba(255,255,255,.07); }
-    .trust-line { color: #8190a9; font-size: 12px; margin-top: 22px; }
+    .hero-visual { position:relative; min-height:535px; isolation:isolate; border-radius:38px; overflow:hidden; background:radial-gradient(ellipse at 50% 38%,rgba(91,97,195,.21),transparent 45%),linear-gradient(145deg,rgba(25,29,59,.8),rgba(10,13,28,.3) 70%); border:1px solid rgba(184,195,255,.13); box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 35px 110px rgba(0,0,0,.18); }
+    .hero-visual::before { content:""; position:absolute; z-index:-1; width:410px; height:410px; left:50%; top:41%; transform:translate(-50%,-50%); border:1px solid rgba(148,161,255,.10); border-radius:50%; box-shadow:0 0 0 42px rgba(148,161,255,.025),0 0 0 94px rgba(148,161,255,.018); }
+    .hero-visual::after { content:""; position:absolute; inset:0; z-index:2; pointer-events:none; background:linear-gradient(180deg,rgba(9,11,24,.02) 40%,rgba(9,11,24,.67) 100%); }
+    .robot-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; z-index:0; }
+    .robot-fallback { display:none; position:absolute; width:175px; height:205px; left:50%; top:42%; transform:translate(-50%,-50%); border-radius:48% 48% 42% 42%; background:linear-gradient(140deg,#e8f0ff,#8296c2 65%,#5a628e); box-shadow:0 28px 65px #0008; }
+    .robot-fallback::before { content:""; position:absolute; left:16px; right:16px; top:48px; height:82px; border-radius:36px; background:linear-gradient(150deg,#080c1a,#1e2e56); box-shadow:inset 0 0 0 2px #7889bd; }
+    .robot-fallback::after { content:"●   ●"; white-space:pre; position:absolute; top:75px; left:35px; color:#8cf7ff; font-size:21px; text-shadow:0 0 14px #68dcff; letter-spacing:10px; }
+    .robot-fallback-mouth { position:absolute; z-index:2; top:110px; left:calc(50% - 14px); width:28px; height:5px; border-bottom:2px solid #8cf7ff; border-radius:0 0 4px 4px; filter:drop-shadow(0 0 4px #68dcff); }
+    .hero-visual.robot-failed .robot-fallback { display:block; }
+    /* The main robot keeps a restrained digital expression; only the status accent changes after real analysis. */
+    .hero-visual.robot-mood-review::before { border-color:rgba(255,202,114,.16); box-shadow:0 0 0 42px rgba(255,202,114,.025),0 0 0 94px rgba(255,202,114,.015); }
+    .hero-visual.robot-mood-high::before { border-color:rgba(255,137,154,.18); box-shadow:0 0 0 42px rgba(255,137,154,.025),0 0 0 94px rgba(255,137,154,.018); }
+    .hero-visual.robot-mood-review .robot-fallback::after { color:#ffca72; text-shadow:0 0 14px #ffb347; }
+    .hero-visual.robot-mood-review .robot-fallback-mouth { border-bottom-color:#ffca72; filter:drop-shadow(0 0 4px #ffb347); }
+    .hero-visual.robot-mood-high .robot-fallback::after { color:#ff899a; text-shadow:0 0 14px #ff5368; }
+    .hero-visual.robot-mood-high .robot-fallback-mouth { border-bottom-color:#ff899a; filter:drop-shadow(0 0 4px #ff5368); }
+    .visual-topline { position:absolute; z-index:4; left:24px; right:24px; top:22px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    .visual-kicker { font-size:10px; color:#afb5d1; letter-spacing:.17em; text-transform:uppercase; }
+    .live-status { display:inline-flex; align-items:center; gap:7px; color:var(--green); background:rgba(9,14,29,.74); border:1px solid rgba(104,226,189,.24); padding:7px 10px; border-radius:999px; font-size:9px; font-weight:850; letter-spacing:.1em; }
+    .live-status span { width:6px; height:6px; border-radius:50%; display:inline-block; background:var(--green); box-shadow:0 0 8px currentColor; }
+    .metric-strip { position:absolute; z-index:4; top:83px; left:20px; display:grid; gap:9px; width:142px; }
+    .metric-card { background:rgba(14,18,38,.78); border:1px solid rgba(192,201,255,.15); backdrop-filter:blur(15px); padding:12px 13px; border-radius:15px; box-shadow:0 10px 30px #0002; }
+    .metric-card span { display:block; font-size:9px; color:#969fbe; line-height:1.3; margin-bottom:5px; }
+    .metric-card strong { display:block; font-size:22px; letter-spacing:-.05em; color:#f4f5ff; }
+    .mini-dashboard { position:absolute; z-index:4; left:22px; right:22px; bottom:20px; display:grid; grid-template-columns:1fr 1.15fr; gap:10px; align-items:stretch; }
+    .chart-panel,.pattern-summary { border:1px solid rgba(185,197,255,.14); border-radius:15px; background:rgba(12,16,34,.83); backdrop-filter:blur(14px); padding:13px 14px; min-width:0; }
+    .chart-head { display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:9px; color:#a6aec9; margin-bottom:9px; }
+    .period { color:#dbe2ff; font-size:9px; }
+    .chart-bars { height:48px; display:flex; align-items:flex-end; gap:5px; }
+    .chart-bars i { display:block; flex:1; height:40%; min-width:3px; border-radius:4px 4px 2px 2px; background:linear-gradient(180deg,#a8a0ff,#6e8bff); box-shadow:0 0 12px rgba(114,140,255,.16); transition:height .3s; }
+    .chart-bars i.risk-bar { background:linear-gradient(180deg,#ff9eb5,#f15b81); }
+    .pattern-title { font-size:9px; color:#a6aec9; margin-bottom:8px; }
+    .pattern-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+    .pattern-summary > div { min-width:0; }
+    .pattern-summary strong { display:block; font-size:16px; letter-spacing:-.04em; color:#f1f3ff; }
+    .pattern-summary span { display:block; color:#939bb9; font-size:8px; white-space:nowrap; }
+    .risk-alert { z-index:5; position:absolute; top:48%; right:16px; max-width:190px; display:flex; align-items:center; gap:9px; padding:10px 12px; border-radius:13px; background:rgba(15,22,45,.9); border:1px solid rgba(147,164,255,.18); box-shadow:0 12px 30px rgba(0,0,0,.18); }
+    .risk-icon { display:grid; place-items:center; flex-shrink:0; width:26px; height:26px; border-radius:9px; background:#1d886f; color:white; font-size:13px; font-weight:900; }
+    .risk-text strong { display:block; color:#eef0ff; font-size:10px; line-height:1.35; }
+    .risk-text span { display:block; color:#9da6c5; font-size:8px; line-height:1.4; margin-top:3px; }
+    .visual-caption { position:absolute; z-index:4; top:66%; left:50%; transform:translateX(-50%); text-align:center; width:74%; pointer-events:none; }
+    .visual-caption strong { font-size:14px; letter-spacing:.02em; text-shadow:0 3px 20px #000; }
+    .visual-caption span { display:block; color:#a9b2d1; font-size:10px; margin-top:3px; }
 
-    .hero-visual {
-      position: relative; min-height: 430px; border: 1px solid var(--border);
-      border-radius: 30px; overflow: hidden;
-      background:
-        radial-gradient(ellipse at 50% 40%, rgba(73,120,233,.19), transparent 55%),
-        linear-gradient(145deg, rgba(21,33,58,.95), rgba(10,16,30,.96));
-      box-shadow: 0 28px 80px rgba(0,0,0,.24);
-    }
-    .hero-visual::before, .hero-visual::after {
-      content: ""; position: absolute; border: 1px solid rgba(124,167,255,.11);
-      border-radius: 50%; width: 330px; height: 330px; left: 50%; top: 45%;
-      transform: translate(-50%,-50%);
-    }
-    .hero-visual::after { width: 250px; height: 250px; }
-    .visual-label { position: absolute; top: 20px; left: 22px; z-index: 4; color: #b9c7df; font-size: 12px; }
-    .live-status { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-size: 11px; }
-    .robot-stage { position: absolute; inset: 40px 0 75px; display: grid; place-items: center; }
-    .robot-glow { position: absolute; width: 210px; height: 190px; border-radius: 50%; background: rgba(67,125,255,.18); filter: blur(42px); }
-    .robot {
-      position: relative; width: 166px; height: 184px; z-index: 2;
-      animation: float 4s ease-in-out infinite;
-      filter: drop-shadow(0 22px 20px rgba(0,0,0,.32));
-    }
-    .robot-ear { position: absolute; top: 72px; width: 18px; height: 43px; border-radius: 9px; background: linear-gradient(90deg,#a6b8d2,#f8fbff,#899bb8); }
-    .robot-ear.left { left: 0; } .robot-ear.right { right: 0; }
-    .robot-head {
-      position: absolute; top: 10px; left: 10px; width: 146px; height: 136px;
-      border-radius: 45px 45px 40px 40px;
-      background: linear-gradient(135deg, #ffffff 0%, #dbe5f5 37%, #9eafc8 70%, #edf3ff 100%);
-      box-shadow: inset -7px -8px 15px rgba(50,70,110,.18), inset 5px 5px 12px white;
-    }
-    .robot-face {
-      position: absolute; top: 35px; left: 21px; width: 104px; height: 78px;
-      border-radius: 29px; background: linear-gradient(145deg,#111b31,#060b17);
-      border: 1px solid rgba(115,178,255,.48);
-      box-shadow: inset 0 0 20px rgba(51,125,255,.15), 0 0 22px rgba(73,142,255,.16);
-      display: flex; justify-content: center; align-items: center; gap: 20px;
-    }
-    .robot-eye { width: 12px; height: 19px; border-radius: 8px; background: #7fe7ff; box-shadow: 0 0 15px #48bfff, 0 0 28px rgba(72,191,255,.7); }
-    .robot-neck { position: absolute; bottom: 21px; left: 68px; width: 30px; height: 25px; background: linear-gradient(90deg,#b3c2d8,#fff,#9aaac4); }
-    .robot-body {
-      position: absolute; bottom: 0; left: 42px; width: 82px; height: 48px;
-      border-radius: 23px 23px 18px 18px; background: linear-gradient(140deg,#f7faff,#a6b7d0);
-      box-shadow: inset -5px -4px 10px rgba(35,50,80,.2);
-    }
-    .robot-body::after { content:""; position:absolute; width:12px;height:12px;border-radius:50%;background:#6bdcff;box-shadow:0 0 13px #6bdcff;top:14px;left:35px; }
-    .robot-shadow { position: absolute; bottom: 6px; width: 150px; height: 18px; border-radius: 50%; background: rgba(0,0,0,.32); filter: blur(12px); }
-    @keyframes float { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
+    /* Brief platform promise */
+    .trust-line { border-block:1px solid rgba(183,194,255,.09); background:rgba(17,20,42,.42); }
+    .trust-inner { display:flex; align-items:center; justify-content:space-between; gap:22px; flex-wrap:wrap; padding:18px 0; color:#a5abc4; font-size:11px; }
+    .trust-inner span { display:inline-flex; align-items:center; gap:8px; }
+    .trust-inner b { color:#e5e8ff; font-weight:700; }
+    .trust-dot { display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--violet); }
 
-    .metric-card, .pattern-summary, .risk-alert {
-      position: absolute; z-index: 5; border: 1px solid rgba(157,185,233,.18);
-      background: rgba(14,23,41,.88); backdrop-filter: blur(14px);
-      box-shadow: 0 12px 32px rgba(0,0,0,.18); border-radius: 14px;
-    }
-    .metric-card { top: 104px; left: 18px; padding: 12px 14px; width: 132px; }
-    .metric-card small, .pattern-summary small { display: block; color: #91a1bc; font-size: 10px; }
-    .metric-card strong { font-family: Manrope,sans-serif; font-size: 21px; }
-    .metric-change { color: var(--green); font-size: 10px; }
-    .pattern-summary { top: 78px; right: 16px; padding: 12px 13px; width: 132px; }
-    .pattern-summary strong { font-size: 19px; }
-    .period { color: #8190a9; font-size: 9px; }
-    .mini-bars { display: flex; align-items: end; gap: 5px; height: 35px; margin-top: 6px; }
-    .chart-bars { display: flex; align-items: end; gap: 5px; height: 100%; }
-    .chart-bars i { display: block; flex: 1; height: 45%; border-radius: 4px 4px 0 0; background: linear-gradient(#71cfff,#6478ff); }
-    .chart-bars i:nth-child(2) { height: 70%; }
-    .chart-bars i:nth-child(3) { height: 52%; }
-    .chart-bars i:nth-child(4) { height: 90%; }
-    .chart-bars i:nth-child(5) { height: 64%; }
-    .chart-bars i:nth-child(6) { height: 100%; }
-    .risk-alert { bottom: 20px; right: 18px; left: 18px; padding: 10px 13px; display: flex; align-items: center; gap: 10px; font-size: 11px; }
-    .risk-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; color: #ffc982; background: rgba(255,190,92,.12); }
-    .risk-alert strong { display: block; font-size: 11px; }
-    .risk-alert span { display: block; color: #94a2ba; font-size: 10px; }
+    /* Workspaces */
+    .workspace-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; }
+    .workspace-card { appearance:none; position:relative; isolation:isolate; overflow:hidden; text-align:left; display:flex; flex-direction:column; min-height:198px; padding:20px; border-radius:19px; border:1px solid rgba(180,191,255,.13); background:linear-gradient(145deg,rgba(30,34,67,.66),rgba(15,18,37,.78)); color:var(--text); transition:transform .22s,border-color .22s,background .22s,box-shadow .22s; }
+    .workspace-card::before { content:""; position:absolute; z-index:-1; width:140px; height:140px; right:-55px; top:-60px; border-radius:50%; background:var(--glow,rgba(137,133,255,.15)); filter:blur(2px); transition:transform .25s; }
+    .workspace-card:hover,.workspace-card:focus-visible { transform:translateY(-4px); border-color:rgba(145,194,255,.42); background:linear-gradient(145deg,rgba(40,47,89,.78),rgba(18,21,44,.92)); box-shadow:0 18px 45px rgba(0,0,0,.22); outline:none; }
+    .workspace-card:hover::before { transform:scale(1.3); }
+    .workspace-icon { display:grid; place-items:center; width:43px; height:43px; border-radius:15px; margin-bottom:18px; font-size:19px; color:var(--accent,#a8b9ff); background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025)); border:1px solid rgba(193,201,255,.18); box-shadow:inset 0 1px 0 rgba(255,255,255,.05); }
+    .workspace-card h3 { font-size:15px; line-height:1.35; margin:0 0 8px; font-weight:770; letter-spacing:-.02em; }
+    .workspace-card p { font-size:11px; color:#a2a9c4; line-height:1.7; margin:0; }
+    .card-open { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:auto; padding-top:15px; color:var(--accent,#a8b9ff); font-size:10px; font-weight:800; letter-spacing:.04em; }
 
-    section { scroll-margin-top: 95px; }
-    .section { padding: 54px 0; }
-    .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 25px; }
-    .section-kicker { color: #83b3ff; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
-    h2 { font-family: Manrope,sans-serif; font-size: clamp(26px,3vw,36px); letter-spacing: -1px; line-height: 1.2; margin: 8px 0; }
-    .section-description { color: var(--muted); font-size: 14px; max-width: 620px; margin: 0; }
-    .workspace-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
-    .workspace-card {
-      text-align: left; color: var(--text); min-height: 165px; padding: 19px;
-      border: 1px solid var(--border); border-radius: 18px;
-      background: linear-gradient(145deg,rgba(19,30,50,.95),rgba(13,21,37,.96));
-      transition: transform .2s,border-color .2s,background .2s;
-    }
-    .workspace-card:hover { transform: translateY(-4px); border-color: rgba(105,157,255,.5); background: linear-gradient(145deg,#182846,#111b30); }
-    .workspace-icon {
-      display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 15px;
-      border-radius: 13px; font-size: 20px; color: #b5d3ff;
-      background: rgba(99,150,255,.13); border: 1px solid rgba(99,150,255,.14);
-    }
-    .workspace-card:nth-child(3n+2) .workspace-icon { color: #9de9ef; background: rgba(88,216,237,.09); }
-    .workspace-card:nth-child(3n) .workspace-icon { color: #c3b8ff; background: rgba(155,139,255,.12); }
-    .workspace-card h3 { font-size: 15px; margin: 0 0 5px; font-family: Manrope,sans-serif; }
-    .workspace-card p { color: var(--muted); font-size: 12px; line-height: 1.65; margin: 0; }
-    .open-workspace { display: block; margin-top: 12px; color: #8bb8ff; font-size: 11px; font-weight: 700; }
+    /* Workspace view */
+    .workspace-view { display:none; min-height:70vh; padding:42px 0 76px; }
+    .workspace-view.active { display:block; }
+    .home-content.hidden { display:none; }
+    .workspace-toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:25px; }
+    .back-button { border:1px solid var(--line); color:#e7eaff; background:rgba(255,255,255,.04); border-radius:12px; padding:10px 13px; }
+    .workspace-intro { margin-bottom:24px; }
+    .workspace-intro h2 { margin:8px 0; font-size:clamp(30px,4vw,46px); letter-spacing:-.05em; }
+    .workspace-intro p { max-width:760px; color:var(--muted); margin:0; }
+    .tool-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; }
+    .tool-card { border:1px solid var(--line); border-radius:16px; padding:19px; background:linear-gradient(145deg,rgba(26,31,61,.74),rgba(15,18,38,.86)); }
+    .tool-card h3 { font-size:14px; margin:0 0 8px; }
+    .tool-card p { font-size:12px; color:var(--muted); margin:0; line-height:1.7; }
+    .workspace-extra { margin-top:17px; }
+    .config-panel { padding:22px; border:1px solid var(--line); border-radius:18px; background:rgba(18,22,45,.78); }
+    .config-panel h3 { margin:0 0 8px; }
+    .config-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:18px; }
+    .field { display:flex; flex-direction:column; gap:7px; }
+    .field label { color:#b2bad5; font-size:11px; }
+    .field input,.field select { width:100%; min-width:0; border:1px solid rgba(180,191,255,.18); border-radius:10px; padding:12px; color:#f5f6ff; background:#0d1124; }
+    .field input:focus,.field select:focus { outline:2px solid rgba(130,217,255,.45); }
+    .help-note { font-size:11px; color:#8992b3; margin:14px 0 0; }
 
-    .workspace-view {
-      display: none; margin: 20px 0 0; padding: 26px;
-      border: 1px solid var(--border); border-radius: 22px;
-      background: linear-gradient(145deg,rgba(17,27,47,.98),rgba(12,19,34,.98));
-    }
-    .workspace-view.active { display: block; }
-    .workspace-view-header { display:flex; align-items:flex-start; justify-content:space-between; gap:15px; }
-    .workspace-view-header h3 { font: 700 24px Manrope,sans-serif; margin: 0 0 7px; }
-    .workspace-view-header p { color:var(--muted); font-size:13px; }
-    .close-workspace { border:1px solid var(--border); color:#cbd8ed; background:transparent; border-radius:10px; padding:8px 12px; }
-    .tool-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:16px; }
-    .tool-item { border:1px solid var(--border); border-radius:13px; padding:15px; background:rgba(255,255,255,.025); }
-    .tool-item strong { display:block; font-size:13px; margin-bottom:5px; }
-    .tool-item span { display:block; color:var(--muted); font-size:11px; line-height:1.65; }
-    .tool-note { margin-top:16px; color:#9eb5d8; font-size:12px; }
+    /* Analyze data */
+    .analyze-section { border-top:1px solid rgba(177,190,255,.09); border-bottom:1px solid rgba(177,190,255,.09); background:linear-gradient(180deg,rgba(25,28,57,.45),rgba(12,14,31,.5)); }
+    .analysis-grid { display:grid; grid-template-columns:.86fr 1.14fr; gap:24px; align-items:start; }
+    .analysis-explainer { padding-top:10px; }
+    .analysis-explainer h2 { font-size:clamp(32px,4.3vw,47px); letter-spacing:-.05em; line-height:1.08; margin:12px 0 18px; }
+    .analysis-explainer p { color:var(--muted); font-size:13px; line-height:1.85; }
+    .workflow-list { display:grid; gap:13px; margin-top:23px; }
+    .workflow-item { display:flex; gap:12px; align-items:flex-start; color:#c7cce3; font-size:12px; }
+    .workflow-num { width:27px; height:27px; display:grid; place-items:center; flex-shrink:0; border-radius:9px; background:rgba(150,143,255,.12); border:1px solid rgba(150,143,255,.20); color:#c2b5ff; font-size:10px; font-weight:800; }
+    .upload-card { border:1px solid rgba(180,191,255,.16); border-radius:22px; padding:23px; background:linear-gradient(145deg,rgba(25,30,60,.9),rgba(13,16,35,.95)); box-shadow:0 26px 80px rgba(0,0,0,.18); }
+    .upload-card-head { display:flex; align-items:flex-start; gap:13px; margin-bottom:20px; }
+    .upload-symbol { display:grid; place-items:center; width:43px; height:43px; border:1px solid rgba(156,247,235,.25); color:var(--cyan); background:rgba(108,225,224,.08); border-radius:14px; font-size:19px; flex-shrink:0; }
+    .upload-card h3 { margin:0 0 5px; font-size:17px; }
+    .upload-card-head p { margin:0; font-size:11px; color:var(--muted); }
 
-    .upload-layout { display:grid; grid-template-columns:.85fr 1.15fr; gap:22px; align-items:start; }
-    .upload-info, .upload-panel, .feature-card, .about-card {
-      border:1px solid var(--border); border-radius:var(--radius);
-      background:linear-gradient(145deg,rgba(18,29,49,.95),rgba(12,20,35,.96));
-    }
-    .upload-info { padding:26px; }
-    .upload-info h3 { font:700 22px Manrope,sans-serif; }
-    .upload-info p, .upload-info li { color:var(--muted); font-size:13px; }
-    .upload-info ul { padding-left:19px; }
-    .upload-panel { padding:24px; }
-    .upload-box {
-      border:1px dashed rgba(119,166,255,.42); border-radius:16px;
-      background:rgba(99,150,255,.045); text-align:center; padding:30px 16px;
-      transition:.2s;
-    }
-    .upload-box.dragover { border-color:var(--cyan); background:rgba(88,216,237,.08); }
-    .upload-symbol { margin:auto auto 12px; display:grid; place-items:center; width:48px; height:48px; border-radius:15px; background:rgba(99,150,255,.13); font-size:23px; }
-    .upload-box h3 { font-size:15px; margin-bottom:6px; }
-    .upload-box p { color:var(--muted); font-size:12px; margin-bottom:14px; }
-    .file-input { display:none; }
-    .upload-label { display:inline-block; border-radius:10px; padding:10px 15px; background:#253d68; color:#e5efff; font-size:12px; font-weight:700; cursor:pointer; }
-    .upload-label:hover { background:#31548b; }
-    .file-hint { color:#7f8ea8; font-size:10px; margin-top:13px; }
-    .field-label { display:block; color:#b7c5dc; font-size:12px; margin:16px 0 7px; }
-    .form-select, .form-input {
-      width:100%; padding:11px 12px; border:1px solid var(--border);
-      background:#0b1425; color:#eef4ff; border-radius:10px; outline:none;
-    }
-    .form-select:focus, .form-input:focus { border-color:var(--blue); }
-    .analyze-button { width:100%; margin-top:17px; }
-    .selected-file-info { margin-top:12px; }
-    #analysisResults { margin-top:25px; }
-    .hidden { display:none !important; }
+    /* Clearly separate the two file workflows at the upload point */
+    .upload-mode-heading { margin: 0 0 12px; }
+    .upload-mode-heading h4 { font-size: 13px; margin: 0 0 5px; }
+    .upload-mode-heading p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
+    .upload-mode-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0 0 17px; }
+    .upload-mode-card { display:flex; flex-direction:column; align-items:flex-start; gap:8px; width:100%; min-width:0; min-height:195px; padding:15px; border-radius:15px; border:1px solid rgba(180,191,255,.18); background:rgba(10,15,34,.70); color:var(--text); text-align:left; cursor:pointer; transition:background .2s,border-color .2s,box-shadow .2s,transform .2s; }
+    .upload-mode-card:hover { transform:translateY(-1px); border-color:rgba(156,247,235,.45); }
+    .upload-mode-card[aria-pressed="true"] { border-color:rgba(156,247,235,.78); background:linear-gradient(145deg,rgba(53,104,126,.22),rgba(23,26,53,.94)); box-shadow:0 0 0 1px rgba(156,247,235,.12),0 10px 32px rgba(0,0,0,.12); }
+    .upload-mode-card:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+    .upload-mode-top { display:flex; align-items:center; gap:9px; }
+    .upload-mode-icon { display:grid; place-items:center; width:32px; height:32px; flex-shrink:0; border-radius:10px; background:rgba(132,154,255,.12); border:1px solid rgba(132,154,255,.20); color:#c9d5ff; font-size:15px; }
+    .upload-mode-card h4 { margin:0; font-size:12px; line-height:1.45; }
+    .upload-mode-subtitle { color:#9cf7eb; font-size:9px; font-weight:850; letter-spacing:.055em; line-height:1.6; }
+    .upload-mode-card p { margin:0; color:var(--muted); font-size:10px; line-height:1.65; }
+    .upload-mode-state { margin-top:auto; padding-top:3px; font-size:9px; font-weight:800; color:#8994b7; }
+    .upload-mode-card[aria-pressed="true"] .upload-mode-state { color:var(--cyan); }
+    .workflow-live-label { font-size:10px; color:#9cf7eb; font-weight:800; margin:0 0 10px; }
+    .upload-box .file-types { min-height:22px; }
+    @media(max-width:560px) { .upload-mode-grid { grid-template-columns:1fr; } .upload-mode-card { min-height:0; } }
 
-    .feature-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
-    .feature-card { padding:21px; }
-    .feature-card .workspace-icon { margin-bottom:12px; }
-    .feature-card h3 { font:700 15px Manrope,sans-serif; margin-bottom:7px; }
-    .feature-card p { color:var(--muted); font-size:12px; margin:0; }
+    .upload-meta { display:grid; grid-template-columns:1fr; gap:15px; margin:0 0 15px; }
+    .select-label { color:#aab2cf; font-size:11px; display:block; margin-bottom:8px; }
+    #dataType { width:100%; color:#f5f6ff; background:#0b1021; border:1px solid rgba(180,191,255,.18); border-radius:11px; padding:12px; }
+.record-type-help { margin-top:10px; padding:12px 13px; border:1px solid rgba(180,191,255,.12); border-radius:11px; background:rgba(12,17,38,.45); color:#aab5d2; font-size:11px; line-height:1.75; }
+    .record-type-help strong { color:#e7ecff; }
+    .record-type-help .type-examples { display:block; margin-top:5px; color:#9de9e4; }
+    .auto-type-note { margin-top:8px; padding:10px 12px; border-left:2px solid #85bdf8; background:rgba(122,167,255,.06); border-radius:0 8px 8px 0; color:#aab5d2; font-size:11px; line-height:1.65; }
+    .auto-type-note strong { color:#c9e7ff; }
+    .upload-box { border:1px dashed rgba(150,173,255,.42); border-radius:16px; padding:23px 18px; text-align:center; background:radial-gradient(ellipse at center,rgba(128,134,255,.09),rgba(12,15,34,.2)); transition:border-color .2s,background .2s; }
+    .upload-box.drag-active,.upload-box.drag-over { border-color:var(--cyan); background:rgba(100,224,217,.08); }
+    .upload-icon { display:grid; place-items:center; margin:0 auto 11px; width:47px; height:47px; border-radius:16px; background:rgba(139,156,255,.12); border:1px solid rgba(139,156,255,.22); color:#bfcaff; font-size:21px; }
+    .upload-box h4 { margin:0 0 5px; font-size:13px; }
+    .upload-box p { margin:0 0 15px; color:#929ab9; font-size:10px; }
+    .file-picker { display:block; width:min(100%,460px); margin:16px auto 8px; padding:11px; border:1px solid rgba(170,183,255,.24); border-radius:10px; color:#e8ecff; background:rgba(8,12,28,.72); font:inherit; font-size:12px; text-align:left; cursor:pointer; }
+    .file-picker::file-selector-button { margin-right:12px; padding:9px 13px; border:1px solid rgba(170,183,255,.28); border-radius:8px; color:#f4f5ff; background:rgba(145,156,255,.14); font:inherit; font-weight:750; cursor:pointer; }
+    .file-picker:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+    .choose-file-button { display:inline-flex; padding:10px 14px; border:1px solid rgba(170,183,255,.25); border-radius:11px; color:#eef0ff; background:rgba(255,255,255,.055); font-size:11px; font-weight:750; }
+    .file-types { margin-top:13px; display:flex; justify-content:center; gap:7px; flex-wrap:wrap; }
+    .file-types span { padding:4px 7px; border-radius:6px; color:#a6b0d1; background:rgba(255,255,255,.045); font-size:9px; letter-spacing:.05em; }
+    .selected-file-info { color:#dcfff8 !important; background:rgba(65,198,166,.09) !important; border:1px solid rgba(104,226,189,.20) !important; overflow-wrap:anywhere; text-align:left; }
+    #analyzeFileButton { padding:12px 18px; border-radius:11px; border:0; color:#0b1224; font-weight:850; font-size:12px; background:linear-gradient(115deg,#9ef4f2,#9fc4ff 65%,#c2a8ff); }
+    #analyzeFileButton:disabled { opacity:.55; cursor:wait; }
 
-    .about-card { padding:28px; display:grid; grid-template-columns:1fr 1fr; gap:30px; }
-    .about-card p { color:var(--muted); font-size:13px; }
-    .feedback-form { display:grid; gap:10px; }
-    .feedback-form textarea { resize:vertical; min-height:100px; }
-    .footer { margin-top:42px; border-top:1px solid var(--border); padding:26px 0; color:#7e8da6; font-size:11px; }
-    .footer-inner { display:flex; align-items:center; justify-content:space-between; gap:15px; }
+    .upload-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:14px; }
+    .upload-actions button { min-height:43px; }
+    #analyzeFileButton { display:inline-flex; align-items:center; justify-content:center; gap:7px; margin:0 !important; }
+    #newAnalysisButton { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 17px; border-radius:11px; border:1px solid rgba(170,183,255,.28); color:#eef0ff; font-weight:800; font-size:12px; background:rgba(255,255,255,.055); transition:background .2s,border-color .2s,transform .2s; }
+    #newAnalysisButton:hover { background:rgba(145,156,255,.12); border-color:rgba(156,247,235,.5); transform:translateY(-1px); }
+    #newAnalysisButton:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+    @media(max-width:480px) { .upload-actions { display:grid; grid-template-columns:1fr; } .upload-actions button { width:100%; } }
 
-    @media (max-width: 950px) {
-      .hero-grid { grid-template-columns:1fr; }
-      .hero-visual { min-height:410px; }
+    .analysis-footnote { margin:14px 0 0; font-size:10px; color:#7f89a8; line-height:1.7; }
+    #resultsContainer { margin:28px 0 0; }
+
+
+    .upload-purpose-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; margin-top:20px; }
+    .upload-purpose-card { border:1px solid rgba(180,191,255,.13); border-radius:17px; padding:19px; background:rgba(17,21,44,.68); }
+    .purpose-number { display:block; color:var(--cyan); font-size:9px; letter-spacing:.13em; font-weight:850; margin-bottom:9px; }
+    .upload-purpose-card h3 { font-size:13px; margin:0 0 8px; }
+    .upload-purpose-card p { font-size:11px; line-height:1.75; color:var(--muted); margin:0; }
+    .selected-file-help,.analysis-status { font-size:11px; line-height:1.7; color:#aab5d2; margin-top:10px; }
+    .analysis-status.error { color:#ff9ba8; }
+    .analysis-status.success { color:#7ae2bd; }
+    .file-types { flex-wrap:wrap; }
+    .finsight-output { color:#edf1ff; }
+    .finsight-output .out-head { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:19px; border:1px solid rgba(180,191,255,.16); border-radius:16px; background:rgba(20,26,53,.78); margin-bottom:14px; }
+    .finsight-output h3 { margin:0 0 5px; font-size:16px; }
+    .finsight-output p { color:#aab5d2; font-size:11px; line-height:1.7; margin:0; }
+    .out-badge { display:inline-flex; align-items:center; gap:7px; padding:7px 11px; border-radius:30px; font-weight:800; font-size:10px; border:1px solid transparent; }
+    .out-badge::before { content:""; display:block; width:6px; height:6px; border-radius:50%; background:currentColor; }
+    .out-badge.normal,.status-normal { color:#70dfb7!important; background:rgba(51,190,139,.12)!important; border-color:rgba(112,223,183,.25)!important; }
+    .out-badge.review,.status-review { color:#ffca72!important; background:rgba(217,143,35,.13)!important; border-color:rgba(255,202,114,.25)!important; }
+    .out-badge.high,.status-high { color:#ff899a!important; background:rgba(218,63,90,.13)!important; border-color:rgba(255,137,154,.25)!important; }
+    .status-duplicate { color:#c7a8ff!important; background:rgba(154,107,255,.15)!important; border-color:rgba(199,168,255,.28)!important; }
+    .out-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:12px 0; }
+    .out-metric { border:1px solid rgba(180,191,255,.13); border-radius:13px; padding:15px; background:rgba(17,21,44,.64); min-width:0; }
+    .out-metric small { display:block; color:#8c98bb; font-size:9px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+    .out-metric strong { display:block; font-size:20px; overflow-wrap:anywhere; }
+    .out-metric p { margin-top:4px; font-size:10px; }
+    .out-block { border:1px solid rgba(180,191,255,.13); border-radius:15px; padding:17px; margin-top:13px; background:rgba(17,21,44,.52); }
+    .out-block h4 { margin:0 0 12px; font-size:13px; }
+    .out-table-wrap { width:100%; overflow-x:auto; }
+    .out-table { width:100%; border-collapse:collapse; min-width:720px; font-size:10px; }
+    .out-table th,.out-table td { text-align:left; padding:10px 9px; border-bottom:1px solid rgba(180,191,255,.10); vertical-align:top; }
+    .out-table th { color:#8c98bb; text-transform:uppercase; font-size:8px; letter-spacing:.09em; }
+    .out-pill { display:inline-block; padding:4px 7px; margin:2px 3px 2px 0; border-radius:20px; border:1px solid transparent; white-space:nowrap; font-size:9px; font-weight:800; }
+    .out-empty { border:1px dashed rgba(180,191,255,.22); padding:22px; border-radius:13px; color:#aab5d2; font-size:11px; line-height:1.7; }
+    .out-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .out-kv { padding:12px; border-radius:10px; background:rgba(255,255,255,.035); border:1px solid rgba(180,191,255,.09); min-width:0; overflow-wrap:anywhere; }
+    .out-kv small { color:#8c98bb; display:block; font-size:9px; margin-bottom:5px; }
+    .out-kv strong { font-size:11px; }
+    .out-preview { white-space:pre-wrap; overflow-wrap:anywhere; max-height:420px; overflow:auto; background:rgba(4,7,18,.35); border-radius:10px; border:1px solid rgba(180,191,255,.1); padding:14px; color:#cad4ed; font-size:10px; line-height:1.8; }
+    @media(max-width:850px) { .upload-purpose-grid { grid-template-columns:1fr; } .out-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } .out-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media(max-width:540px) { .out-metrics,.out-grid { grid-template-columns:1fr 1fr; } }
+
+    /* Capabilities + Founder */
+    .capability-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; }
+    .capability { display:flex; align-items:flex-start; gap:13px; border-bottom:1px solid rgba(182,193,255,.12); padding:19px 5px 21px; }
+    .capability-icon { color:var(--cyan); font-size:18px; width:28px; flex-shrink:0; }
+    .capability h3 { font-size:13px; margin:0 0 6px; }
+    .capability p { color:var(--muted); font-size:11px; line-height:1.7; margin:0; }
+    .founder-wrap { display:grid; grid-template-columns:.62fr 1.38fr; gap:28px; align-items:stretch; }
+    .founder-identity { position:relative; overflow:hidden; min-height:245px; border:1px solid rgba(171,185,255,.16); border-radius:22px; padding:24px; display:flex; flex-direction:column; justify-content:space-between; background:radial-gradient(ellipse at 50% 10%,rgba(145,122,255,.20),transparent 55%),linear-gradient(150deg,#1d2246,#11142b); }
+    .founder-orb { width:90px; height:90px; position:relative; border-radius:50%; border:1px solid rgba(189,205,255,.32); background:radial-gradient(circle at 34% 30%,#b7fdff,#7e8de3 40%,#323c77 72%,#11162a); box-shadow:0 0 55px rgba(136,136,255,.23),inset -8px -10px 24px rgba(14,18,52,.55); }
+    .founder-orb::before,.founder-orb::after { content:""; position:absolute; background:#171e45; border-radius:50%; top:29px; width:10px; height:13px; box-shadow:0 0 9px #9cf7eb; }
+    .founder-orb::before { left:25px; } .founder-orb::after { right:25px; }
+    /* A gentle happy smile on the small founder-section face only. */
+    .founder-smile { position:absolute; left:29px; top:48px; width:31px; height:15px; border-bottom:3px solid #171e45; border-radius:0 0 22px 22px; filter:drop-shadow(0 0 4px #9cf7eb); }
+    .founder-title { font-size:10px; color:#a9b1d0; text-transform:uppercase; letter-spacing:.16em; }
+    .founder-identity h3 { font-size:22px; line-height:1.1; margin:8px 0 5px; letter-spacing:-.04em; }
+    .founder-identity p { color:#adb5d2; font-size:11px; margin:0; }
+    .founder-message { padding:29px; border:1px solid rgba(171,185,255,.14); border-radius:22px; background:linear-gradient(145deg,rgba(25,29,58,.68),rgba(12,15,32,.82)); }
+    .quote-mark { font-size:38px; line-height:1; color:var(--violet); }
+    .founder-message h3 { font-size:20px; margin:12px 0; }
+    .founder-message p { color:#b3bad4; font-size:13px; line-height:1.95; margin:0 0 13px; }
+    .signature { color:#e9ebff; font-size:12px; font-weight:800; margin-top:21px; }
+    .signature span { color:#8f98ba; display:block; font-size:10px; font-weight:500; margin-top:3px; }
+    .founder-location { display:inline-flex; align-items:center; gap:8px; margin-top:12px; padding:7px 10px; border-radius:999px; border:1px solid rgba(156,247,235,.22); background:rgba(90,215,206,.07); color:#c6fff6; font-size:10px; font-weight:750; letter-spacing:.025em; width:max-content; max-width:100%; }
+    .founder-location .flag { font-size:16px; line-height:1; }
+
+    /* Feedback form */
+    .feedback-card { border:1px solid rgba(171,185,255,.15); border-radius:22px; padding:clamp(20px,4vw,34px); background:linear-gradient(145deg,rgba(22,27,54,.84),rgba(12,15,32,.9)); }
+    .feedback-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; }
+    .feedback-field { display:flex; flex-direction:column; gap:7px; min-width:0; }
+    .feedback-field label { color:#c5cbe3; font-size:11px; font-weight:700; }
+    .feedback-field input,.feedback-field select,.feedback-field textarea { width:100%; color:#f4f6ff; background:#0b1024; border:1px solid rgba(188,201,255,.18); border-radius:11px; padding:12px 13px; outline:none; }
+    .feedback-field input:focus,.feedback-field select:focus,.feedback-field textarea:focus { border-color:#9cf7eb; box-shadow:0 0 0 3px rgba(156,247,235,.08); }
+    .feedback-field input::placeholder,.feedback-field textarea::placeholder { color:#707995; }
+    .feedback-field textarea { min-height:130px; resize:vertical; }
+    .feedback-field.full { grid-column:1/-1; }
+    .feedback-privacy { color:#858daa; font-size:10px; line-height:1.8; margin:16px 0; }
+    .feedback-status { font-size:12px; line-height:1.65; margin-top:13px; color:#a5abc4; }
+    .feedback-status.success { color:#68e2bd; }
+    .feedback-status.error { color:#ff9aa8; }
+    .feedback-honeypot { position:absolute !important; width:1px !important; height:1px !important; padding:0 !important; margin:-1px !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; white-space:nowrap !important; border:0 !important; }
+    .site-footer { padding:25px 0; border-top:1px solid rgba(182,193,255,.10); color:#838ba8; font-size:10px; }
+    .footer-inner { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
+    .footer-brand { color:#dce0fa; font-weight:800; }
+
+    
+    .export-actions { display:flex; flex-wrap:wrap; align-items:center; gap:9px; padding:13px; margin:0 0 16px; border:1px solid #dfe4f1; border-radius:12px; background:#f7f9ff; }
+    .export-actions strong { font-size:12px; color:#27304c; margin-right:4px; }
+    .export-actions .btn { min-height:34px; padding:8px 11px; font-size:11px; cursor:pointer; }
+    @media(max-width:560px){ .export-actions { align-items:stretch; } .export-actions strong { width:100%; } .export-actions .btn { flex:1 1 42%; } }
+
+    /* Results injected by the existing script.js */
+    #resultsContainer .finsight-results { color:#171b2e; }
+    #resultsContainer .finsight-results .result-section { background:#fff; color:#171b2e; }
+    #resultsContainer .finsight-results .results-header { background:#f6f8ff; }
+    #resultsContainer .finsight-results .result-card { color:#171b2e; }
+    #resultsContainer .finsight-results .mapping-item { color:#171b2e; }
+    #resultsContainer .finsight-results .risk-box { color:#171b2e; }
+    #resultsContainer .finsight-results .result-section p { color:#636b82; }
+
+    @media (max-width:1060px) {
+      .nav-wrap { align-items:flex-start; padding:14px 0; flex-direction:column; gap:12px; }
+      .nav-links { width:100%; justify-content:flex-start; overflow-x:auto; padding-bottom:2px; }
+      .hero-grid { grid-template-columns:1fr 1fr; }
+      .hero-visual { min-height:500px; }
       .workspace-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
-      .upload-layout { grid-template-columns:1fr; }
-      .nav-links { gap:14px; }
+      .risk-alert { right:10px; max-width:165px; }
+      .metric-strip { left:12px; width:125px; }
     }
-    @media (max-width: 650px) {
-      .shell { width:min(100% - 28px,1180px); }
-      .nav { min-height:66px; }
-      .nav-links { display:none; }
+    @media (max-width:760px) {
+      .nav-wrap { flex-direction:row; align-items:center; min-height:70px; }
       .mobile-menu { display:block; }
-      .nav-button { padding:10px 12px; font-size:12px; }
-      .hero { padding:44px 0 25px; }
-      h1 { letter-spacing:-1.6px; }
-      .hero-copy { font-size:14px; }
-      .hero-visual { min-height:385px; }
-      .robot { transform:scale(.83); }
-      .metric-card { left:10px; width:116px; top:92px; }
-      .pattern-summary { right:10px; width:112px; top:65px; }
-      .risk-alert { left:10px; right:10px; bottom:12px; }
+      .nav-links { display:none; width:100%; flex-direction:column; align-items:stretch; padding:10px 0 5px; overflow:visible; }
+      .nav-links.open { display:flex; }
+      .nav-links a { padding:12px 14px; }
+      .nav-wrap.menu-open { flex-wrap:wrap; }
+      .hero-actions { display:grid; grid-template-columns:1fr; width:min(100%,420px); gap:12px; }
+      .hero-actions .btn { width:100%; min-width:0; min-height:54px; }
+      .hero { min-height:auto; padding:36px 0 44px; }
+      .hero-grid { grid-template-columns:1fr; gap:15px; }
+      .hero-copy { padding:12px 0; }
+      h1 { font-size:clamp(43px,13vw,66px); }
+      .hero-visual { min-height:470px; }
+      .hero-visual::before { width:290px; height:290px; top:40%; }
+      .metric-strip { width:118px; top:74px; }
+      .metric-card { padding:9px 10px; }
+      .metric-card strong { font-size:19px; }
+      .risk-alert { top:47%; max-width:150px; }
+      .visual-caption { top:64%; }
+      .mini-dashboard { left:12px; right:12px; bottom:12px; grid-template-columns:1fr; gap:7px; }
+      .chart-panel { display:none; }
+      .pattern-summary { padding:9px 12px; }
+      .pattern-summary strong { font-size:14px; }
+      .pattern-title { margin-bottom:4px; }
+      .section { padding:62px 0; }
       .workspace-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-      .workspace-card { padding:14px; min-height:157px; }
+      .workspace-card { padding:15px; min-height:190px; }
       .workspace-card h3 { font-size:13px; }
-      .workspace-card p { font-size:11px; }
-      .section { padding:37px 0; }
-      .section-heading { display:block; }
-      .tool-grid, .feature-grid { grid-template-columns:1fr; }
-      .workspace-view { padding:17px; }
-      .workspace-view-header h3 { font-size:20px; }
-      .about-card { grid-template-columns:1fr; padding:20px; }
-      .footer-inner { align-items:flex-start; flex-direction:column; }
+      .workspace-card p { font-size:10px; }
+      .workspace-icon { width:38px; height:38px; margin-bottom:14px; }
+      .analysis-grid,.founder-wrap { grid-template-columns:1fr; }
+      .feedback-grid { grid-template-columns:1fr; }
+      .feedback-field.full { grid-column:auto; }
+      .analysis-explainer { padding:0; }
+      .tool-grid,.capability-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .founder-identity { min-height:220px; }
     }
+    @media (max-width:420px) {
+      .workspace-grid,.tool-grid,.capability-grid { grid-template-columns:1fr; }
+      .hero-visual { min-height:440px; }
+      .metric-strip { left:10px; width:105px; }
+      .metric-card strong { font-size:16px; }
+      .risk-alert { max-width:140px; right:7px; padding:8px; }
+      .risk-text strong { font-size:9px; }
+      .risk-text span { font-size:7px; }
+      .pattern-summary { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .config-grid { grid-template-columns:1fr; }
+      .upload-card { padding:16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior:auto; }
+      *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    }
+
+    /* Empty dashboard and understandable, color-coded analysis results */
+    .waiting-status { color:#b7c8ed !important; }
+    .waiting-status > span { background:#8296bd !important; box-shadow:0 0 0 4px rgba(130,150,189,.12) !important; }
+    .waiting-alert { background:rgba(19,26,52,.92) !important; border-color:rgba(154,173,221,.22) !important; }
+    .waiting-alert .risk-icon { background:#435477 !important; color:#fff !important; }
+    .empty-chart i { height:0 !important; box-shadow:none !important; }
+    .results-guide-container { margin-top:22px; }
+    .results-guide { padding:23px; border:1px solid rgba(185,197,255,.15); border-radius:18px; background:linear-gradient(145deg,rgba(19,24,49,.92),rgba(14,19,39,.93)); }
+    .guide-heading h3 { font-size:22px; margin:6px 0 7px; }
+    .guide-heading p { color:var(--muted); max-width:780px; margin:0; font-size:14px; }
+    .status-legend { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:20px; }
+    .legend-item { display:flex; align-items:flex-start; gap:10px; border:1px solid rgba(185,197,255,.12); background:rgba(7,11,28,.35); border-radius:12px; padding:13px; min-width:0; }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .legend-dot.normal { background:#45d6a5; box-shadow:0 0 12px #45d6a555; }
+    .legend-dot.review { background:#f4b84a; box-shadow:0 0 12px #f4b84a55; }
+    .legend-dot.high { background:#ff667b; box-shadow:0 0 12px #ff667b55; }
+    .legend-dot.duplicate { background:#b69aff; box-shadow:0 0 12px #b69aff55; }
+    .legend-item strong { display:block; font-size:12px; color:var(--text); }
+    .legend-item small { display:block; font-size:11px; line-height:1.5; color:var(--muted); margin-top:3px; }
+    .guide-note { margin:17px 0 0; padding-top:14px; border-top:1px solid rgba(185,197,255,.13); color:var(--muted); font-size:12px; line-height:1.7; }
+    .guide-note strong { color:#e9ecff; }
+    .finsight-interpretation { border:1px solid rgba(185,197,255,.15); border-radius:15px; background:#11182e; padding:20px; margin:18px 0; color:#f4f5ff; }
+    .finsight-interpretation h3 { margin:0 0 7px; font-size:19px; }
+    .finsight-interpretation > p { color:#b7bfdc; font-size:13px; margin:0 0 14px; }
+    .interpretation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+    .interpretation-item { padding:13px; border-radius:10px; border:1px solid rgba(185,197,255,.12); background:rgba(7,11,28,.35); min-width:0; }
+    .interpretation-item small { display:block; color:#a9b2d0; font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+    .interpretation-item strong { display:block; margin-top:5px; font-size:15px; overflow-wrap:anywhere; }
+    .interpretation-explain { padding:12px 14px; margin-top:12px; background:rgba(100,130,190,.1); border-radius:10px; color:#c3cbe3; font-size:12px; line-height:1.7; }
+    #resultsContainer .status-pill.status-duplicate { background:#f0e9ff !important; color:#6840b5 !important; }
+    #resultsContainer .pattern-bar.duplicate { background:#9b7ae9 !important; }
+    @media(max-width:800px) { .status-legend { grid-template-columns:repeat(2,minmax(0,1fr)); } .interpretation-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media(max-width:480px) { .results-guide { padding:17px; } .status-legend,.interpretation-grid { grid-template-columns:1fr; } }
+
   </style>
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="shell nav">
-      <a class="brand" href="#home" aria-label="FinSight AI home">
-        <span class="brand-mark">F</span>
-        <span class="brand-name">FinSight <span>AI</span></span>
+  <header class="site-header">
+    <div class="container nav-wrap" id="navWrap">
+      <a class="brand" href="#home" aria-label="FinSight AI home" onclick="showHome()">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span><span class="brand-title">FinSight AI</span><span class="brand-sub" style="display:block">Your finance companion</span></span>
       </a>
-
-      <nav class="nav-links" aria-label="Main navigation">
-        <a href="#workspaces">Workspaces</a>
-        <a href="#analyze">Analyze Data</a>
-        <a href="#capabilities">Capabilities</a>
-        <a href="#about">About</a>
+      <button class="mobile-menu" id="mobileMenu" type="button" aria-expanded="false" aria-controls="navLinks">Menu ☰</button>
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+        <a href="#home" onclick="showHome()">Home</a>
+        <a href="#about" onclick="showHome()">About</a>
+        <a href="#capabilities" onclick="showHome()">Capabilities</a>
+        <a href="#analyze" onclick="showHome()">Analyze Data</a>
+        <a href="#workspaces" onclick="showHome()">Workspaces</a>
       </nav>
-
-      <button class="nav-button" onclick="scrollToUpload()">Start Analyzing ↗</button>
     </div>
   </header>
 
-  <main>
+  <main id="homeContent" class="home-content">
     <section class="hero" id="home">
-      <div class="shell hero-grid">
-        <div>
-          <div class="eyebrow"><span class="eyebrow-dot"></span> YOUR FINANCIAL INTELLIGENCE PLATFORM</div>
-          <h1 id="welcomeHeading">Welcome to <span class="gradient-text">FinSight AI</span></h1>
-          <p class="hero-copy">
-            Turn complex financial data into clear insights. Analyze transactions,
-            uncover risks, understand performance, and make better-informed decisions
-            from one intelligent workspace.
-          </p>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="hero-label"><span class="pulse-dot"></span> INTELLIGENCE, WITH A HUMAN TOUCH</div>
+          <h1><span id="greeting">Welcome</span> to<br><span class="gradient">FinSight AI.</span></h1>
+          <p>Your financial AI companion helps you explore transaction data, spot unusual activity, and turn complex numbers into clearer next steps — while keeping people in control of decisions.</p>
           <div class="hero-actions">
-            <button class="primary-button start-analysis-button" onclick="scrollToUpload()">Analyze Your Data ↗</button>
-            <button class="secondary-button" onclick="scrollToHowItWorks()">Explore Workspaces ↓</button>
+            <a class="btn btn-primary" href="#workspaces">Meet your workspaces <span aria-hidden="true">↓</span></a>
+            <a class="btn btn-ghost" href="#analyze">Analyze your data <span aria-hidden="true">↗</span></a>
           </div>
-          <p class="trust-line">Built for finance professionals, analysts, and smarter business decisions.</p>
+          <div class="hero-footnote">Your dashboard stays empty until you upload a file. Only results from your own analysis will appear here.</div>
         </div>
 
-        <div class="hero-visual" aria-label="FinSight AI intelligent financial dashboard illustration">
-          <div class="visual-label">
-            <span class="live-status"><span class="eyebrow-dot"></span> Intelligence overview</span>
+        <div class="hero-visual" id="heroVisual">
+          <div class="visual-topline"><span class="visual-kicker">Your AI finance companion</span><div class="live-status waiting-status"><span></span> AWAITING FILE</div></div>
+          <div class="robot-fallback" aria-hidden="true"><span class="robot-fallback-mouth"></span></div>
+          <div class="visual-caption"><strong>Meet your FinSight companion</strong><span>Observe patterns. Ask better questions. Review with confidence.</span></div>
+          <div class="metric-strip">
+            <div class="metric-card"><span>Transactions analyzed</span><strong>—</strong></div>
+            <div class="metric-card"><span>Risk signals detected</span><strong>—</strong></div>
           </div>
-
-          <div class="robot-stage">
-            <div class="robot-glow"></div>
-            <div class="robot" aria-hidden="true">
-              <div class="robot-ear left"></div>
-              <div class="robot-ear right"></div>
-              <div class="robot-head">
-                <div class="robot-face">
-                  <span class="robot-eye"></span>
-                  <span class="robot-eye"></span>
-                </div>
-              </div>
-              <div class="robot-neck"></div>
-              <div class="robot-body"></div>
-            </div>
-            <div class="robot-shadow"></div>
-          </div>
-
-          <div class="metric-card">
-            <small>Transactions reviewed</small>
-            <strong>1,284</strong>
-            <div class="metric-change">Analysis preview</div>
-          </div>
-
-          <div class="pattern-summary">
-            <small>Performance trend</small>
-            <strong>+12.8%</strong>
-            <div class="period">Illustrative dashboard</div>
-            <div class="mini-bars chart-bars">
-              <i></i><i></i><i></i><i></i><i></i><i></i>
-            </div>
-          </div>
-
-          <div class="risk-alert">
-            <div class="risk-icon">✦</div>
-            <div>
-              <strong>AI-assisted financial insights</strong>
-              <span>Upload your own data to generate analysis</span>
-            </div>
+          <div class="risk-alert waiting-alert"><div class="risk-icon">i</div><div class="risk-text"><strong>No file analyzed yet</strong><span>Upload a statement to see real results here.</span></div></div>
+          <div class="mini-dashboard">
+            <div class="chart-panel"><div class="chart-head"><span>Transaction activity</span><span class="period">Waiting for file</span></div><div class="chart-bars empty-chart" aria-label="No transaction data yet" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="pattern-summary"><div style="grid-column:1/-1" class="pattern-title">Pattern overview · No file yet</div><div><strong>—</strong><span>Review</span></div><div><strong>—</strong><span>Normal</span></div><div><strong>—</strong><span>Total rows</span></div></div>
           </div>
         </div>
       </div>
     </section>
+
+    <div class="trust-line"><div class="container trust-inner"><span><i class="trust-dot"></i><b>One companion</b> across finance workflows</span><span><i class="trust-dot"></i>Risk signals are for human review</span><span><i class="trust-dot"></i>Built for teams around the world</span></div></div>
 
     <section class="section" id="workspaces">
-      <div class="shell">
-        <div class="section-heading">
-          <div>
-            <div class="section-kicker">One platform, connected tools</div>
-            <h2>Your financial workspaces</h2>
-            <p class="section-description">Choose a workspace to explore its tools and workflows. Each area is organized around a different finance responsibility.</p>
-          </div>
-        </div>
-
+      <div class="container">
+        <div class="section-heading"><div class="eyebrow">Explore together</div><h2>One companion. <span class="gradient">Twelve ways to work.</span></h2><p>Open a workspace to find its tools in one organized view. Standards & Compliance and Company & Settings are full workspaces too — not hidden under a footer.</p></div>
         <div class="workspace-grid">
-          <button class="workspace-card" data-workspace="finance">
-            <span class="workspace-icon">◈</span>
-            <h3>Finance</h3>
-            <p>Financial statements, cash flow, budgeting, forecasting, and performance.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="accounting">
-            <span class="workspace-icon">▤</span>
-            <h3>Accounting</h3>
-            <p>Transaction review, reconciliations, ledgers, and accounting workflows.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="costing">
-            <span class="workspace-icon">⌗</span>
-            <h3>Costing</h3>
-            <p>Cost allocation, product costing, margins, and cost variance analysis.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="insights">
-            <span class="workspace-icon">⌁</span>
-            <h3>Insights</h3>
-            <p>Trends, KPIs, patterns, anomalies, and decision-ready summaries.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="risk">
-            <span class="workspace-icon">⬡</span>
-            <h3>Risk</h3>
-            <p>Flag unusual transactions, monitor exposure, and investigate exceptions.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="audit">
-            <span class="workspace-icon">◎</span>
-            <h3>Audit</h3>
-            <p>Audit preparation, evidence organization, testing, and issue tracking.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="tax">
-            <span class="workspace-icon">%</span>
-            <h3>Tax</h3>
-            <p>Tax data organization, tax-period analysis, and compliance preparation.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="planning">
-            <span class="workspace-icon">↗</span>
-            <h3>Planning</h3>
-            <p>Budgets, scenarios, forecasts, assumptions, and financial plans.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="reports">
-            <span class="workspace-icon">▥</span>
-            <h3>Reports</h3>
-            <p>Organize findings into financial summaries and management reports.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="assistant">
-            <span class="workspace-icon">✧</span>
-            <h3>AI Assistant</h3>
-            <p>Get help interpreting finance concepts, data, and analysis results.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="compliance">
-            <span class="workspace-icon">⛨</span>
-            <h3>Standards &amp; Compliance</h3>
-            <p>Reporting frameworks, regulatory updates, standards, and version history.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-
-          <button class="workspace-card" data-workspace="settings">
-            <span class="workspace-icon">⚙</span>
-            <h3>Company &amp; Settings</h3>
-            <p>Company profile, reporting preferences, users, permissions, and security.</p>
-            <span class="open-workspace">Open workspace ↗</span>
-          </button>
-        </div>
-
-        <div class="workspace-view" id="workspaceView" aria-live="polite">
-          <div class="workspace-view-header">
-            <div>
-              <div class="section-kicker">Workspace</div>
-              <h3 id="workspaceTitle">Workspace</h3>
-              <p id="workspaceDescription"></p>
-            </div>
-            <button class="close-workspace" id="closeWorkspace">Close ×</button>
-          </div>
-          <div class="tool-grid" id="workspaceTools"></div>
-          <p class="tool-note" id="workspaceNote"></p>
+          <button class="workspace-card" style="--accent:#8de9f7;--glow:rgba(79,205,227,.18)" onclick="openWorkspace('finance')"><span class="workspace-icon">◈</span><h3>Finance</h3><p>Statements, performance, cash flow, budgeting and forecasting.</p><span class="card-open">Explore Finance <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#b6a5ff;--glow:rgba(150,125,255,.18)" onclick="openWorkspace('accounting')"><span class="workspace-icon">▤</span><h3>Accounting</h3><p>Ledgers, transaction records, reconciliations and mapping.</p><span class="card-open">Explore Accounting <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#f0beff;--glow:rgba(200,119,255,.17)" onclick="openWorkspace('costing')"><span class="workspace-icon">◫</span><h3>Costing</h3><p>Product costs, allocation, margins and cost variance.</p><span class="card-open">Explore Costing <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#8de8c7;--glow:rgba(70,222,173,.16)" onclick="openWorkspace('insights')"><span class="workspace-icon">⌁</span><h3>Insights</h3><p>Patterns, performance signals, trends and KPIs.</p><span class="card-open">Explore Insights <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#ffabbc;--glow:rgba(255,103,155,.16)" onclick="openWorkspace('risk')"><span class="workspace-icon">⬡</span><h3>Risk</h3><p>Potential duplicates, unusual transactions and risk indicators.</p><span class="card-open">Explore Risk <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#ffd58c;--glow:rgba(246,193,91,.15)" onclick="openWorkspace('audit')"><span class="workspace-icon">✓</span><h3>Audit</h3><p>Testing workflows, exceptions, evidence and findings.</p><span class="card-open">Explore Audit <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#a6c7ff;--glow:rgba(88,155,255,.16)" onclick="openWorkspace('tax')"><span class="workspace-icon">▧</span><h3>Tax</h3><p>Tax records, jurisdiction settings and review workflows.</p><span class="card-open">Explore Tax <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#9ef0e7;--glow:rgba(64,210,194,.15)" onclick="openWorkspace('planning')"><span class="workspace-icon">◎</span><h3>Planning</h3><p>Budgets, assumptions, scenarios and forecasts.</p><span class="card-open">Explore Planning <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#c4b6ff;--glow:rgba(128,110,255,.17)" onclick="openWorkspace('reports')"><span class="workspace-icon">▥</span><h3>Reports</h3><p>Structured financial summaries and analysis results.</p><span class="card-open">Explore Reports <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#95ecff;--glow:rgba(76,205,255,.18)" onclick="openWorkspace('assistant')"><span class="workspace-icon">✧</span><h3>AI Assistant</h3><p>Guided financial workflows and answer support.</p><span class="card-open">Explore Assistant <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#e2b4ff;--glow:rgba(170,105,255,.18)" onclick="openWorkspace('standards')"><span class="workspace-icon">§</span><h3>Standards & Compliance</h3><p>IFRS, US GAAP, local GAAP, audit standards and update tracking.</p><span class="card-open">Explore Standards <span>↗</span></span></button>
+          <button class="workspace-card" style="--accent:#a6f0cc;--glow:rgba(91,222,159,.16)" onclick="openWorkspace('settings')"><span class="workspace-icon">⚙</span><h3>Company & Settings</h3><p>Company profile, country, currency, fiscal year and framework.</p><span class="card-open">Configure company <span>↗</span></span></button>
         </div>
       </div>
     </section>
 
-    <section class="section" id="analyze">
-      <div class="shell">
-        <div class="section-heading">
-          <div>
-            <div class="section-kicker">Phase 1 · Data analysis</div>
-            <h2>Bring your financial data to life</h2>
-            <p class="section-description">Upload a supported data file to start the existing FinSight AI analysis workflow.</p>
+    <section class="section analyze-section upload-section" id="analyze">
+      <div class="container analysis-grid">
+        <div class="analysis-explainer">
+          <div class="eyebrow">Phase 1 · Financial analysis</div>
+          <h2>Your financial files, <span class="gradient">made easier to review.</span></h2>
+          <p>Use Financial Analysis for CSV/XLS/XLSX transaction data. Use Document & Image Reading for PDF/DOCX/PPTX/TXT and JPG/JPEG/PNG/WEBP/GIF/BMP files. Each workflow reports only what it actually processed.</p>
+          <div class="workflow-list">
+            <div class="workflow-item"><span class="workflow-num">01</span><span><b>Upload</b><br>Choose Bank Statement, General Ledger, Cash Book, or Other Financial Transactions such as POS/payment-gateway row exports.</span></div>
+            <div class="workflow-item"><span class="workflow-num">02</span><span><b>Analyze</b><br>Send the file and selected record type to the existing API.</span></div>
+            <div class="workflow-item"><span class="workflow-num">03</span><span><b>Review</b><br>Explore the analysis and use human judgment before acting on risk signals.</span></div>
           </div>
         </div>
 
-        <div class="upload-layout">
-          <div class="upload-info">
-            <div class="workspace-icon">↥</div>
-            <h3>From raw data to useful insights</h3>
-            <p>Use the analysis workflow to review transaction data and surface potential patterns or unusual activity.</p>
-            <ul>
-              <li>Upload a supported CSV or Excel file.</li>
-              <li>Select the type of data you are submitting.</li>
-              <li>Run analysis and review the returned results.</li>
-              <li>Check findings carefully before making business decisions.</li>
-            </ul>
-            <p><strong>Important:</strong> The dashboard preview above is illustrative. Actual results depend on the file you upload and the analysis returned by the backend.</p>
+        <div class="upload-card">
+          <div class="upload-card-head"><div class="upload-symbol">↥</div><div><h3>Choose a file workflow</h3><p>Choose one of the two workflows below. They are different because financial analysis uses structured rows, while document and image reading extracts text for inspection.</p></div></div>
+          <div class="upload-mode-heading"><h4>What would you like to do?</h4><p>Select a workflow to see its supported file types and the correct processing steps.</p></div>
+          <div class="upload-mode-grid" role="group" aria-label="Choose a file processing workflow">
+            <button class="upload-mode-card is-selected" id="financialAnalysisModeButton" type="button" aria-pressed="true">
+              <span class="upload-mode-top"><span class="upload-mode-icon" aria-hidden="true">▤</span><span><h4>Financial Analysis</h4><span class="upload-mode-subtitle">CSV · XLS · XLSX</span></span></span>
+              <p>Analyze structured transaction rows, transaction count, totals, averages, column mapping, and supported duplicate or unusual-value checks.</p>
+              <span class="upload-mode-state" id="financialModeState">✓ Selected workflow</span>
+            </button>
+            <button class="upload-mode-card" id="documentReadingModeButton" type="button" aria-pressed="false">
+              <span class="upload-mode-top"><span class="upload-mode-icon" aria-hidden="true">▧</span><span><h4>Document &amp; Image Reading</h4><span class="upload-mode-subtitle">PDF · DOCX · PPTX · TXT · JPG/JPEG · PNG · WEBP · GIF · BMP</span></span></span>
+              <p>Extract readable text from documents and images, show a preview, and let you inspect what was found. This does not automatically run transaction-level risk checks.</p>
+              <span class="upload-mode-state" id="documentModeState">Select this workflow</span>
+            </button>
           </div>
-
-          <div class="upload-panel">
-            <div class="upload-box" id="uploadBox">
-              <div class="upload-symbol">⇧</div>
-              <h3>Upload your financial file</h3>
-              <p>Drag and drop your file here, or choose it from your computer.</p>
-              <label for="fileInput" class="upload-label">Choose file</label>
-              <input class="file-input" type="file" id="fileInput" accept=".csv,.xlsx,.xls" />
-              <div class="file-hint">CSV or Excel formats, depending on backend support</div>
+          <div class="upload-meta" id="recordTypeWrapper"><div><label class="select-label" for="dataType">What type of financial record are you uploading?</label><select id="dataType" name="data_type"><option value="bank_statement">Bank Statement</option><option value="general_ledger">General Ledger</option><option value="cash_book">Cash Book</option><option value="other_financial_data">Other Financial Transactions</option></select>
+            <div id="recordTypeHelp" class="record-type-help">
+              <strong>Selected type guide</strong>
+              <span id="recordTypeCurrentHint" class="type-examples">Bank Statement: deposits, withdrawals, account activity and bank references.</span>
+              <strong style="display:block;margin-top:9px">What belongs in “Other Financial Transactions”?</strong>
+              <span class="type-examples">POS transaction exports, payment-gateway/digital-wallet transactions, or ERP transaction exports containing individual transaction rows. Do not use this for budgets, tax returns, financial statements or audit evidence—those belong in their dedicated workspace.</span>
+              <strong style="display:block;margin-top:9px">Helpful columns</strong>
+              <span class="type-examples">Date, amount OR debit/credit, description, transaction/reference ID, and invoice ID if available. You do not need every field; FinSight will show which recognizable columns it found.</span>
+              <div class="auto-type-note"><strong>Column detection:</strong> after you run analysis, FinSight maps recognizable fields such as date, amount, debit/credit, reference, description and invoice ID when present. Review the returned mapping before relying on the results. A filename can suggest a record type, but it cannot confirm it.</div>
             </div>
-
-            <label class="field-label" for="dataType">Data type</label>
-            <select class="form-select" id="dataType" name="data_type">
-              <option value="transactions">Financial transactions</option>
-              <option value="financial">Financial data</option>
-              <option value="expenses">Expenses</option>
-              <option value="sales">Sales data</option>
-            </select>
-
-            <button class="primary-button analyze-button" id="analyzeButton" onclick="analyzeFile()">Analyze file →</button>
-            <div id="analysisResults"></div>
+          </div></div>
+          <div class="upload-box" id="uploadBox">
+            <div class="upload-icon">⇧</div>
+            <h4 id="uploadPromptTitle">Drop your financial file here</h4>
+            <p id="uploadPromptHelp">Financial Analysis is selected. Choose a CSV, XLS, or XLSX file, or drop it here.</p>
+            <button class="choose-file-button" id="chooseFileButton" type="button" style="margin:6px auto 12px;">Choose financial file</button>
+            <input class="file-picker" id="fileInput" name="file" type="file" accept=".csv,.xls,.xlsx,.pdf,.docx,.pptx,.txt,.jpg,.jpeg,.png,.webp,.gif,.bmp" aria-label="Choose a supported file from your computer">
+            <div class="file-info" hidden>Choose a file to begin</div>
+            <!-- Compatibility hook for the older deployed script.js. The visible picker above is used instead. -->
+            <button class="upload-button" type="button" hidden aria-hidden="true" tabindex="-1"></button>
+            <div class="file-types"><span>CSV</span><span>XLS</span><span>XLSX</span><span>PDF</span><span>DOCX</span><span>PPTX</span><span>TXT</span><span>JPG/JPEG</span><span>PNG</span><span>WEBP</span><span>GIF</span><span>BMP</span></div>
           </div>
+          <div class="upload-actions" id="uploadActions" aria-label="Analysis actions">
+            <button class="btn btn-primary" id="analyzeFileButton" type="button" disabled>Analyze financial data →</button>
+            <button id="newAnalysisButton" type="button" aria-label="Clear the selected file and previous results to start a new analysis">↻ New Analysis</button>
+          </div>
+          <p class="analysis-footnote">Nothing is calculated before you choose a file and click the action button. CSV/XLS/XLSX run Phase 1 transaction analysis. PDF/DOCX/PPTX/TXT use the document-inspection API. Images and scanned PDFs use browser OCR (English-first) to extract readable text; OCR text is not automatically converted into transaction rows, so it does not itself produce duplicate/risk results. Old .DOC/.PPT files are not supported; convert them to .DOCX/.PPTX.</p>
+          <div id="selectedFileHelp" class="selected-file-help" role="status" aria-live="polite">No file selected yet. Your dashboard will remain empty until you run an analysis.</div>
+          <div id="analysisStatus" class="analysis-status" role="status" aria-live="polite"></div>
         </div>
       </div>
+      <div class="container upload-purpose-grid">
+        <article class="upload-purpose-card">
+          <span class="purpose-number">01 · INPUT</span>
+          <h3>Analyze Data: what does it do?</h3>
+          <p>This is the shared file-intake and results workflow. It reads a supported dataset, counts transaction rows, calculates amounts, checks invoice or transaction repeats where fields allow, flags unusual amounts, and shows the evidence returned by the analysis service.</p>
+        </article>
+        <article class="upload-purpose-card">
+          <span class="purpose-number">02 · WORKSPACES</span>
+          <h3>How is it different from the 12 cards?</h3>
+          <p>The 12 cards are separate work areas: Finance, Accounting, Costing, Insights, Risk, Audit, Tax, Planning, Reports, AI Assistant, Standards &amp; Compliance, and Company &amp; Settings. Analyze Data is the shared starting point that feeds actual file findings into those relevant work areas; it is not another workspace card.</p>
+        </article>
+        <article class="upload-purpose-card">
+          <span class="purpose-number">03 · FILE TYPES</span>
+          <h3>Which file should I upload?</h3>
+          <p><strong>Financial Analysis — CSV/XLS/XLSX:</strong> structured transaction analysis using the connected API. <strong>Document &amp; Image Reading — PDF/DOCX/PPTX/TXT:</strong> extract readable text and show a document preview. <strong>JPG/JPEG/PNG/WEBP/GIF/BMP:</strong> browser-based, English-first OCR extracts visible text and shows an image preview. OCR can misread numbers and does not turn images into validated transaction rows. Convert old .doc/.ppt files to .docx/.pptx first.</p>
+        </article>
+      </div>
+      <div class="container results-guide-container">
+        <div class="results-guide">
+          <div class="guide-heading"><div class="eyebrow">How to read your results</div><h3>Your file, explained clearly.</h3><p>After analysis, FinSight should tell you what file was processed, how many records were read, which columns were mapped, what checks ran and which rows need review.</p></div>
+          <div class="status-legend" aria-label="Risk status color legend">
+            <div class="legend-item"><span class="legend-dot normal"></span><div><strong>Normal</strong><small>Green · No current rule triggered</small></div></div>
+            <div class="legend-item"><span class="legend-dot review"></span><div><strong>Unusual / Review</strong><small>Amber · Check this pattern</small></div></div>
+            <div class="legend-item"><span class="legend-dot high"></span><div><strong>High risk</strong><small>Red · Prioritize human review</small></div></div>
+            <div class="legend-item"><span class="legend-dot duplicate"></span><div><strong>Duplicate candidate</strong><small>Purple · Matching invoice/transaction details</small></div></div>
+          </div>
+          <p class="guide-note"><strong>Important:</strong> Duplicate and unusual are different findings. A repeated invoice/reference is a potential duplicate; an unusual transaction is a pattern that stands out. A risk flag is not proof of fraud. Duplicate results can only be reported separately when the connected analysis API returns duplicate-specific findings.</p>
+        </div>
+      </div>
+      <div class="container"><div id="resultsContainer" aria-live="polite"></div></div>
     </section>
 
     <section class="section" id="capabilities">
-      <div class="shell">
-        <div class="section-heading">
-          <div>
-            <div class="section-kicker">Designed for finance teams</div>
-            <h2>Clarity for every decision</h2>
-            <p class="section-description">A connected finance experience that brings important workflows into one place.</p>
-          </div>
-        </div>
-
-        <div class="feature-grid">
-          <div class="feature-card">
-            <div class="workspace-icon">⌁</div>
-            <h3>Understand performance</h3>
-            <p>Organize financial indicators, review trends, and understand changes across reporting periods.</p>
-          </div>
-          <div class="feature-card">
-            <div class="workspace-icon">◉</div>
-            <h3>Identify exceptions</h3>
-            <p>Review unusual records and potential risks surfaced by supported analysis workflows.</p>
-          </div>
-          <div class="feature-card">
-            <div class="workspace-icon">▥</div>
-            <h3>Support planning</h3>
-            <p>Bring budgeting, forecasting, and management reporting tasks into a clearer workflow.</p>
-          </div>
+      <div class="container">
+        <div class="section-heading"><div class="eyebrow">What FinSight supports</div><h2>Designed around <span class="gradient">better review, not more clutter.</span></h2><p>Keep the essentials visible, then open the workspace that matches the task in front of you.</p></div>
+        <div class="capability-grid">
+          <article class="capability"><span class="capability-icon">⌁</span><div><h3>Financial summaries</h3><p>Transaction count, total amounts and averages returned by the analysis.</p></div></article>
+          <article class="capability"><span class="capability-icon">◇</span><div><h3>Potential duplicates</h3><p>Review duplicate invoices or transaction patterns when supported by your analysis rules and input data.</p></div></article>
+          <article class="capability"><span class="capability-icon">◉</span><div><h3>Anomaly signals</h3><p>Surface unusual transactions for careful human review, not as automatic proof of fraud.</p></div></article>
+          <article class="capability"><span class="capability-icon">▤</span><div><h3>Column mapping</h3><p>Show mapping information returned from the existing analysis endpoint when available.</p></div></article>
+          <article class="capability"><span class="capability-icon">§</span><div><h3>Reporting frameworks</h3><p>Organize framework preferences for IFRS, US GAAP, local/national GAAP or another framework.</p></div></article>
+          <article class="capability"><span class="capability-icon">✧</span><div><h3>Human-centered AI</h3><p>Use AI-supported review to inform decisions while keeping professional judgment in control.</p></div></article>
         </div>
       </div>
     </section>
 
     <section class="section" id="about">
-      <div class="shell">
-        <div class="about-card">
-          <div>
-            <div class="section-kicker">About FinSight AI</div>
-            <h2>Better financial understanding starts with better visibility.</h2>
-            <p>FinSight AI is designed to help people work with financial information more clearly. The aim is to make analysis more approachable, organize finance workflows, and support informed decisions.</p>
-            <p>AI-generated insights should be reviewed against the underlying records and applicable professional requirements.</p>
-          </div>
+      <div class="container">
+        <div class="section-heading"><div class="eyebrow">About FinSight AI</div><h2>A finance companion with a <span class="gradient">clear purpose.</span></h2><p>FinSight AI is being shaped around a simple idea: financial work should feel more understandable, organized and actionable.</p></div>
+        <div class="founder-wrap">
+          <div class="founder-identity"><div><div class="founder-orb" aria-hidden="true"><span class="founder-smile"></span></div><div class="founder-title" style="margin-top:22px">The person behind the vision</div></div><div><h3>Syeda Tabassum Kanwal</h3><p>Founder, FinSight AI</p><div class="founder-location"><span class="flag" aria-label="Pakistan flag">🇵🇰</span><span>Pakistan-based Developer</span></div></div></div>
+          <div class="founder-message"><div class="quote-mark">“</div><div class="eyebrow">A message from the founder</div><h3>Making financial analysis more accessible.</h3><p>FinSight AI was created with a vision to make financial analysis more accessible, efficient, and insightful. Our goal is to help finance professionals and businesses understand their financial data, identify potential risks, detect anomalies, and make more informed decisions.</p><p>We believe technology should simplify complex financial work and empower people to focus on what matters most: better financial decisions.</p><div class="signature">Syeda Tabassum Kanwal<span>Founder, FinSight AI · Pakistan 🇵🇰</span></div><div style="margin-top:22px"><a class="btn btn-ghost" href="#feedback">Share feedback ↗</a></div></div>
+        </div>
+      </div>
+    </section>
 
-          <div>
-            <div class="section-kicker">Feedback</div>
-            <h2>Help improve FinSight AI</h2>
-            <p>Share a suggestion or describe a problem you experienced. This form opens your default email application; it does not send feedback automatically.</p>
-            <form class="feedback-form" id="feedbackForm">
-              <input class="form-input" type="text" id="feedbackName" placeholder="Your name (optional)" />
-              <input class="form-input" type="email" id="feedbackEmail" placeholder="Your email (optional)" />
-              <textarea class="form-input" id="feedbackMessage" placeholder="Your feedback or suggestion" required></textarea>
-              <button class="primary-button" type="submit">Prepare feedback email ↗</button>
-              <p id="feedbackStatus" class="file-hint"></p>
-            </form>
-          </div>
+    <section class="section" id="feedback">
+      <div class="container">
+        <div class="section-heading"><div class="eyebrow">Help us improve</div><h2>Share your <span class="gradient">feedback.</span></h2><p>Tell us what feels useful, what is confusing, or which feature you would like to see next. Please do not include bank account numbers, passwords, complete statements, or confidential financial details.</p></div>
+        <div class="feedback-card">
+          <form id="feedbackForm">
+            <div class="feedback-grid">
+              <div class="feedback-field"><label for="feedbackName">Your name (optional)</label><input id="feedbackName" name="name" type="text" maxlength="80" placeholder="Name"></div>
+              <div class="feedback-field"><label for="feedbackEmail">Email (optional)</label><input id="feedbackEmail" name="contact_email" type="email" maxlength="254" placeholder="you@example.com" autocomplete="email"></div>
+              <div class="feedback-field"><label for="feedbackCategory">What is your feedback about?</label><select id="feedbackCategory" name="category"><option value="General feedback">General feedback</option><option value="Bug report">Report a problem</option><option value="Feature request">Suggest a feature</option><option value="Financial analysis">Financial analysis results</option><option value="Usability">Website usability</option><option value="Other">Other</option></select></div>
+              <div class="feedback-field"><label for="feedbackRating">Overall experience</label><select id="feedbackRating" name="rating"><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3" selected>3 — Okay</option><option value="2">2 — Needs improvement</option><option value="1">1 — Poor</option></select></div>
+              <div class="feedback-field full"><label for="feedbackMessage">Your feedback <span aria-hidden="true">*</span></label><textarea id="feedbackMessage" name="message" required minlength="8" maxlength="2500" placeholder="What should we improve? Please be as specific as possible."></textarea></div>
+              <div class="feedback-honeypot" aria-hidden="true"><label for="feedbackWebsite">Leave this field empty</label><input id="feedbackWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+            </div>
+            <p class="feedback-privacy">Name and email are optional. Feedback is sent to the FinSight AI backend for review. Please share only general product feedback, not confidential financial or personal information.</p>
+            <button class="btn btn-primary" id="feedbackSubmit" type="submit">Send feedback ↗</button>
+            <div class="feedback-status" id="feedbackStatus" role="status" aria-live="polite"></div>
+          </form>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="shell footer-inner">
-      <a class="brand" href="#home">
-        <span class="brand-mark">F</span>
-        <span class="brand-name">FinSight <span>AI</span></span>
-      </a>
-      <span>Financial intelligence, made clearer.</span>
-      <span>© <span id="currentYear"></span> FinSight AI</span>
+  <section id="workspaceView" class="workspace-view" aria-live="polite">
+    <div class="container">
+      <div class="workspace-toolbar"><button class="back-button" type="button" onclick="showHome()">← Back to home</button><button class="btn btn-primary" type="button" onclick="openAnalysis()">Analyze Data ↗</button></div>
+      <div class="workspace-intro"><div class="eyebrow">FinSight AI workspace</div><h2 id="workspaceHeading">Workspace</h2><p id="workspaceDescription"></p></div>
+      <div class="tool-grid" id="workspaceTools"></div>
+      <div class="workspace-extra" id="workspaceExtra"></div>
     </div>
-  </footer>
+  </section>
+
+  <footer class="site-footer"><div class="container footer-inner"><span><span class="footer-brand">FinSight AI</span> · Financial intelligence, made clearer.</span><span><a href="#feedback" aria-label="Get support or share feedback" style="color:#9cf7eb;margin-right:14px">Support &amp; feedback</a>© <span id="currentYear"></span> FinSight AI · Review financial findings with professional judgment.</span></div></footer>
 
   <script>
-    // Greeting uses the visitor's local browser time. No personal name is hardcoded.
-    (function () {
-      const hour = new Date().getHours();
-      let greeting = "Good evening";
-      if (hour >= 5 && hour < 12) greeting = "Good morning";
-      else if (hour >= 12 && hour < 17) greeting = "Good afternoon";
-
-      const heading = document.getElementById("welcomeHeading");
-      heading.innerHTML = greeting + "! Welcome to <span class='gradient-text'>FinSight AI</span>";
-      document.getElementById("currentYear").textContent = new Date().getFullYear();
-    })();
-
-    // Workspace descriptions and tool categories.
     const workspaceData = {
-      finance: {
-        title: "Finance",
-        description: "Review financial performance and organize core finance workflows.",
-        note: "Upload relevant financial data in the analysis section to use the currently available backend workflow.",
-        tools: [
-          ["Financial statements", "Review and organize statement-related data."],
-          ["Financial reporting", "Prepare structured summaries for review."],
-          ["Budgeting", "Organize budgets and planned spending."],
-          ["Forecasting", "Review assumptions and future projections."],
-          ["Variance analysis", "Compare actual results with budgets or forecasts."],
-          ["Cash flow & working capital", "Review cash movement and working-capital indicators."]
-        ]
-      },
-      accounting: {
-        title: "Accounting",
-        description: "Organize transaction-level work and accounting review tasks.",
-        note: "The actual functions available here depend on the connected backend. Do not treat the workspace labels as proof that every feature is already implemented.",
-        tools: [
-          ["Transaction review", "Inspect records and investigate unusual entries."],
-          ["Reconciliation", "Organize records for reconciliation checks."],
-          ["General ledger", "Review ledger-related data and classifications."],
-          ["Journal entries", "Organize entries for accounting review."],
-          ["Account mapping", "Review how fields and accounts are classified."],
-          ["Period close", "Prepare a checklist for closing activities."]
-        ]
-      },
-      costing: {
-        title: "Costing",
-        description: "Understand cost structure, allocation, and profitability.",
-        note: "Costing is a dedicated workspace with equal visual importance to the other workspaces.",
-        tools: [
-          ["Product costing", "Organize direct and indirect product costs."],
-          ["Cost allocation", "Review cost allocation bases and methods."],
-          ["Cost centre analysis", "Compare costs by department or cost centre."],
-          ["Variance analysis", "Review actual costs against standards or budgets."],
-          ["Contribution margin", "Organize sales, variable costs, and contribution."],
-          ["Profitability analysis", "Compare margins across products or services."]
-        ]
-      },
-      insights: {
-        title: "Insights",
-        description: "Explore patterns and turn analysis results into understandable findings.",
-        note: "Only findings returned by a connected analysis workflow should be represented as actual results.",
-        tools: [
-          ["Trend analysis", "Review changes over time."],
-          ["KPI overview", "Organize key performance indicators."],
-          ["Pattern detection", "Explore recurring patterns in data."],
-          ["Anomaly review", "Investigate records flagged by analysis."],
-          ["Executive summary", "Structure concise management takeaways."],
-          ["Data quality", "Review missing, inconsistent, or unexpected values."]
-        ]
-      },
-      risk: {
-        title: "Risk",
-        description: "Organize financial risk review and exception investigation.",
-        note: "Risk indicators are decision-support signals and should be verified against source records.",
-        tools: [
-          ["Transaction exceptions", "Review records that require attention."],
-          ["Risk register", "Organize identified risks and responses."],
-          ["Control monitoring", "Track checks and control observations."],
-          ["Exposure overview", "Structure risk exposure information."],
-          ["Investigation notes", "Record observations for follow-up."],
-          ["Issue tracking", "Organize owners, actions, and resolution status."]
-        ]
-      },
-      audit: {
-        title: "Audit",
-        description: "Organize audit preparation, evidence, and review activities.",
-        note: "This is an organizing workspace, not a substitute for professional audit judgment or required audit procedures.",
-        tools: [
-          ["Audit planning", "Organize objectives, timelines, and scope."],
-          ["Evidence register", "Track evidence references and documentation."],
-          ["Sample review", "Organize records selected for testing."],
-          ["Findings log", "Track observations and proposed actions."],
-          ["Control testing", "Organize control tests and results."],
-          ["Audit trail", "Record review notes and follow-up items."]
-        ]
-      },
-      tax: {
-        title: "Tax",
-        description: "Organize tax-related data and compliance preparation.",
-        note: "Tax rules depend on jurisdiction and period. Verify calculations and deadlines with authoritative sources or a qualified professional.",
-        tools: [
-          ["Tax data preparation", "Organize records needed for tax review."],
-          ["Tax-period summary", "Group relevant information by period."],
-          ["Tax adjustments", "Track proposed adjustments for review."],
-          ["Indirect tax review", "Organize relevant sales and purchase data."],
-          ["Tax calendar", "Track deadlines entered by your team."],
-          ["Tax documentation", "Organize supporting records."]
-        ]
-      },
-      planning: {
-        title: "Planning",
-        description: "Organize budgets, forecasts, scenarios, and financial assumptions.",
-        note: "Planning outputs depend on the assumptions and data supplied by your team.",
-        tools: [
-          ["Annual budget", "Organize budget lines and assumptions."],
-          ["Rolling forecast", "Structure forecasts across future periods."],
-          ["Scenario planning", "Compare alternative assumptions."],
-          ["Cash planning", "Organize projected receipts and payments."],
-          ["Headcount planning", "Track workforce-related assumptions."],
-          ["Forecast vs actual", "Compare plans with recorded outcomes."]
-        ]
-      },
-      reports: {
-        title: "Reports",
-        description: "Structure financial findings for review and communication.",
-        note: "Report export and generation options depend on the backend and the data available.",
-        tools: [
-          ["Management reports", "Organize key information for managers."],
-          ["Financial summaries", "Structure important financial figures."],
-          ["KPI reports", "Group indicators and reporting periods."],
-          ["Exception reports", "Collect items requiring further investigation."],
-          ["Period comparisons", "Compare selected periods."],
-          ["Reporting checklist", "Track preparation and review steps."]
-        ]
-      },
-      assistant: {
-        title: "AI Assistant",
-        description: "An entry point for finance-related help and analysis guidance.",
-        note: "This homepage does not create a new AI chat API. Connect an assistant endpoint before enabling live conversational responses.",
-        tools: [
-          ["Explain a finance concept", "Prepare questions about finance terminology."],
-          ["Interpret analysis", "Review findings returned by the existing analysis workflow."],
-          ["Formula guidance", "Explore common finance and accounting formulas."],
-          ["Report-writing help", "Organize a draft summary from verified findings."],
-          ["Data preparation", "Get guidance on structuring data for upload."],
-          ["Review checklist", "Create a list of items to verify."]
-        ]
-      },
-      compliance: {
-        title: "Standards & Compliance",
-        description: "Organize reporting frameworks, regulatory information, and compliance monitoring.",
-        note: "A live regulatory update feed, automatic monitoring, and version history require a verified data source and backend implementation.",
-        tools: [
-          ["Reporting frameworks", "IFRS, US GAAP, Local/National GAAP, and Other."],
-          ["Regulatory updates", "Organize updates by authority, date, and jurisdiction."],
-          ["Tax updates", "Track tax changes for review and validation."],
-          ["Audit standards", "Organize relevant auditing standards and references."],
-          ["Version history", "Record framework versions and change notes."],
-          ["Update monitoring", "Plan review frequency, owners, and follow-up."]
-        ]
-      },
-      settings: {
-        title: "Company & Settings",
-        description: "Prepare the organization profile and preferences for a multi-company finance environment.",
-        note: "These settings are a visual workspace only until persistent storage, authentication, and permissions are connected to the backend.",
-        tools: [
-          ["Company profile", "Company name, industry, country, and organization details."],
-          ["Currency & fiscal year", "Default currency, fiscal-year start, and reporting period."],
-          ["Reporting framework", "Select IFRS, US GAAP, Local/National GAAP, or Other."],
-          ["Users & roles", "Organize user roles and access requirements."],
-          ["Permissions", "Plan role-based access to data and functions."],
-          ["Data sources & security", "Organize connected sources and security preferences."]
-        ]
-      }
+      finance: {title:"Finance",description:"Review financial performance and move from uploaded records to useful financial summaries.",tools:[["Financial Analysis","Transaction count, total amounts, average amounts and key summary measures."],["Financial Statements","Organize statement-related review workflows."],["Financial Reporting","Structure financial summaries for review and communication."],["Budgeting","Organize budget assumptions and planned amounts."],["Forecasting","Review forecast assumptions and future estimates."],["Variance Analysis","Compare actual data with budgets or forecasts when both are available."],["Cash Flow","Review cash inflows, outflows and movement."],["Working Capital","Organize working-capital measures and review tasks."]],analysis:true},
+      accounting: {title:"Accounting",description:"A dedicated view for accounting records and transaction review.",tools:[["Bank Statement","Upload a bank statement using Analyze Data."],["General Ledger","Select the general-ledger record type before analysis."],["Cash Book","Select the cash-book record type before analysis."],["Column Mapping","Review the column mappings returned from the analysis endpoint."],["Transaction Review","Inspect transaction-level results and potential discrepancies."],["Reconciliation","Organize reconciliation tasks for supported input data."]],analysis:true},
+      costing: {title:"Costing",description:"Keep costing as a peer workspace within FinSight's wider financial intelligence purpose.",tools:[["Cost Analysis","Review cost totals and movements where source data supports them."],["Product Costing","Organize product or service cost review."],["Cost Allocation","Structure cost allocation by cost centre."],["Cost Centre Analysis","Group costs by centre or department."],["Margin Analysis","Review revenue, costs and margin indicators where available."],["Cost Variance","Compare expected and actual costs where both are provided."]]},
+      insights: {title:"Insights",description:"Organize patterns, trends and financial findings into a clearer review workflow.",tools:[["Pattern Analysis","Explore returned patterns and transaction trends."],["Performance Indicators","Organize financial measures and summaries."],["Trend Review","Review changes across available periods."],["Key Findings","Collect significant results for human review."]]},
+      risk: {title:"Risk",description:"Review potential risks and anomalies flagged by the current analysis rules.",tools:[["Risk Overview","View overall risk status and returned risk counts."],["Duplicate Invoices","Investigate potential duplicate invoice records when the input includes relevant fields."],["Unusual Transactions","Review anomaly signals returned by the backend."],["Risk Score & Level","Inspect the risk score and level for a flagged item."],["Transaction-Level Results","Review affected records and related explanations."]],analysis:true},
+      audit: {title:"Audit",description:"Organize audit review work without presenting risk signals as proof of fraud.",tools:[["Transaction Testing","Review selected transactions for audit follow-up."],["Exceptions & Findings","Organize potential issues surfaced during review."],["Evidence Tracking","Structure evidence collection tasks."],["Audit Standards","Open Standards & Compliance for standards-related information."]]},
+      tax: {title:"Tax",description:"Organize jurisdiction-specific tax review and tax-related workstreams.",tools:[["Tax Profile","Review the configured company tax jurisdiction."],["Tax Records","Organize tax-relevant financial records."],["Tax Updates","Track tax updates once a reliable source is connected."],["Tax Review","Plan a structured review of tax-related records."]]},
+      planning: {title:"Planning",description:"Arrange budgets, forecasts, scenarios and assumptions in one focused space.",tools:[["Budgets","Organize planned financial amounts."],["Forecasts","Review future estimates and assumptions."],["Scenario Planning","Compare planning assumptions."],["Variance Review","Compare actuals to planned figures when available."]]},
+      reports: {title:"Reports",description:"Find financial summaries and results produced by analysis workflows.",tools:[["Financial Summary","Review the core figures returned by analysis."],["Risk Summary","Organize anomaly counts and risk findings."],["Pattern Summary","Review patterns based on the transactions provided."],["Transaction Results","Inspect transaction-level output."]],analysis:true},
+      assistant: {title:"AI Assistant",description:"A dedicated place for guided workflows. Generated AI answers require an AI service to be connected.",tools:[["Financial Questions","A home for finance-related guided question workflows."],["Explain Results","Explain results when connected to the relevant analysis or AI service."],["Workflow Guidance","Organize practical next steps for finance review."]]},
+      standards: {title:"Standards & Compliance",description:"Choose a reporting framework and organize related compliance topics. This workspace is a framework organizer, not a compliance certification service.",tools:[["IFRS","International Financial Reporting Standards."],["US GAAP","Generally Accepted Accounting Principles used in the United States."],["Local / National GAAP","The applicable local or national accounting framework."],["Other Frameworks","Record another reporting framework relevant to your organization."],["Regulatory Updates","Organize regulatory update monitoring; live updates need a connected source."],["Tax Updates","Track tax-related changes for the relevant jurisdiction."],["Audit Standards","Organize audit standards relevant to your organization."],["Current Version & History","Record the standard version and history used by the company."],["Update Monitoring","Plan how applicable changes will be reviewed."]],extra:"standards"},
+      settings: {title:"Company & Settings",description:"Set the company context used to guide reporting and financial review across the platform.",tools:[["Company Profile","Record company identity and profile details."],["Country & Currency","Set the relevant country and functional currency."],["Industry","Choose an industry for company context."],["Fiscal Year","Set the company's financial year."],["Reporting Framework","Choose IFRS, US GAAP, Local/National GAAP or another framework."],["Users & Roles","Organize user roles and access requirements."],["Permissions & Security","Plan permissions and security rules."],["Data Sources","Organize source files and connected data sources."]],extra:"settings"}
     };
 
-    const workspaceView = document.getElementById("workspaceView");
-    const workspaceTitle = document.getElementById("workspaceTitle");
-    const workspaceDescription = document.getElementById("workspaceDescription");
-    const workspaceTools = document.getElementById("workspaceTools");
-    const workspaceNote = document.getElementById("workspaceNote");
+    function updateGreeting() {
+      const greeting = document.getElementById("greeting");
+      const now = new Date();
 
-    document.querySelectorAll(".workspace-card").forEach(function (card) {
-      card.addEventListener("click", function () {
-        const item = workspaceData[card.dataset.workspace];
-        if (!item) return;
-
-        workspaceTitle.textContent = item.title;
-        workspaceDescription.textContent = item.description;
-        workspaceNote.textContent = item.note;
-        workspaceTools.replaceChildren();
-
-        item.tools.forEach(function (tool) {
-          const article = document.createElement("div");
-          article.className = "tool-item";
-
-          const title = document.createElement("strong");
-          title.textContent = tool[0];
-
-          const description = document.createElement("span");
-          description.textContent = tool[1];
-
-          article.append(title, description);
-          workspaceTools.appendChild(article);
-        });
-
-        workspaceView.classList.add("active");
-        workspaceView.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
-
-    document.getElementById("closeWorkspace").addEventListener("click", function () {
-      workspaceView.classList.remove("active");
-      document.getElementById("workspaces").scrollIntoView({ behavior: "smooth" });
-    });
-
-    // Navigation helpers retained for the existing frontend script.
-    function scrollToUpload() {
-      document.getElementById("analyze").scrollIntoView({ behavior: "smooth" });
-    }
-
-    function scrollToHowItWorks() {
-      document.getElementById("workspaces").scrollIntoView({ behavior: "smooth" });
-    }
-
-    // Feedback opens an email draft instead of silently pretending to submit.
-    document.getElementById("feedbackForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      const name = document.getElementById("feedbackName").value.trim();
-      const email = document.getElementById("feedbackEmail").value.trim();
-      const message = document.getElementById("feedbackMessage").value.trim();
-
-      if (!message) {
-        document.getElementById("feedbackStatus").textContent = "Please enter your feedback first.";
-        return;
+      // Detect the visitor's browser/device time zone (for example, Asia/Karachi).
+      // This avoids hardcoding Pakistan or any other country for a global platform.
+      let visitorTimeZone;
+      try {
+        visitorTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      } catch (error) {
+        visitorTimeZone = undefined;
       }
 
-      const subject = encodeURIComponent("FinSight AI Feedback");
-      const body = encodeURIComponent(
-        "Feedback for FinSight AI\n\n" +
-        "Name: " + (name || "Not provided") + "\n" +
-        "Email: " + (email || "Not provided") + "\n\n" +
-        message
-      );
+      let hour = now.getHours();
+      try {
+        const options = { hour: "2-digit", hourCycle: "h23" };
+        if (visitorTimeZone) options.timeZone = visitorTimeZone;
+        hour = Number(new Intl.DateTimeFormat("en-GB", options).format(now));
+      } catch (error) {
+        // Fall back to the browser's local clock if timezone formatting is unavailable.
+      }
 
-      document.getElementById("feedbackStatus").textContent =
-        "Your email application should open with the feedback draft. Please review and send it there.";
-      window.location.href = "mailto:?subject=" + subject + "&body=" + body;
+      // Friendly greeting based on the visitor's own local time zone.
+      // “Good night” is usually a farewell, so late-night visitors get “Hello, night owl”.
+      let value;
+      if (hour >= 5 && hour < 12) value = "Hello, good morning!";
+      else if (hour >= 12 && hour < 17) value = "Hello, good afternoon!";
+      else if (hour >= 17 && hour < 22) value = "Hello, good evening!";
+      else value = "Hello, night owl!"; // 10:00 PM–4:59 AM
+
+      if (greeting) greeting.textContent = value;
+      const year = document.getElementById("currentYear");
+      if (year) year.textContent = now.getFullYear();
+    }
+
+    function showHome() {
+      document.getElementById("homeContent").classList.remove("hidden");
+      document.getElementById("workspaceView").classList.remove("active");
+      closeMobileMenu();
+    }
+
+    function openAnalysis() {
+      showHome();
+      setTimeout(() => {
+        const section = document.getElementById("analyze");
+        if (section) section.scrollIntoView({behavior:"smooth",block:"start"});
+      }, 0);
+    }
+
+    function openWorkspace(key) {
+      const item = workspaceData[key];
+      if (!item) return;
+      document.getElementById("homeContent").classList.add("hidden");
+      document.getElementById("workspaceView").classList.add("active");
+      document.getElementById("workspaceHeading").textContent = item.title;
+      document.getElementById("workspaceDescription").textContent = item.description;
+      const tools = document.getElementById("workspaceTools");
+      tools.replaceChildren();
+      item.tools.forEach(([title,description]) => {
+        const card = document.createElement("article");
+        card.className = "tool-card";
+        const h3 = document.createElement("h3"); h3.textContent = title;
+        const p = document.createElement("p"); p.textContent = description;
+        card.append(h3,p); tools.appendChild(card);
+      });
+      const extra = document.getElementById("workspaceExtra");
+      extra.replaceChildren();
+      if (item.analysis) {
+        const panel = document.createElement("div"); panel.className = "config-panel";
+        panel.innerHTML = '<h3>Open the Phase 1 analysis workflow</h3><p class="muted">Upload a bank statement, general ledger, cash book, or supported other financial transaction export and review results returned by the backend.</p><button class="btn btn-primary" type="button" onclick="openAnalysis()">Go to Analyze Data ↗</button>';
+        extra.appendChild(panel);
+      } else if (item.extra === "standards") {
+        extra.innerHTML = '<div class="config-panel"><h3>Reporting framework guide</h3><p class="muted">Choose the framework applicable to your company. A framework selection does not itself confirm compliance.</p><div class="config-grid"><div class="field"><label for="standardsFramework">Reporting framework</label><select id="standardsFramework"><option>IFRS</option><option>US GAAP</option><option>Local / National GAAP</option><option>Other</option></select></div><div class="field"><label for="standardsCountry">Jurisdiction</label><select id="standardsCountry"><option value="">Select country / jurisdiction</option><option>Pakistan</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>India</option><option>Other</option></select></div></div><p class="help-note">These selections are interface-only until connected to a company-settings endpoint. Regulatory updates require a reliable external source.</p></div>';
+      } else if (item.extra === "settings") {
+        extra.innerHTML = '<div class="config-panel"><h3>Company setup</h3><p class="muted">Set a reporting context for this company.</p><div class="config-grid"><div class="field"><label for="companyName">Company name</label><input id="companyName" placeholder="Enter company name"></div><div class="field"><label for="companyCountry">Country</label><select id="companyCountry"><option value="">Select country</option><option>Pakistan</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>India</option><option>Other</option></select></div><div class="field"><label for="companyCurrency">Currency</label><select id="companyCurrency"><option value="">Select currency</option><option>PKR</option><option>USD</option><option>GBP</option><option>AED</option><option>INR</option><option>Other</option></select></div><div class="field"><label for="companyIndustry">Industry</label><select id="companyIndustry"><option value="">Select industry</option><option>Manufacturing</option><option>Retail</option><option>Services</option><option>Technology</option><option>Financial Services</option><option>Other</option></select></div><div class="field"><label for="companyFiscalYear">Fiscal year</label><select id="companyFiscalYear"><option value="">Select fiscal year</option><option>January–December</option><option>July–June</option><option>April–March</option><option>Other</option></select></div><div class="field"><label for="companyFramework">Reporting framework</label><select id="companyFramework"><option value="">Select framework</option><option>IFRS</option><option>US GAAP</option><option>Local / National GAAP</option><option>Other</option></select></div><div class="field"><label for="companyTax">Tax jurisdiction</label><input id="companyTax" placeholder="e.g. Pakistan"></div></div><p class="help-note">These fields are not saved between visits yet. Persistent settings and role permissions need a backend endpoint.</p></div>';
+      }
+      closeMobileMenu();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    function closeMobileMenu() {
+      const nav = document.getElementById("navLinks");
+      const wrap = document.getElementById("navWrap");
+      const button = document.getElementById("mobileMenu");
+      if (nav) nav.classList.remove("open");
+      if (wrap) wrap.classList.remove("menu-open");
+      if (button) button.setAttribute("aria-expanded","false");
+    }
+
+    document.getElementById("mobileMenu").addEventListener("click", function() {
+      const nav = document.getElementById("navLinks");
+      const wrap = document.getElementById("navWrap");
+      const opened = nav.classList.toggle("open");
+      wrap.classList.toggle("menu-open", opened);
+      this.setAttribute("aria-expanded", String(opened));
     });
+
+    updateGreeting();
   </script>
 
-  <!-- Keep your existing backend-connected script. -->
-  <script src="/script.js"></script>
+  <!-- Three.js gives the hero character actual 3D geometry. If the CDN is unavailable, a CSS fallback remains visible. -->
+  <script type="module">
+    const stage = document.getElementById('heroVisual');
+    let applyRobotMood = null;
+    // Expose a safe, tiny API for the existing analysis script to update only the big hero robot.
+    window.setFinSightRobotMood = function(mood = 'normal') {
+      const normalized = ['normal','review','high'].includes(mood) ? mood : 'normal';
+      window.finSightRobotMood = normalized;
+      if (stage) {
+        stage.classList.remove('robot-mood-review','robot-mood-high');
+        if (normalized === 'review') stage.classList.add('robot-mood-review');
+        if (normalized === 'high') stage.classList.add('robot-mood-high');
+      }
+      if (typeof applyRobotMood === 'function') applyRobotMood(normalized);
+    };
+    try {
+      const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js');
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+      camera.position.set(0, 0.05, 7.4);
+      const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true, powerPreference:'high-performance'});
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+      renderer.domElement.className = 'robot-canvas';
+      renderer.domElement.setAttribute('aria-label','Animated 3D FinSight AI robot companion');
+      stage.prepend(renderer.domElement);
+
+      scene.add(new THREE.HemisphereLight(0xc5d9ff, 0x17112d, 2.15));
+      const keyLight = new THREE.DirectionalLight(0xdceaff, 3.0); keyLight.position.set(3,4,5); scene.add(keyLight);
+      const blueLight = new THREE.PointLight(0x4fcbff, 18, 9); blueLight.position.set(-2,1,3); scene.add(blueLight);
+      const violetLight = new THREE.PointLight(0x9670ff, 22, 10); violetLight.position.set(2,1,-1); scene.add(violetLight);
+      const pinkLight = new THREE.PointLight(0xf18cff, 5, 7); pinkLight.position.set(-2,-1,1); scene.add(pinkLight);
+
+      const robot = new THREE.Group(); scene.add(robot);
+      const shellMat = new THREE.MeshPhysicalMaterial({color:0xc9d7f0, metalness:.68, roughness:.22, clearcoat:1, clearcoatRoughness:.14});
+      const sideMat = new THREE.MeshPhysicalMaterial({color:0x7187b5, metalness:.78, roughness:.22, clearcoat:.8});
+      const visorMat = new THREE.MeshPhysicalMaterial({color:0x0a1023, metalness:.58, roughness:.15, clearcoat:1, clearcoatRoughness:.08});
+      const blueMat = new THREE.MeshPhysicalMaterial({color:0x428cd8, metalness:.62, roughness:.24, clearcoat:.9});
+      const eyeMat = new THREE.MeshStandardMaterial({color:0xc6ffff, emissive:0x62dcff, emissiveIntensity:3.4, metalness:.2, roughness:.15});
+      const violetEyeMat = new THREE.MeshStandardMaterial({color:0xe3d6ff, emissive:0x9b81ff, emissiveIntensity:2.3, roughness:.15});
+      const darkMat = new THREE.MeshStandardMaterial({color:0x10172d, metalness:.72, roughness:.24});
+      const glowMat = new THREE.MeshBasicMaterial({color:0x91e9ff});
+
+      const sphere = (radius, material, scale, position, parent=robot) => {
+        const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius,48,36), material);
+        if (scale) mesh.scale.set(...scale);
+        if (position) mesh.position.set(...position);
+        parent.add(mesh); return mesh;
+      };
+      const cylinder = (r1,r2,length,material,position,rotation,parent=robot) => {
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,length,40,1),material);
+        if(position) mesh.position.set(...position); if(rotation) mesh.rotation.set(...rotation); parent.add(mesh); return mesh;
+      };
+
+      // Rounded metallic head and deep glass face shield.
+      sphere(1, shellMat, [1.02,1.03,.79], [0,.38,0]);
+      sphere(.78, visorMat, [.91,.49,.20], [0,.39,.69]);
+      // Outer face rim adds a machined, dimensional edge around the visor.
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(.71,.035,14,64), sideMat);
+      rim.scale.set(1.18,.73,.5); rim.position.set(0,.39,.82); robot.add(rim);
+      // Ear/side modules.
+      for (const side of [-1,1]) {
+        sphere(.28, sideMat, [1,.94,.85], [side*.99,.39,.02]);
+        sphere(.20, blueMat, [.65,1,.8], [side*1.12,.39,.08]);
+        sphere(.115, darkMat, [1,1,.5], [side*1.18,.39,.18]);
+        sphere(.065, glowMat, [1,1,.55], [side*1.19,.39,.23]);
+      }
+      // Expressive, softly glowing eyes.
+      sphere(.105, eyeMat, [1.07,1.25,.48], [-.285,.43,.887]);
+      sphere(.105, eyeMat, [1.07,1.25,.48], [.285,.43,.887]);
+      sphere(.043, violetEyeMat, [1,1,.5], [-.265,.445,.935]);
+      sphere(.043, violetEyeMat, [1,1,.5], [.305,.445,.935]);
+      // A restrained, near-neutral digital mouth: robotic and attentive, with only a slight friendly lift.
+      const mouthNeutralMat = new THREE.MeshStandardMaterial({color:0x8cf7ff,emissive:0x37d8ff,emissiveIntensity:1.45,roughness:.28});
+      const mouthReviewMat = new THREE.MeshStandardMaterial({color:0xffca72,emissive:0xf5a623,emissiveIntensity:1.55,roughness:.28});
+      const mouthHighMat = new THREE.MeshStandardMaterial({color:0xff899a,emissive:0xf0445b,emissiveIntensity:1.75,roughness:.28});
+      const makeDigitalMouth = (points, material) => {
+        const curve = new THREE.CatmullRomCurve3(points.map(([x,y,z]) => new THREE.Vector3(x,y,z)));
+        const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 28, .016, 8, false), material);
+        robot.add(mesh);
+        return mesh;
+      };
+      const neutralMouth = makeDigitalMouth([
+        [-.17,.096,.895],[-.11,.086,.912],[-.055,.080,.922],[0,.078,.925],[.055,.080,.922],[.11,.086,.912],[.17,.096,.895]
+      ], mouthNeutralMat);
+      const reviewMouth = makeDigitalMouth([
+        [-.17,.083,.895],[-.11,.087,.912],[-.055,.088,.922],[0,.087,.925],[.055,.088,.922],[.11,.087,.912],[.17,.083,.895]
+      ], mouthReviewMat);
+      const highMouth = makeDigitalMouth([
+        [-.17,.074,.895],[-.11,.087,.912],[-.055,.093,.922],[0,.095,.925],[.055,.093,.922],[.11,.087,.912],[.17,.074,.895]
+      ], mouthHighMat);
+      reviewMouth.visible = false;
+      highMouth.visible = false;
+      // Tiny side status lights replace cartoon-like cheek dots, keeping the visor technical.
+      sphere(.012, sideMat, [1,1,.5], [-.245,.085,.89]);
+      sphere(.012, sideMat, [1,1,.5], [.245,.085,.89]);
+      // Antenna and glowing tip.
+      cylinder(.028,.045,.27,sideMat,[0,1.48,0]);
+      sphere(.10, violetEyeMat,[1,1,1],[0,1.64,0]);
+      // Neck ring and upper body.
+      cylinder(.26,.34,.19,sideMat,[0,-.79,0]);
+      const torso = new THREE.Mesh(new THREE.SphereGeometry(.68,48,36),blueMat);
+      torso.scale.set(.74,.68,.53); torso.position.set(0,-1.18,-.01); robot.add(torso);
+      sphere(.36, visorMat,[1,.72,.15],[0,-1.17,.39]);
+      sphere(.17, eyeMat,[1,1,.25],[0,-1.16,.535]);
+      // Shoulder joints and tiny arms make it read as a robot rather than a floating mask.
+      for (const side of [-1,1]) {
+        sphere(.23, shellMat,[1,.9,.85],[side*.57,-.99,0]);
+        const arm = cylinder(.115,.14,.48,sideMat,[side*.78,-1.28,.01],[0,0,side*-.35]);
+        sphere(.135, shellMat,[1,1,1],[side*.86,-1.53,.02]);
+      }
+      // Floating holographic orbit/ring behind the character.
+      const orbitMat = new THREE.MeshBasicMaterial({color:0x7a9cff,transparent:true,opacity:.43});
+      const orbit = new THREE.Mesh(new THREE.TorusGeometry(1.64,.009,8,120),orbitMat);
+      orbit.rotation.set(1.15,.2,-.35); orbit.position.y=-.05; robot.add(orbit);
+      const orbit2Mat = new THREE.MeshBasicMaterial({color:0x67e0f0,transparent:true,opacity:.23});
+      const orbit2 = new THREE.Mesh(new THREE.TorusGeometry(1.87,.006,8,120),orbit2Mat);
+      orbit2.rotation.set(.55,-.6,.42); orbit2.position.y=-.03; robot.add(orbit2);
+      // Small glowing motes around the character.
+      const moteMat = new THREE.MeshBasicMaterial({color:0x9eafff});
+      for (let i=0;i<22;i++) {
+        const a=(i/22)*Math.PI*2, r=1.85+(i%4)*.12;
+        const mote=new THREE.Mesh(new THREE.SphereGeometry(i%5===0?.035:.018,12,12),i%3===0?glowMat:moteMat);
+        mote.position.set(Math.cos(a)*r,Math.sin(a)*r*.68,Math.sin(a*2)*.28-.05); robot.add(mote);
+      }
+      robot.position.set(0,.05,0);
+      robot.scale.setScalar(.98);
+
+      applyRobotMood = (mood) => {
+        const palette = mood === 'high'
+          ? {eye:0xff899a, emissive:0xff5268, secondary:0xff6b86, light:0xff5368, energy:3.9}
+          : mood === 'review'
+            ? {eye:0xffd38a, emissive:0xffad36, secondary:0xffc45d, light:0xffb347, energy:3.2}
+            : {eye:0xc6ffff, emissive:0x62dcff, secondary:0xe3d6ff, light:0x4fcbff, energy:3.4};
+        eyeMat.color.setHex(palette.eye);
+        eyeMat.emissive.setHex(palette.emissive);
+        eyeMat.emissiveIntensity = palette.energy;
+        violetEyeMat.color.setHex(palette.secondary);
+        violetEyeMat.emissive.setHex(palette.secondary);
+        glowMat.color.setHex(palette.eye);
+        blueLight.color.setHex(palette.light);
+        violetLight.color.setHex(mood === 'normal' ? 0x9670ff : palette.light);
+        pinkLight.color.setHex(mood === 'normal' ? 0xf18cff : palette.light);
+        orbitMat.color.setHex(mood === 'normal' ? 0x7a9cff : palette.light);
+        orbit2Mat.color.setHex(mood === 'normal' ? 0x67e0f0 : palette.secondary);
+        neutralMouth.visible = mood === 'normal';
+        reviewMouth.visible = mood === 'review';
+        highMouth.visible = mood === 'high';
+      };
+      window.setFinSightRobotMood(window.finSightRobotMood || 'normal');
+
+      const resize = () => {
+        const w=stage.clientWidth, h=stage.clientHeight;
+        if(!w||!h) return;
+        camera.aspect=w/h; camera.position.z=w<560?8.6:7.4; camera.updateProjectionMatrix();
+        renderer.setSize(w,h,false);
+      };
+      const observer = new ResizeObserver(resize); observer.observe(stage); resize();
+      let mouseX=0,mouseY=0, targetX=0,targetY=0;
+      stage.addEventListener('pointermove', e => {
+        const rect=stage.getBoundingClientRect();
+        targetY=((e.clientX-rect.left)/rect.width-.5)*.22;
+        targetX=((e.clientY-rect.top)/rect.height-.5)*-.12;
+      });
+      stage.addEventListener('pointerleave',()=>{targetX=0;targetY=0;});
+      const clock = new THREE.Clock();
+      const animate = () => {
+        const t=clock.getElapsedTime();
+        mouseX += (targetX-mouseX)*.035; mouseY += (targetY-mouseY)*.035;
+        robot.rotation.x = mouseX + Math.sin(t*.65)*.025;
+        robot.rotation.y = mouseY + Math.sin(t*.42)*.105;
+        robot.position.y = .05 + Math.sin(t*1.0)*.07;
+        orbit.rotation.z = -.35 + Math.sin(t*.25)*.08;
+        orbit2.rotation.y = -.6 + t*.035;
+        renderer.render(scene,camera);
+        requestAnimationFrame(animate);
+      };
+      animate();
+    } catch (error) {
+      console.warn('3D robot could not be loaded; using fallback illustration.', error);
+      stage.classList.add('robot-failed');
+    }
+  </script>
+
+  <!-- Keep the existing Phase 1 JavaScript. This root version assumes script.js sits beside index.html. -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
-```
