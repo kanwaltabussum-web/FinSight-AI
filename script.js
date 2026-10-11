@@ -876,19 +876,61 @@ function displayDocumentResults(data) {
     const img = el.querySelector("#finsightOcrSourcePreview");
     if (img) img.src = data.source_preview_url;
   }
-  const downloadButton = el.querySelector("#downloadExtractedTextButton");
-  if (downloadButton) downloadButton.addEventListener("click", () => {
-    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${file.replace(/\.[^.]+$/, "") || "extracted-text"}_extracted.txt`;
-    document.body.appendChild(anchor); anchor.click(); anchor.remove();
-    URL.revokeObjectURL(url);
+  
+const downloadButton = el.querySelector("#downloadExtractedTextButton");
+
+if (downloadButton) {
+  downloadButton.textContent = "Choose Download Format";
+
+  downloadButton.addEventListener("click", () => {
+    const choice = window.prompt(
+      "Choose download format:\n" +
+      "1 = PDF\n" +
+      "2 = TXT\n" +
+      "3 = Excel (.xlsx)\n" +
+      "4 = CSV\n\n" +
+      "Enter 1, 2, 3, or 4:"
+    );
+
+    const formats = {
+      "1": "pdf",
+      "2": "txt",
+      "3": "xlsx",
+      "4": "csv"
+    };
+
+    const format = formats[(choice || "").trim()];
+
+    if (!format) {
+      if (choice !== null) {
+        setStatus("Invalid choice. Please enter 1, 2, 3, or 4.", "error");
+      }
+      return;
+    }
+
+    if (format === "txt") {
+      const blob = new Blob([text], {
+        type: "text/plain;charset=utf-8"
+      });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+
+      anchor.href = url;
+      anchor.download =
+        `${file.replace(/\.[^.]+$/, "") || "extracted-text"}_extracted.txt`;
+
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return;
+    }
+
+    downloadReport(format);
   });
   lastExportPayload = { kind: "document", fileName: file, data, text, detectedAmounts, kindLabel: kind };
 }
-
+}
 
 function exportSafeName(name) {
   return String(name || "finsight-report").replace(/\.[^.]+$/, "").replace(/[^a-z0-9_-]+/gi, "_").replace(/^_+|_+$/g, "") || "finsight-report";
