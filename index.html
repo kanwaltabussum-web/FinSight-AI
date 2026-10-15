@@ -143,6 +143,10 @@
     .tool-card { border:1px solid var(--line); border-radius:16px; padding:19px; background:linear-gradient(145deg,rgba(26,31,61,.74),rgba(15,18,38,.86)); }
     .tool-card h3 { font-size:14px; margin:0 0 8px; }
     .tool-card p { font-size:12px; color:var(--muted); margin:0; line-height:1.7; }
+    .tool-card-action { width:100%; text-align:left; color:inherit; cursor:pointer; position:relative; transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; }
+    .tool-card-action:hover { transform:translateY(-2px); border-color:rgba(130,217,255,.55); box-shadow:0 12px 28px rgba(0,0,0,.18); }
+    .tool-card-action:focus-visible { outline:2px solid rgba(130,217,255,.9); outline-offset:3px; }
+    .tool-card-action-label { display:inline-flex; margin-top:14px; color:#9fe7ff; font-size:11px; font-weight:800; letter-spacing:.03em; }
     .workspace-extra { margin-top:17px; }
     .config-panel { padding:22px; border:1px solid var(--line); border-radius:18px; background:rgba(18,22,45,.78); }
     .config-panel h3 { margin:0 0 8px; }
@@ -167,27 +171,6 @@
     .upload-symbol { display:grid; place-items:center; width:43px; height:43px; border:1px solid rgba(156,247,235,.25); color:var(--cyan); background:rgba(108,225,224,.08); border-radius:14px; font-size:19px; flex-shrink:0; }
     .upload-card h3 { margin:0 0 5px; font-size:17px; }
     .upload-card-head p { margin:0; font-size:11px; color:var(--muted); }
-
-    /* Clearly separate the two file workflows at the upload point */
-    .upload-mode-heading { margin: 0 0 12px; }
-    .upload-mode-heading h4 { font-size: 13px; margin: 0 0 5px; }
-    .upload-mode-heading p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
-    .upload-mode-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0 0 17px; }
-    .upload-mode-card { display:flex; flex-direction:column; align-items:flex-start; gap:8px; width:100%; min-width:0; min-height:195px; padding:15px; border-radius:15px; border:1px solid rgba(180,191,255,.18); background:rgba(10,15,34,.70); color:var(--text); text-align:left; cursor:pointer; transition:background .2s,border-color .2s,box-shadow .2s,transform .2s; }
-    .upload-mode-card:hover { transform:translateY(-1px); border-color:rgba(156,247,235,.45); }
-    .upload-mode-card[aria-pressed="true"] { border-color:rgba(156,247,235,.78); background:linear-gradient(145deg,rgba(53,104,126,.22),rgba(23,26,53,.94)); box-shadow:0 0 0 1px rgba(156,247,235,.12),0 10px 32px rgba(0,0,0,.12); }
-    .upload-mode-card:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
-    .upload-mode-top { display:flex; align-items:center; gap:9px; }
-    .upload-mode-icon { display:grid; place-items:center; width:32px; height:32px; flex-shrink:0; border-radius:10px; background:rgba(132,154,255,.12); border:1px solid rgba(132,154,255,.20); color:#c9d5ff; font-size:15px; }
-    .upload-mode-card h4 { margin:0; font-size:12px; line-height:1.45; }
-    .upload-mode-subtitle { color:#9cf7eb; font-size:9px; font-weight:850; letter-spacing:.055em; line-height:1.6; }
-    .upload-mode-card p { margin:0; color:var(--muted); font-size:10px; line-height:1.65; }
-    .upload-mode-state { margin-top:auto; padding-top:3px; font-size:9px; font-weight:800; color:#8994b7; }
-    .upload-mode-card[aria-pressed="true"] .upload-mode-state { color:var(--cyan); }
-    .workflow-live-label { font-size:10px; color:#9cf7eb; font-weight:800; margin:0 0 10px; }
-    .upload-box .file-types { min-height:22px; }
-    @media(max-width:560px) { .upload-mode-grid { grid-template-columns:1fr; } .upload-mode-card { min-height:0; } }
-
     .upload-meta { display:grid; grid-template-columns:1fr; gap:15px; margin:0 0 15px; }
     .select-label { color:#aab2cf; font-size:11px; display:block; margin-bottom:8px; }
     #dataType { width:100%; color:#f5f6ff; background:#0b1021; border:1px solid rgba(180,191,255,.18); border-radius:11px; padding:12px; }
@@ -307,12 +290,6 @@
     .footer-inner { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; }
     .footer-brand { color:#dce0fa; font-weight:800; }
 
-    
-    .export-actions { display:flex; flex-wrap:wrap; align-items:center; gap:9px; padding:13px; margin:0 0 16px; border:1px solid #dfe4f1; border-radius:12px; background:#f7f9ff; }
-    .export-actions strong { font-size:12px; color:#27304c; margin-right:4px; }
-    .export-actions .btn { min-height:34px; padding:8px 11px; font-size:11px; cursor:pointer; }
-    @media(max-width:560px){ .export-actions { align-items:stretch; } .export-actions strong { width:100%; } .export-actions .btn { flex:1 1 42%; } }
-
     /* Results injected by the existing script.js */
     #resultsContainer .finsight-results { color:#171b2e; }
     #resultsContainer .finsight-results .result-section { background:#fff; color:#171b2e; }
@@ -420,6 +397,98 @@
     @media(max-width:800px) { .status-legend { grid-template-columns:repeat(2,minmax(0,1fr)); } .interpretation-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     @media(max-width:480px) { .results-guide { padding:17px; } .status-legend,.interpretation-grid { grid-template-columns:1fr; } }
 
+
+
+    /* Phase 2 — Advanced Financial Analysis workspace */
+    .phase2-shell { display:grid; gap:18px; }
+    .phase2-hero { padding:24px; border:1px solid rgba(130,217,255,.22); border-radius:20px; background:radial-gradient(ellipse at 88% 8%,rgba(130,135,255,.15),transparent 42%),linear-gradient(145deg,rgba(24,31,64,.94),rgba(13,17,37,.96)); }
+    .phase2-hero h3 { margin:9px 0 8px; font-size:clamp(23px,3vw,32px); letter-spacing:-.04em; }
+    .phase2-hero p { max-width:850px; margin:0; color:var(--muted); font-size:12px; line-height:1.8; }
+    .phase2-load { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr) auto; gap:13px; align-items:end; padding:18px; border:1px solid var(--line); border-radius:17px; background:rgba(18,22,45,.74); }
+    .phase2-load .field input[type=file] { padding:9px; font-size:11px; }
+    .phase2-load .phase2-upload-help { margin:7px 0 0; color:#aab4d0; font-size:11px; line-height:1.65; max-width:560px; }
+    .phase2-load-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+    .phase2-load-actions .btn { white-space:nowrap; }
+    .phase2-status { grid-column:1/-1; margin:0; color:#aab5d2; font-size:11px; line-height:1.6; }
+    .phase2-status.success { color:#91edc4; }
+    .phase2-status.error { color:#ffabb8; }
+    .phase2-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .phase2-metric,.phase2-panel { min-width:0; padding:18px; border:1px solid var(--line); border-radius:17px; background:linear-gradient(145deg,rgba(25,30,59,.78),rgba(13,16,34,.88)); }
+    .phase2-metric span { display:block; color:var(--muted); font-size:10px; line-height:1.6; }
+    .phase2-metric strong { display:block; margin-top:9px; overflow-wrap:anywhere; font-size:clamp(18px,2vw,25px); letter-spacing:-.035em; }
+    .phase2-metric small { display:block; margin-top:5px; color:#8e98b8; font-size:10px; line-height:1.5; }
+    .phase2-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .phase2-panel-head { display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .phase2-panel h3 { margin:0 0 6px; font-size:15px; }
+    .phase2-panel-head p,.phase2-note { margin:0; color:var(--muted); font-size:10px; line-height:1.7; }
+    .phase2-period-toggle { display:flex; flex-wrap:wrap; gap:5px; padding:4px; border:1px solid rgba(180,191,255,.14); border-radius:11px; background:rgba(7,11,26,.55); }
+    .phase2-period-toggle button { padding:8px 10px; border:0; border-radius:7px; color:#aab4d0; background:transparent; cursor:pointer; font:inherit; font-size:10px; font-weight:750; }
+    .phase2-period-toggle button[aria-pressed="true"] { color:#071626; background:linear-gradient(100deg,#8bdcff,#9cf7eb); }
+    .phase2-chart { display:grid; gap:12px; }
+    .phase2-bar-row { display:grid; grid-template-columns:minmax(70px,110px) minmax(0,1fr) minmax(55px,auto); gap:9px; align-items:center; }
+    .phase2-bar-label { overflow:hidden; color:#bdc5df; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+    .phase2-bar-track { height:10px; overflow:hidden; border-radius:999px; background:rgba(255,255,255,.055); }
+    .phase2-bar-fill { height:100%; min-width:2px; border-radius:999px; background:linear-gradient(90deg,#788fff,#84ddff,#92f0dc); }
+    .phase2-bar-value { color:#e2e8ff; text-align:right; font-size:10px; font-variant-numeric:tabular-nums; }
+    .phase2-empty { padding:20px 10px; color:#8e98b8; text-align:center; font-size:11px; line-height:1.7; }
+    .phase2-table-wrap { overflow-x:auto; }
+    .phase2-table { width:100%; border-collapse:collapse; font-size:11px; }
+    .phase2-table th,.phase2-table td { padding:10px 8px; border-bottom:1px solid rgba(180,191,255,.1); text-align:left; white-space:nowrap; }
+    .phase2-table th { color:#9ea9ca; font-weight:700; }
+    .phase2-table td { color:#e1e6fb; }
+    .phase2-disclaimer { padding:12px 14px; border:1px solid rgba(242,199,122,.18); border-radius:12px; color:#c9bb9d; background:rgba(242,199,122,.045); font-size:10px; line-height:1.75; }
+    .phase2-cashflow-status { padding:16px; border:1px dashed rgba(180,191,255,.2); border-radius:12px; color:#aab4d0; font-size:11px; line-height:1.8; }
+    .phase2-cashflow-status strong { display:block; margin-bottom:5px; color:#f0d7a1; }
+    .phase2-dashboard { display:grid; gap:14px; margin-top:14px; }
+    .phase2-dashboard-title { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+    .phase2-dashboard-title .eyebrow { margin-bottom:6px; }
+    .phase2-kpi-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:16px; }
+    .phase2-kpi .phase2-kpi-icon { float:right; font-size:18px; opacity:.82; }
+    .phase2-chart-svg { width:100%; height:auto; display:block; overflow:visible; }
+    .phase2-chart-svg text { fill:#9da9c8; font-size:10px; font-family:inherit; }
+    .phase2-chart-legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:10px; color:#aab5d2; font-size:10px; }
+    .phase2-legend-item { display:inline-flex; align-items:center; gap:6px; }
+    .phase2-legend-dot { display:inline-block; width:9px; height:9px; border-radius:3px; flex:0 0 auto; }
+    .phase2-donut-layout { display:grid; grid-template-columns:minmax(120px, .8fr) minmax(0,1.2fr); gap:12px; align-items:center; }
+    .phase2-donut { width:100%; max-width:190px; margin:auto; display:block; }
+    .phase2-donut-legend { display:grid; gap:9px; }
+    .phase2-donut-row { display:grid; grid-template-columns:9px minmax(0,1fr) auto; gap:7px; align-items:center; font-size:10px; }
+    .phase2-donut-row .name { color:#c7d0e8; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .phase2-donut-row .value { color:#eef2ff; font-variant-numeric:tabular-nums; text-align:right; }
+    .phase2-dual-chart { display:grid; gap:13px; }
+    .phase2-dual-row { display:grid; grid-template-columns:minmax(68px,92px) minmax(0,1fr); gap:10px; align-items:center; }
+    .phase2-dual-bars { display:grid; gap:5px; }
+    .phase2-dual-track { height:9px; background:rgba(255,255,255,.055); border-radius:999px; overflow:hidden; }
+    .phase2-dual-fill { height:100%; border-radius:999px; min-width:0; }
+    .phase2-dual-fill.inflow { background:linear-gradient(90deg,#42c7a4,#91f0d7); }
+    .phase2-dual-fill.outflow { background:linear-gradient(90deg,#f0ad65,#ff8f9d); }
+    @media(max-width:900px) { .phase2-metrics,.phase2-kpis,.phase2-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .phase2-load { grid-template-columns:1fr 1fr; } .phase2-load .btn { grid-column:1/-1; justify-self:start; } }
+    @media(max-width:620px) { .phase2-grid { grid-template-columns:1fr; } .phase2-load { grid-template-columns:1fr; } .phase2-load .btn { grid-column:auto; width:100%; } .phase2-hero,.phase2-panel { padding:16px; } .phase2-bar-row { grid-template-columns:76px minmax(0,1fr) 58px; gap:7px; } .phase2-kpis,.phase2-kpi-grid { grid-template-columns:1fr 1fr; } .phase2-date-filters { display:grid; grid-template-columns:1fr 1fr; width:100%; } .phase2-date-filters input { width:100%; } .phase2-donut-layout { grid-template-columns:1fr; } .phase2-donut { max-width:155px; } }
+    .phase2-dashboard-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:14px; }
+    .phase2-dashboard-head h3 { margin:0 0 5px; font-size:18px; }
+    .phase2-dashboard-head p { margin:0; color:var(--muted); font-size:11px; line-height:1.7; }
+    .phase2-date-filters { display:flex; flex-wrap:wrap; gap:8px; align-items:end; }
+    .phase2-date-filters label { display:grid; gap:4px; color:#aab5d2; font-size:10px; }
+    .phase2-date-filters input { width:140px; min-width:0; padding:8px 9px; color:#f5f6ff; background:#0d1124; border:1px solid rgba(180,191,255,.18); border-radius:8px; }
+    .phase2-date-filters button { padding:9px 11px; border:1px solid rgba(180,191,255,.18); border-radius:8px; color:#e8ecff; background:rgba(255,255,255,.05); font-size:10px; }
+    .phase2-filter-status { margin:10px 0 0; padding:9px 11px; border:1px solid rgba(91,224,190,.22); border-radius:8px; color:#bcefe1; background:rgba(91,224,190,.06); font-size:11px; line-height:1.5; }
+    .phase2-kpis { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:18px; }
+    .phase2-kpi { padding:16px; min-width:0; border:1px solid var(--line); border-radius:15px; background:linear-gradient(145deg,rgba(25,30,59,.78),rgba(13,16,34,.88)); box-shadow:inset 0 1px 0 rgba(255,255,255,.025); }
+    .phase2-kpi span { display:block; color:var(--muted); font-size:10px; }
+    .phase2-kpi strong { display:block; margin-top:7px; font-size:clamp(17px,2vw,24px); overflow-wrap:anywhere; letter-spacing:-.03em; }
+    .phase2-kpi small { display:block; margin-top:5px; color:#8e98b8; font-size:10px; line-height:1.5; }
+    .phase2-insights { display:grid; gap:10px; }
+    .phase2-insight { padding:14px 15px; border:1px solid rgba(180,191,255,.14); border-radius:13px; background:rgba(13,17,36,.58); }
+    .phase2-insight strong { display:block; margin-bottom:5px; font-size:12px; color:#eaf0ff; }
+    .phase2-insight p { margin:0; color:#aab5d2; font-size:11px; line-height:1.75; }
+    .phase2-insight.review { border-color:rgba(255,202,114,.24); }
+    .phase2-insight.high { border-color:rgba(255,137,154,.28); }
+    .phase2-insight.good { border-color:rgba(104,226,189,.23); }
+    .phase2-insight-note { margin-top:12px; color:#8e98b8; font-size:10px; line-height:1.7; }
+    .phase2-back { margin-bottom:16px; }
+    @media(max-width:900px) { .phase2-metrics,.phase2-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } .phase2-load { grid-template-columns:1fr 1fr; } .phase2-load .btn { grid-column:1/-1; justify-self:start; } }
+    @media(max-width:620px) { .phase2-grid { grid-template-columns:1fr; } .phase2-load { grid-template-columns:1fr; } .phase2-load .btn { grid-column:auto; width:100%; } .phase2-hero,.phase2-panel { padding:16px; } .phase2-bar-row { grid-template-columns:76px minmax(0,1fr) 58px; gap:7px; } .phase2-kpis { grid-template-columns:1fr 1fr; } .phase2-date-filters { display:grid; grid-template-columns:1fr 1fr; width:100%; } .phase2-date-filters input { width:100%; } }
+
   </style>
 </head>
 <body>
@@ -448,8 +517,8 @@
           <h1><span id="greeting">Welcome</span> to<br><span class="gradient">FinSight AI.</span></h1>
           <p>Your financial AI companion helps you explore transaction data, spot unusual activity, and turn complex numbers into clearer next steps — while keeping people in control of decisions.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#workspaces">Meet your workspaces <span aria-hidden="true">↓</span></a>
-            <a class="btn btn-ghost" href="#analyze">Analyze your data <span aria-hidden="true">↗</span></a>
+            <a class="btn btn-ghost" href="#workspaces">Meet your workspaces <span aria-hidden="true">↓</span></a>
+            <a class="btn btn-primary" href="#analyze">Analyze your data <span aria-hidden="true">↗</span></a>
           </div>
           <div class="hero-footnote">Your dashboard stays empty until you upload a file. Only results from your own analysis will appear here.</div>
         </div>
@@ -498,30 +567,17 @@
         <div class="analysis-explainer">
           <div class="eyebrow">Phase 1 · Financial analysis</div>
           <h2>Your financial files, <span class="gradient">made easier to review.</span></h2>
-          <p>Use Financial Analysis for CSV/XLS/XLSX transaction data. Use Document & Image Reading for PDF/DOCX/PPTX/TXT and JPG/JPEG/PNG/WEBP/GIF/BMP files. Each workflow reports only what it actually processed.</p>
+          <p>Upload a CSV/Excel file for transaction analysis, a PDF/Word/PowerPoint/text document for readable-text inspection, or a JPG/PNG/WebP image for preview. Each file type follows a different workflow, and FinSight will explain which processing was actually performed.</p>
           <div class="workflow-list">
-            <div class="workflow-item"><span class="workflow-num">01</span><span><b>Upload</b><br>Choose Bank Statement, General Ledger, Cash Book, or Other Financial Transactions such as POS/payment-gateway row exports.</span></div>
+            <div class="workflow-item"><span class="workflow-num">01</span><span><b>Upload</b><br>Choose a bank statement, general ledger, cash book, or an other financial transaction export such as POS or payment-gateway rows.</span></div>
             <div class="workflow-item"><span class="workflow-num">02</span><span><b>Analyze</b><br>Send the file and selected record type to the existing API.</span></div>
             <div class="workflow-item"><span class="workflow-num">03</span><span><b>Review</b><br>Explore the analysis and use human judgment before acting on risk signals.</span></div>
           </div>
         </div>
 
         <div class="upload-card">
-          <div class="upload-card-head"><div class="upload-symbol">↥</div><div><h3>Choose a file workflow</h3><p>Choose one of the two workflows below. They are different because financial analysis uses structured rows, while document and image reading extracts text for inspection.</p></div></div>
-          <div class="upload-mode-heading"><h4>What would you like to do?</h4><p>Select a workflow to see its supported file types and the correct processing steps.</p></div>
-          <div class="upload-mode-grid" role="group" aria-label="Choose a file processing workflow">
-            <button class="upload-mode-card is-selected" id="financialAnalysisModeButton" type="button" aria-pressed="true">
-              <span class="upload-mode-top"><span class="upload-mode-icon" aria-hidden="true">▤</span><span><h4>Financial Analysis</h4><span class="upload-mode-subtitle">CSV · XLS · XLSX</span></span></span>
-              <p>Analyze structured transaction rows, transaction count, totals, averages, column mapping, and supported duplicate or unusual-value checks.</p>
-              <span class="upload-mode-state" id="financialModeState">✓ Selected workflow</span>
-            </button>
-            <button class="upload-mode-card" id="documentReadingModeButton" type="button" aria-pressed="false">
-              <span class="upload-mode-top"><span class="upload-mode-icon" aria-hidden="true">▧</span><span><h4>Document &amp; Image Reading</h4><span class="upload-mode-subtitle">PDF · DOCX · PPTX · TXT · JPG/JPEG · PNG · WEBP · GIF · BMP</span></span></span>
-              <p>Extract readable text from documents and images, show a preview, and let you inspect what was found. This does not automatically run transaction-level risk checks.</p>
-              <span class="upload-mode-state" id="documentModeState">Select this workflow</span>
-            </button>
-          </div>
-          <div class="upload-meta" id="recordTypeWrapper"><div><label class="select-label" for="dataType">What type of financial record are you uploading?</label><select id="dataType" name="data_type"><option value="bank_statement">Bank Statement</option><option value="general_ledger">General Ledger</option><option value="cash_book">Cash Book</option><option value="other_financial_data">Other Financial Transactions</option></select>
+          <div class="upload-card-head"><div class="upload-symbol">↥</div><div><h3>Upload data or a document</h3><p>Choose a spreadsheet for financial analysis, a document for text inspection, or an image for preview.</p></div></div>
+          <div class="upload-meta"><div><label class="select-label" for="dataType">What type of record are you uploading?</label><select id="dataType" name="data_type"><option value="bank_statement">Bank Statement</option><option value="general_ledger">General Ledger</option><option value="cash_book">Cash Book</option><option value="other_financial_data">Other Financial Transactions</option></select>
             <div id="recordTypeHelp" class="record-type-help">
               <strong>Selected type guide</strong>
               <span id="recordTypeCurrentHint" class="type-examples">Bank Statement: deposits, withdrawals, account activity and bank references.</span>
@@ -534,10 +590,10 @@
           </div></div>
           <div class="upload-box" id="uploadBox">
             <div class="upload-icon">⇧</div>
-            <h4 id="uploadPromptTitle">Drop your financial file here</h4>
-            <p id="uploadPromptHelp">Financial Analysis is selected. Choose a CSV, XLS, or XLSX file, or drop it here.</p>
-            <button class="choose-file-button" id="chooseFileButton" type="button" style="margin:6px auto 12px;">Choose financial file</button>
-            <input class="file-picker" id="fileInput" name="file" type="file" accept=".csv,.xls,.xlsx,.pdf,.docx,.pptx,.txt,.jpg,.jpeg,.png,.webp,.gif,.bmp" aria-label="Choose a supported file from your computer">
+            <h4>Drop your file here</h4>
+            <p>Click Browse your computer or use the file chooser. You can select any file; FinSight then explains which formats it can process.</p>
+            <button class="choose-file-button" id="chooseFileButton" type="button" style="margin:6px auto 12px;">Browse your computer</button>
+            <input class="file-picker" id="fileInput" name="file" type="file" accept="*/*" aria-label="Choose any file from your computer">
             <div class="file-info" hidden>Choose a file to begin</div>
             <!-- Compatibility hook for the older deployed script.js. The visible picker above is used instead. -->
             <button class="upload-button" type="button" hidden aria-hidden="true" tabindex="-1"></button>
@@ -547,7 +603,7 @@
             <button class="btn btn-primary" id="analyzeFileButton" type="button" disabled>Analyze financial data →</button>
             <button id="newAnalysisButton" type="button" aria-label="Clear the selected file and previous results to start a new analysis">↻ New Analysis</button>
           </div>
-          <p class="analysis-footnote">Nothing is calculated before you choose a file and click the action button. CSV/XLS/XLSX run Phase 1 transaction analysis. PDF/DOCX/PPTX/TXT use the document-inspection API. Images and scanned PDFs use browser OCR (English-first) to extract readable text; OCR text is not automatically converted into transaction rows, so it does not itself produce duplicate/risk results. Old .DOC/.PPT files are not supported; convert them to .DOCX/.PPTX.</p>
+          <p class="analysis-footnote">Nothing is calculated before you run a file. CSV/XLS/XLSX run Phase 1 transaction analysis. PDF/DOCX/PPTX/TXT require the document-inspection endpoint. JPG/JPEG/PNG/WEBP/GIF/BMP can be previewed, but OCR is not enabled. Other file types can be selected but may need conversion before processing.</p>
           <div id="selectedFileHelp" class="selected-file-help" role="status" aria-live="polite">No file selected yet. Your dashboard will remain empty until you run an analysis.</div>
           <div id="analysisStatus" class="analysis-status" role="status" aria-live="polite"></div>
         </div>
@@ -566,7 +622,7 @@
         <article class="upload-purpose-card">
           <span class="purpose-number">03 · FILE TYPES</span>
           <h3>Which file should I upload?</h3>
-          <p><strong>Financial Analysis — CSV/XLS/XLSX:</strong> structured transaction analysis using the connected API. <strong>Document &amp; Image Reading — PDF/DOCX/PPTX/TXT:</strong> extract readable text and show a document preview. <strong>JPG/JPEG/PNG/WEBP/GIF/BMP:</strong> browser-based, English-first OCR extracts visible text and shows an image preview. OCR can misread numbers and does not turn images into validated transaction rows. Convert old .doc/.ppt files to .docx/.pptx first.</p>
+          <p><strong>CSV/XLS/XLSX:</strong> transaction counts, totals, averages, duplicate candidates and unusual-amount checks. <strong>PDF/DOCX/PPTX/TXT:</strong> extract readable text and preview document contents. <strong>JPG/JPEG/PNG/WEBP/GIF/BMP:</strong> preview the image only; OCR is not enabled, so an image of a statement will not yet become transaction rows. Use modern .docx/.pptx files; older .doc/.ppt formats need conversion first.</p>
         </article>
       </div>
       <div class="container results-guide-container">
@@ -639,20 +695,20 @@
     </div>
   </section>
 
-  <footer class="site-footer"><div class="container footer-inner"><span><span class="footer-brand">FinSight AI</span> · Financial intelligence, made clearer.</span><span><a href="#feedback" aria-label="Get support or share feedback" style="color:#9cf7eb;margin-right:14px">Support &amp; feedback</a>© <span id="currentYear"></span> FinSight AI · Review financial findings with professional judgment.</span></div></footer>
+  <footer class="site-footer"><div class="container footer-inner"><span><span class="footer-brand">FinSight AI</span> · Financial intelligence, made clearer.</span><span><a href="#feedback" style="color:#9cf7eb;margin-right:14px">Share feedback</a>© <span id="currentYear"></span> FinSight AI · Review financial findings with professional judgment.</span></div></footer>
 
   <script>
     const workspaceData = {
-      finance: {title:"Finance",description:"Review financial performance and move from uploaded records to useful financial summaries.",tools:[["Financial Analysis","Transaction count, total amounts, average amounts and key summary measures."],["Financial Statements","Organize statement-related review workflows."],["Financial Reporting","Structure financial summaries for review and communication."],["Budgeting","Organize budget assumptions and planned amounts."],["Forecasting","Review forecast assumptions and future estimates."],["Variance Analysis","Compare actual data with budgets or forecasts when both are available."],["Cash Flow","Review cash inflows, outflows and movement."],["Working Capital","Organize working-capital measures and review tasks."]],analysis:true},
-      accounting: {title:"Accounting",description:"A dedicated view for accounting records and transaction review.",tools:[["Bank Statement","Upload a bank statement using Analyze Data."],["General Ledger","Select the general-ledger record type before analysis."],["Cash Book","Select the cash-book record type before analysis."],["Column Mapping","Review the column mappings returned from the analysis endpoint."],["Transaction Review","Inspect transaction-level results and potential discrepancies."],["Reconciliation","Organize reconciliation tasks for supported input data."]],analysis:true},
-      costing: {title:"Costing",description:"Keep costing as a peer workspace within FinSight's wider financial intelligence purpose.",tools:[["Cost Analysis","Review cost totals and movements where source data supports them."],["Product Costing","Organize product or service cost review."],["Cost Allocation","Structure cost allocation by cost centre."],["Cost Centre Analysis","Group costs by centre or department."],["Margin Analysis","Review revenue, costs and margin indicators where available."],["Cost Variance","Compare expected and actual costs where both are provided."]]},
-      insights: {title:"Insights",description:"Organize patterns, trends and financial findings into a clearer review workflow.",tools:[["Pattern Analysis","Explore returned patterns and transaction trends."],["Performance Indicators","Organize financial measures and summaries."],["Trend Review","Review changes across available periods."],["Key Findings","Collect significant results for human review."]]},
-      risk: {title:"Risk",description:"Review potential risks and anomalies flagged by the current analysis rules.",tools:[["Risk Overview","View overall risk status and returned risk counts."],["Duplicate Invoices","Investigate potential duplicate invoice records when the input includes relevant fields."],["Unusual Transactions","Review anomaly signals returned by the backend."],["Risk Score & Level","Inspect the risk score and level for a flagged item."],["Transaction-Level Results","Review affected records and related explanations."]],analysis:true},
-      audit: {title:"Audit",description:"Organize audit review work without presenting risk signals as proof of fraud.",tools:[["Transaction Testing","Review selected transactions for audit follow-up."],["Exceptions & Findings","Organize potential issues surfaced during review."],["Evidence Tracking","Structure evidence collection tasks."],["Audit Standards","Open Standards & Compliance for standards-related information."]]},
-      tax: {title:"Tax",description:"Organize jurisdiction-specific tax review and tax-related workstreams.",tools:[["Tax Profile","Review the configured company tax jurisdiction."],["Tax Records","Organize tax-relevant financial records."],["Tax Updates","Track tax updates once a reliable source is connected."],["Tax Review","Plan a structured review of tax-related records."]]},
-      planning: {title:"Planning",description:"Arrange budgets, forecasts, scenarios and assumptions in one focused space.",tools:[["Budgets","Organize planned financial amounts."],["Forecasts","Review future estimates and assumptions."],["Scenario Planning","Compare planning assumptions."],["Variance Review","Compare actuals to planned figures when available."]]},
-      reports: {title:"Reports",description:"Find financial summaries and results produced by analysis workflows.",tools:[["Financial Summary","Review the core figures returned by analysis."],["Risk Summary","Organize anomaly counts and risk findings."],["Pattern Summary","Review patterns based on the transactions provided."],["Transaction Results","Inspect transaction-level output."]],analysis:true},
-      assistant: {title:"AI Assistant",description:"A dedicated place for guided workflows. Generated AI answers require an AI service to be connected.",tools:[["Financial Questions","A home for finance-related guided question workflows."],["Explain Results","Explain results when connected to the relevant analysis or AI service."],["Workflow Guidance","Organize practical next steps for finance review."]]},
+      finance: {title:"Finance",description:"Review historical performance, financial statements, cash movement, profitability and integrated financial models. Advanced calculations depend on complete, correctly mapped source data.",tools:[["Financial Analysis","Review actual revenue, expenses, profit/loss only when supported by the uploaded fields, plus monthly, quarterly and yearly trends."],["Financial Statements","Review Income Statement, Balance Sheet and Cash Flow Statement data."],["Ratio Analysis","Calculate profitability, liquidity, leverage, efficiency and growth ratios when all required statement fields are available."],["EBITDA & Profitability","Review EBITDA, EBITDA margin and operating profitability only when the required accounting figures are provided."],["Three-Statement Model","Link Income Statement, Balance Sheet and Cash Flow Statement using validated opening balances, assumptions and schedules."],["Cash Flow","Review cash inflows, outflows and net cash movement from supported cash transaction fields."],["Working Capital","Review receivables, payables, inventory and short-term liquidity where source data supports them."],["Valuation & Valuation Drivers","Organize DCF assumptions, EBITDA multiples, enterprise value and equity value estimates; results require relevant financials and defensible assumptions."],["Financial Reporting","Prepare structured financial summaries for review and communication."]] },
+      accounting: {title:"Accounting",description:"Manage accounting records, transaction mapping, reconciliation and source-data quality.",tools:[["Bank Statement","Upload and review supported bank statement files."],["General Ledger","Review general-ledger accounts and account-level transactions."],["Journal Entries","Organize journal entries and adjustments where supported."],["Cash Book","Review cash-book transactions and balances."],["Chart of Accounts & Column Mapping","Map source columns and accounts to the expected financial fields."],["Accounts Receivable & Payable","Review customer balances, supplier balances and aging where data is provided."],["Bank Reconciliation","Compare bank records against book records when both datasets are available."],["Data Quality & Reconciliation Checks","Flag missing fields, duplicates, invalid dates and mismatched totals for review."]],analysis:true},
+      costing: {title:"Costing",description:"Analyze product and service costs, cost allocation and margins using supported cost and revenue data.",tools:[["Cost Analysis","Review cost totals and movements where source data supports them."],["Product & Service Costing","Organize direct costs by product or service."],["Cost Allocation","Structure cost allocation by cost centre or department."],["Cost Centre Analysis","Group costs by centre or department."],["Gross Margin Analysis","Compare revenue and cost of sales when both are available."],["Cost Variance","Compare expected and actual costs when both are provided."]]},
+      insights: {title:"Insights",description:"Review patterns, trends, KPIs and financial signals derived from uploaded data and connected analyses.",tools:[["Pattern Analysis","Explore returned patterns and transaction trends."],["Performance Indicators","Review supported financial KPIs and their definitions."],["Trend Review","Compare changes across monthly, quarterly and yearly periods."],["Revenue & Expense Trends","Review revenue and expense trends only when those values are explicitly supported."],["Profitability Trends","Review margin and profit trends when accounting data supports them."],["Key Findings","Collect significant results and explain their source and limitations."]]},
+      risk: {title:"Risk",description:"Review potential risks and anomalies flagged by available rules; a signal is not proof of fraud.",tools:[["Risk Overview","View available risk status and returned risk counts."],["Duplicate Transactions","Investigate possible duplicate records when identifying fields are available."],["Unusual Transactions","Review anomaly signals and the transactions that triggered them."],["Liquidity & Credit Risk","Review supported liquidity indicators and credit-related data where available."],["Risk Score & Level","Inspect risk indicators and their explanations; do not treat missing data as a zero-risk result."],["Transaction-Level Results","Review affected records and supporting details."]],analysis:true},
+      audit: {title:"Audit",description:"Organize audit testing, exceptions, evidence and findings for human review.",tools:[["Transaction Testing","Review selected transactions for audit follow-up."],["Exceptions & Findings","Organize potential issues surfaced during review."],["Evidence Tracking","Structure evidence collection tasks and references."],["Audit Trail","Record review actions and relevant changes where audit logging is connected."],["Audit Standards","Open Standards & Compliance for standards-related information."]]},
+      tax: {title:"Tax",description:"Organize jurisdiction-specific tax records and review workflows; tax outcomes require appropriate rules and source data.",tools:[["Tax Profile","Review the configured company tax jurisdiction."],["Tax Records","Organize tax-relevant financial records."],["Tax Calculations & Adjustments","Review tax calculations only when the jurisdiction, rules and required data are configured."],["Tax Updates","Track tax updates once a reliable source is connected."],["Tax Review","Plan a structured review of tax-related records."]]},
+      planning: {title:"Planning",description:"Create budgets, out-year projections beyond the current planning year, multi-year forecasts and scenario plans from historical results and explicit assumptions.",tools:[["Budgets","Organize planned financial amounts by period and category."],["Out-Year & Multi-Year Projections","Project financial results beyond the current budget or forecast year, including Years 2–3, 4–5 and optional 10-year horizons. Forecast revenue, expenses, EBITDA/profit and cash flow only when historical data and explicit assumptions support them."],["Forecasts","Review future estimates, assumptions and forecast periods."],["Scenario Planning","Compare base, optimistic and pessimistic cases by changing documented assumptions."],["Assumptions & Drivers","Manage growth rates, margins, tax, capital expenditure and working-capital assumptions."],["Variance Analysis","Compare actuals against budget and forecast when matching periods and values are available."]]},
+      reports: {title:"Reports",description:"Find structured financial summaries and analysis results. Reports must distinguish actuals, assumptions and projections.",tools:[["Financial Summary","Review supported historical financial figures."],["Financial Statement Reports","Organize income statement, balance sheet and cash-flow summaries."],["Ratio & KPI Reports","Summarize calculated ratios and KPIs with formulas or definitions."],["Forecast & Variance Reports","Present projections and actual-versus-plan comparisons with assumptions disclosed."],["Risk & Audit Summary","Organize anomaly counts, exceptions and review findings."],["Transaction Results","Inspect transaction-level output and source records."]],analysis:true},
+      assistant: {title:"AI Assistant",description:"Use guided financial workflows and explanations. AI-generated answers require a connected AI service; calculations should remain traceable to source data.",tools:[["Financial Questions","Organize finance-related guided question workflows."],["Explain Results","Explain calculations, ratios and model outputs with references to the source fields."],["Workflow Guidance","Suggest practical next steps for finance review."],["Data Limitations","Explain missing inputs and why a metric cannot be calculated."]]},
       standards: {title:"Standards & Compliance",description:"Choose a reporting framework and organize related compliance topics. This workspace is a framework organizer, not a compliance certification service.",tools:[["IFRS","International Financial Reporting Standards."],["US GAAP","Generally Accepted Accounting Principles used in the United States."],["Local / National GAAP","The applicable local or national accounting framework."],["Other Frameworks","Record another reporting framework relevant to your organization."],["Regulatory Updates","Organize regulatory update monitoring; live updates need a connected source."],["Tax Updates","Track tax-related changes for the relevant jurisdiction."],["Audit Standards","Organize audit standards relevant to your organization."],["Current Version & History","Record the standard version and history used by the company."],["Update Monitoring","Plan how applicable changes will be reviewed."]],extra:"standards"},
       settings: {title:"Company & Settings",description:"Set the company context used to guide reporting and financial review across the platform.",tools:[["Company Profile","Record company identity and profile details."],["Country & Currency","Set the relevant country and functional currency."],["Industry","Choose an industry for company context."],["Fiscal Year","Set the company's financial year."],["Reporting Framework","Choose IFRS, US GAAP, Local/National GAAP or another framework."],["Users & Roles","Organize user roles and access requirements."],["Permissions & Security","Plan permissions and security rules."],["Data Sources","Organize source files and connected data sources."]],extra:"settings"}
     };
@@ -692,6 +748,648 @@
       if (year) year.textContent = now.getFullYear();
     }
 
+    let phase2AnalysisData = null;
+    let phase2FileLabel = "";
+    let phase2PeriodMode = "monthly";
+    let phase2DateFrom = "";
+    let phase2DateTo = "";
+
+    function escapePhase2HTML(value) {
+      return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+    function phase2Number(value) {
+      if (value === null || value === undefined || value === "") return null;
+      const n = typeof value === "number" ? value : Number(String(value).replace(/,/g,""));
+      return Number.isFinite(n) ? n : null;
+    }
+    function phase2Format(value, decimals = 0) {
+      if (value === null || value === undefined || !Number.isFinite(Number(value))) return "Not reported";
+      return Number(value).toLocaleString("en-US", {minimumFractionDigits:decimals, maximumFractionDigits:decimals});
+    }
+    function phase2ValidLabel(value) {
+      const label = String(value ?? "").trim();
+      if (!label || /^(not available|none|null|nan|undefined|n\/a)$/i.test(label)) return "";
+      return label;
+    }
+    function phase2Date(value) {
+      if (value === null || value === undefined || value === "" || /^(not available|none|null|nan|undefined|n\/a)$/i.test(String(value).trim())) return null;
+      if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : new Date(value.getFullYear(), value.getMonth(), value.getDate());
+      const text = String(value).trim();
+      // Parse common transaction-date formats explicitly; avoid browser-dependent DD/MM interpretation.
+      let match = text.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:[ T].*)?$/);
+      let year, month, day;
+      if (match) { year = Number(match[1]); month = Number(match[2]); day = Number(match[3]); }
+      else {
+        match = text.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+        if (match) { day = Number(match[1]); month = Number(match[2]); year = Number(match[3]); }
+        else {
+          const parsed = new Date(text);
+          return Number.isNaN(parsed.getTime()) ? null : new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+        }
+      }
+      const parsed = new Date(year, month - 1, day);
+      if (year < 1000 || year > 9999 || parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
+      return parsed;
+    }
+    function phase2Transactions() {
+      const rows = phase2AnalysisData && Array.isArray(phase2AnalysisData.transactions) ? phase2AnalysisData.transactions : [];
+      return rows.filter(row => row && typeof row === "object");
+    }
+    function phase2ApplyDateFilter(rows) {
+      return rows.filter(row => {
+        const date = phase2Date(row.date);
+        if (!date) return !phase2DateFrom && !phase2DateTo;
+        const day = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
+        return (!phase2DateFrom || day >= phase2DateFrom) && (!phase2DateTo || day <= phase2DateTo);
+      });
+    }
+    function phase2PeriodGrowth(periods) {
+      if (periods.length < 2) return null;
+      const current = periods[periods.length - 1].amount;
+      const previous = periods[periods.length - 2].amount;
+      if (!Number.isFinite(previous) || previous === 0) return null;
+      return ((current - previous) / Math.abs(previous)) * 100;
+    }
+    function phase2RenderLineChart(items, emptyText) {
+      if (!items.length) return `<div class="phase2-empty">${escapePhase2HTML(emptyText)}</div>`;
+      const width = 680, height = 245, left = 48, right = 14, top = 18, bottom = 42;
+      const plotW = width-left-right, plotH = height-top-bottom;
+      let vals = items.map(item => Number(item.amount)).filter(Number.isFinite);
+      if (!vals.length) return `<div class="phase2-empty">${escapePhase2HTML(emptyText)}</div>`;
+      let min = Math.min(0,...vals), max = Math.max(0,...vals);
+      if (min === max) { min -= 1; max += 1; }
+      const y = value => top + ((max-value)/(max-min))*plotH;
+      const x = index => items.length === 1 ? left+plotW/2 : left+(index/(items.length-1))*plotW;
+      const points = items.map((item,index)=>`${x(index).toFixed(1)},${y(Number(item.amount)||0).toFixed(1)}`).join(' ');
+      const grid = Array.from({length:5},(_,i)=>{
+        const value=max-(max-min)*i/4, gy=top+plotH*i/4;
+        return `<line x1="${left}" y1="${gy}" x2="${width-right}" y2="${gy}" stroke="rgba(180,191,255,.12)" stroke-dasharray="3 4"/><text x="${left-7}" y="${gy+3}" text-anchor="end">${escapePhase2HTML(phase2Format(value,0))}</text>`;
+      }).join('');
+      const marks = items.map((item,index)=>`<circle cx="${x(index).toFixed(1)}" cy="${y(Number(item.amount)||0).toFixed(1)}" r="3.7" fill="#91f0d7" stroke="#10172b" stroke-width="2"><title>${escapePhase2HTML(item.label)}: ${escapePhase2HTML(phase2Format(item.amount,2))}</title></circle>`).join('');
+      const labelIndexes = [...new Set([0,Math.floor((items.length-1)/3),Math.floor(2*(items.length-1)/3),items.length-1])];
+      const labels = labelIndexes.map(index=>`<text x="${x(index)}" y="${height-13}" text-anchor="${index===0?'start':index===items.length-1?'end':'middle'}">${escapePhase2HTML(items[index].label)}</text>`).join('');
+      const zeroY = y(0);
+      return `<svg class="phase2-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Line chart showing financial amounts by period"><title>Financial trend by period</title>${grid}<line x1="${left}" y1="${zeroY}" x2="${width-right}" y2="${zeroY}" stroke="rgba(145,240,215,.45)"/><polyline points="${points}" fill="none" stroke="#91f0d7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${marks}${labels}</svg><div class="phase2-chart-legend"><span class="phase2-legend-item"><i class="phase2-legend-dot" style="background:#91f0d7"></i>${items.some(item=>item.hasDirection)?'Net cash movement':'Transaction amount'}</span></div>`;
+    }
+    function phase2RenderDonut(items) {
+      const usable = items.filter(item=>Number.isFinite(item.amount)&&item.amount>0).slice(0,5);
+      if (!usable.length) return '<div class="phase2-empty">Category breakdown is unavailable until usable category amounts are present.</div>';
+      const total = usable.reduce((sum,item)=>sum+item.amount,0);
+      if (!(total>0)) return '<div class="phase2-empty">Category breakdown is unavailable for this selection.</div>';
+      const colors=['#91f0d7','#7da8ff','#b99bff','#f5bd75','#ff8fa3'];
+      const radius=42, circumference=2*Math.PI*radius;
+      let offset=0;
+      const rings=usable.map((item,index)=>{
+        const portion=item.amount/total*circumference;
+        const ring=`<circle cx="60" cy="60" r="${radius}" fill="none" stroke="${colors[index]}" stroke-width="17" stroke-dasharray="${portion} ${circumference-portion}" stroke-dashoffset="${-offset}" transform="rotate(-90 60 60)"><title>${escapePhase2HTML(item.label)}: ${escapePhase2HTML(phase2Format(item.amount,2))}</title></circle>`;
+        offset+=portion; return ring;
+      }).join('');
+      const legend=usable.map((item,index)=>`<div class="phase2-donut-row"><i class="phase2-legend-dot" style="background:${colors[index]}"></i><span class="name" title="${escapePhase2HTML(item.label)}">${escapePhase2HTML(item.label)}</span><span class="value">${(item.amount/total*100).toFixed(1)}%</span></div>`).join('');
+      return `<div class="phase2-donut-layout"><svg class="phase2-donut" viewBox="0 0 120 120" role="img" aria-label="Donut chart showing category amount composition"><title>Category amount composition</title><circle cx="60" cy="60" r="42" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="17"/>${rings}<text x="60" y="57" text-anchor="middle" style="fill:#f2f5ff;font-size:11px;font-weight:700">${escapePhase2HTML(phase2Format(total,0))}</text><text x="60" y="70" text-anchor="middle" style="fill:#dce5ff;font-size:8px;font-weight:600">Total amount</text></svg><div class="phase2-donut-legend">${legend}</div></div><p class="phase2-note" style="margin-top:12px">Composition of the top ${usable.length} displayed categories; not a profit or margin breakdown.</p>`;
+    }
+    function phase2RenderCashFlowPeriods(items) {
+      const usable=items.filter(item=>item.hasDirection);
+      if (!phase2DirectionFieldsAvailable || !usable.length) return '<div class="phase2-cashflow-status"><strong>Cash inflow/outflow comparison unavailable</strong>Provide separate credit/inflow and debit/outflow columns to compare cash direction. A single amount column is not enough to infer cash flow.</div>';
+      const shown=usable.slice(-8);
+      const max=Math.max(1,...shown.flatMap(item=>[item.inflow||0,item.outflow||0]));
+      return `<div class="phase2-dual-chart">${shown.map(item=>`<div class="phase2-dual-row"><span class="phase2-bar-label" title="${escapePhase2HTML(item.label)}">${escapePhase2HTML(item.label)}</span><div class="phase2-dual-bars"><div class="phase2-dual-track" title="Inflows ${escapePhase2HTML(phase2Format(item.inflow,2))}"><div class="phase2-dual-fill inflow" style="width:${Math.max(0,Math.min(100,(item.inflow||0)/max*100))}%"></div></div><div class="phase2-dual-track" title="Outflows ${escapePhase2HTML(phase2Format(item.outflow,2))}"><div class="phase2-dual-fill outflow" style="width:${Math.max(0,Math.min(100,(item.outflow||0)/max*100))}%"></div></div><div class="phase2-bar-value" style="text-align:left">In ${phase2Format(item.inflow,2)} · Out ${phase2Format(item.outflow,2)}</div></div></div>`).join('')}</div><div class="phase2-chart-legend"><span class="phase2-legend-item"><i class="phase2-legend-dot" style="background:#42c7a4"></i>Cash inflows</span><span class="phase2-legend-item"><i class="phase2-legend-dot" style="background:#f0ad65"></i>Cash outflows</span></div>`;
+    }
+    function phase2DashboardHTML(rows, periods, categories, suppliers, cash) {
+      const amounts = rows.map(row=>phase2Number(row.amount)).filter(value=>value!==null);
+      const totalAmount = amounts.reduce((sum,value)=>sum+value,0);
+      const averageAmount = amounts.length ? totalAmount/amounts.length : null;
+      const growth = phase2PeriodGrowth(periods);
+      const growthText = growth === null ? "Not available" : `${growth >= 0 ? "+" : ""}${growth.toFixed(1)}%`;
+      const movementRatio = cash.available && cash.inflow > 0 ? (cash.net / cash.inflow) * 100 : null;
+      // Only report accounting-style measures when the uploaded file has explicit matching columns.
+      const sumExplicit = field => {
+        const values = rows.map(row => phase2Number(row[field])).filter(value => value !== null);
+        return values.length ? values.reduce((sum, value) => sum + value, 0) : null;
+      };
+      const revenue = phase2FinancialColumnMap.revenue ? sumExplicit("revenue") : null;
+      const expenses = phase2FinancialColumnMap.expenses ? sumExplicit("expenses") : null;
+      const reportedProfit = phase2FinancialColumnMap.profit ? sumExplicit("profit") : null;
+      const profit = reportedProfit !== null ? reportedProfit : (revenue !== null && expenses !== null ? revenue - expenses : null);
+      const profitMargin = profit !== null && revenue !== null && revenue !== 0 ? profit / revenue * 100 : null;
+      const accountingKpis = (revenue !== null ? `<div class="phase2-kpi"><span>Reported Revenue</span><strong>${phase2Format(revenue,2)}</strong><small>Summed from the explicitly mapped revenue column; not inferred from bank credits.</small></div>` : '') +
+        (expenses !== null ? `<div class="phase2-kpi"><span>Reported Expenses</span><strong>${phase2Format(expenses,2)}</strong><small>Summed from the explicitly mapped expense column; not inferred from debits alone.</small></div>` : '') +
+        (profit !== null ? `<div class="phase2-kpi"><span>${reportedProfit !== null ? 'Reported Net Profit / Loss' : 'Calculated Profit / Loss'}</span><strong>${phase2Format(profit,2)}</strong><small>${reportedProfit !== null ? 'Taken from the explicitly mapped profit column.' : 'Revenue minus expenses, both provided in the uploaded file.'}</small></div>` : '') +
+        (profitMargin !== null ? `<div class="phase2-kpi"><span>Profit Margin</span><strong>${profitMargin.toFixed(2)}%</strong><small>Profit divided by reported revenue.</small></div>` : '');
+      const accountingUnavailable = !accountingKpis ? '<div class="phase2-cashflow-status"><strong>Profit, revenue and expense figures are not available from this file.</strong> To calculate these, upload a file with explicit Revenue and Expense columns, or a reported Net Profit column. Bank credits/debits and total transaction amounts are not automatically treated as revenue, expenses or profit.</div>' : '';
+      const dateSummary = phase2DateFrom || phase2DateTo
+        ? `Showing ${rows.length} of ${phase2Transactions().length} transactions${phase2DateFrom ? ` from ${escapePhase2HTML(phase2DateFrom)}` : ""}${phase2DateTo ? ` through ${escapePhase2HTML(phase2DateTo)}` : ""}.`
+        : `Showing all ${phase2Transactions().length} transactions. Choose a date range to focus the analysis.`;
+      return `<section class="phase2-dashboard" aria-label="Financial Performance Dashboard">
+        <div class="phase2-panel">
+          <div class="phase2-dashboard-title"><div><div class="eyebrow">PHASE 2 · FINANCIAL PERFORMANCE</div><h3>Financial Analysis Dashboard</h3><p class="phase2-note">KPIs and chart types are selected for the data available. Unsupported financial measures remain unavailable rather than estimated.</p></div>
+          <div class="phase2-date-filters"><label>From date<input id="phase2DateFromInput" type="date" autocomplete="off" aria-label="From date" title="Choose the first date to include" value="${escapePhase2HTML(phase2DateFrom)}"></label><label>To date<input id="phase2DateToInput" type="date" autocomplete="off" aria-label="To date" title="Choose the last date to include" value="${escapePhase2HTML(phase2DateTo)}"></label><button type="button" class="btn btn-primary" onclick="applyPhase2DateFilters()">Apply Filters</button><button type="button" onclick="clearPhase2DateFilter()">Clear dates</button></div></div>
+          <p class="phase2-filter-status" role="status" aria-live="polite">${dateSummary}</p>
+          ${accountingKpis ? `<div class="phase2-kpi-grid" style="margin-bottom:12px">${accountingKpis}</div>` : accountingUnavailable}
+          <div class="phase2-kpi-grid">
+            <div class="phase2-kpi"><span>Transactions analyzed</span><strong>${phase2Format(rows.length)}</strong><small>Rows included in the selected date range.</small></div>
+            <div class="phase2-kpi"><span>Total transaction amount</span><strong>${phase2Format(totalAmount,2)}</strong><small>Sum of numeric amounts; direction is not implied.</small></div>
+            <div class="phase2-kpi"><span>Average transaction amount</span><strong>${averageAmount===null?'Not available':phase2Format(averageAmount,2)}</strong><small>Average of rows with numeric amounts.</small></div>
+            <div class="phase2-kpi"><span>Cash inflows / credits</span><strong>${cash.available?phase2Format(cash.inflow,2):'Not available'}</strong><small>${cash.available?'Sum of the mapped credit/inflow values.':'Requires a separate inflow/credit column.'}</small></div>
+            <div class="phase2-kpi"><span>Cash outflows / debits</span><strong>${cash.available?phase2Format(cash.outflow,2):'Not available'}</strong><small>${cash.available?'Sum of the mapped debit/outflow values.':'Requires a separate outflow/debit column.'}</small></div>
+            <div class="phase2-kpi"><span>Net cash movement</span><strong>${cash.available?`${cash.net>=0?'+':'−'}${phase2Format(Math.abs(cash.net),2)}`:'Not available'}</strong><small>Cash movement is not accounting profit.</small></div>
+            <div class="phase2-kpi"><span>Beginning cash</span><strong>${cash.beginningCash===null?'Not available':phase2Format(cash.beginningCash,2)}</strong><small>${escapePhase2HTML(cash.beginningCashNote)}</small></div>
+            <div class="phase2-kpi"><span>Ending / last balance</span><strong>${cash.endingCash===null?'Not available':phase2Format(cash.endingCash,2)}</strong><small>${escapePhase2HTML(cash.endingCashNote)}</small></div>
+            <div class="phase2-kpi"><span>${phase2PeriodMode[0].toUpperCase()+phase2PeriodMode.slice(1)} change</span><strong>${growthText}</strong><small>${growth===null?'Needs at least two comparable periods.':`Compared with the previous ${phase2PeriodMode==='monthly'?'month':phase2PeriodMode==='quarterly'?'quarter':'year'}; ${cash.available?'net cash movement':'transaction amount'} trend.`}</small></div>
+          </div>
+          ${cash.receivablesAvailable || cash.payablesAvailable ? `<article style="margin-top:14px"><div class="phase2-panel-head"><div><div class="eyebrow">WORKING CAPITAL</div><h3>Accounts Receivable & Payable</h3><p>Shown only when the uploaded file contains explicit receivable/payable amount columns.</p></div></div><div class="phase2-kpi-grid"><div class="phase2-kpi"><span>Accounts receivable</span><strong>${cash.receivablesAvailable?phase2Format(cash.receivables,2):'Not available'}</strong><small>${cash.receivablesAvailable?'Sum of the mapped receivable amount column.':'No receivable amount column was detected.'}</small></div><div class="phase2-kpi"><span>Accounts payable</span><strong>${cash.payablesAvailable?phase2Format(cash.payables,2):'Not available'}</strong><small>${cash.payablesAvailable?'Sum of the mapped payable amount column.':'No payable amount column was detected.'}</small></div></div></article>` : ''}
+        </div>
+        <div class="phase2-grid">
+          <article class="phase2-panel"><div class="phase2-panel-head"><div><h3>${cash.available?'Cash movement over time':'Transaction amount over time'}</h3><p>Line chart is used to show the direction of change across ${phase2PeriodMode} periods.</p></div><div class="phase2-period-toggle" aria-label="Choose trend period"><button type="button" onclick="setPhase2Period('monthly')" aria-pressed="${phase2PeriodMode==='monthly'}">Monthly</button><button type="button" onclick="setPhase2Period('quarterly')" aria-pressed="${phase2PeriodMode==='quarterly'}">Quarterly</button><button type="button" onclick="setPhase2Period('yearly')" aria-pressed="${phase2PeriodMode==='yearly'}">Yearly</button></div></div>${phase2RenderLineChart(periods.slice(-12),"Add valid transaction dates and amounts to see a trend.")}</article>
+          <article class="phase2-panel"><div class="phase2-panel-head"><div><h3>Spending / Category Mix</h3><p>Donut chart shows the relative share of the largest available categories.</p></div></div>${phase2RenderDonut(categories)}<div style="margin-top:16px">${phase2RenderBars(categories.slice(0,5),"No usable category amounts were found.")}</div></article>
+          <article class="phase2-panel"><div class="phase2-panel-head"><div><h3>Cash In vs Cash Out</h3><p>Paired bars make incoming and outgoing amounts easy to compare by period.</p></div></div>${phase2RenderCashFlowPeriods(periods)}</article>
+          <article class="phase2-panel"><div class="phase2-panel-head"><div><h3>Supplier Comparison</h3><p>Sorted horizontal bars compare supplier amounts, making the highest totals easy to rank.</p></div></div>${phase2RenderBars(suppliers.slice(0,8),"No usable supplier amounts were found.")}${phase2RenderTable(suppliers,"Supplier")}</article>
+        </div>
+        <div class="phase2-disclaimer">Chart guide applied: line chart for time trends, horizontal bars for category/supplier comparisons, donut for a small category composition, and paired bars for inflow/outflow comparison. Cash-flow measures require separate direction-specific fields. Profit, margin, opening cash, closing cash, receivables and payables are only shown when the input data supports them.</div>
+      </section>`;
+    }
+    function phase2InsightsHTML(rows, periods, categories, suppliers, cash) {
+      const insights = [];
+      const growth = phase2PeriodGrowth(periods);
+      if (growth !== null) {
+        const last = periods[periods.length-1], prev = periods[periods.length-2];
+        insights.push({tone: growth > 10 ? "review" : growth < -10 ? "high" : "", title:`${cash.available ? "Net cash movement" : "Transaction volume"} changed ${growth >= 0 ? "up" : "down"} ${Math.abs(growth).toFixed(1)}%`, text:`${last.label} ${cash.available ? "net cash movement" : "transaction amount total"} was ${phase2Format(last.amount,2)} compared with ${phase2Format(prev.amount,2)} in ${prev.label}. ${cash.available ? "This is cash movement, not accounting profit." : "This compares transaction amounts, not necessarily revenue or profit."}`});
+      }
+      if (categories.length) {
+        const top = categories[0];
+        const totalCategory = categories.reduce((sum,item)=>sum+item.amount,0);
+        const share = totalCategory > 0 ? top.amount/totalCategory*100 : 0;
+        insights.push({tone: share >= 35 ? "review" : "", title:`Highest category concentration: ${top.label}`, text:`This category totals ${phase2Format(top.amount,2)} across ${top.count} rows and represents ${share.toFixed(1)}% of the categorized amount shown. Review its transactions if this concentration is unexpected.`});
+      }
+      if (suppliers.length) {
+        const top = suppliers[0];
+        insights.push({tone:"", title:`Largest supplier total: ${top.label}`, text:`The supplier total is ${phase2Format(top.amount,2)} across ${top.count} rows. Compare invoices and the relevant period to confirm that the amount is expected.`});
+      }
+      const amountRows = rows.map(row=>({row, amount:phase2Number(row.amount)})).filter(item=>item.amount!==null && item.amount>0);
+      if (amountRows.length >= 4) {
+        const sorted = amountRows.map(item=>item.amount).sort((a,b)=>a-b);
+        const median = sorted[Math.floor(sorted.length/2)];
+        const high = amountRows.filter(item=>item.amount >= median*3 && item.amount>0).sort((a,b)=>b.amount-a.amount).slice(0,3);
+        if (high.length) insights.push({tone:"review", title:`${high.length} unusually large transaction${high.length===1?"":"s"} to review`, text:`Flagged amount${high.length===1?"":"s"}: ${high.map(item=>phase2Format(item.amount,2)).join(", ")}. These are at least three times the dataset median amount; this is a review signal, not evidence of fraud.`});
+      }
+      if (cash.available) {
+        insights.push({tone:cash.net < 0 ? "high" : "good", title:cash.net < 0 ? "Outflows exceed inflows in this selection" : "Inflows exceed outflows in this selection", text:`Inflow/credit total: ${phase2Format(cash.inflow,2)}; outflow/debit total: ${phase2Format(cash.outflow,2)}; net movement: ${cash.net>=0?"+":"−"}${phase2Format(Math.abs(cash.net),2)}. This is not a closing balance or a verified profit figure.`});
+      } else {
+        insights.push({tone:"review", title:"Cash direction data is incomplete", text:"Separate debit/credit or inflow/outflow columns were not detected. The system will not infer income, expenses, or net movement from a single unsigned amount column."});
+      }
+      if (!insights.length) insights.push({tone:"",title:"More data is needed for insights",text:"Load rows with valid dates, amounts, and (where available) category and supplier columns to generate useful comparisons."});
+      return `<section class="phase2-panel" aria-label="AI Financial Insights"><div class="phase2-panel-head"><div><div class="eyebrow">PHASE 2 · INSIGHTS</div><h3>AI Financial Insights</h3><p>Findings and review suggestions derived from the currently selected transaction rows.</p></div></div><div class="phase2-insights">${insights.map(item=>`<article class="phase2-insight ${item.tone}"><strong>${escapePhase2HTML(item.title)}</strong><p>${escapePhase2HTML(item.text)}</p></article>`).join("")}</div><p class="phase2-insight-note">Local test mode: these are transparent rule-based insights, not responses from a connected AI model. Validate flags against source documents before making financial decisions.</p></section>`;
+    }
+    function normalizePhase2FilterDate(value) {
+      const text = String(value || "").trim();
+      if (!text) return "";
+      // Accept ISO YYYY-MM-DD and common DD/MM/YYYY or DD-MM-YYYY entry.
+      let match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      let year, month, day;
+      if (match) { year = Number(match[1]); month = Number(match[2]); day = Number(match[3]); }
+      else {
+        match = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+        if (!match) return null;
+        day = Number(match[1]); month = Number(match[2]); year = Number(match[3]);
+      }
+      const check = new Date(year, month - 1, day);
+      if (year < 1000 || year > 9999 || check.getFullYear() !== year || check.getMonth() !== month - 1 || check.getDate() !== day) return null;
+      return `${String(year).padStart(4,"0")}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    }
+    function setPhase2DateFilter(which, value) {
+      const normalized = normalizePhase2FilterDate(value);
+      if (normalized === null) {
+        window.alert("Please enter a valid date as YYYY-MM-DD (for example, 2026-01-31) or DD/MM/YYYY.");
+        renderPhase2Results();
+        return;
+      }
+      if (which === "from") phase2DateFrom = normalized;
+      if (which === "to") phase2DateTo = normalized;
+      if (phase2DateFrom && phase2DateTo && phase2DateFrom > phase2DateTo) {
+        if (which === "from") phase2DateTo = phase2DateFrom; else phase2DateFrom = phase2DateTo;
+      }
+      renderPhase2Results();
+    }
+    function applyPhase2DateFilters() {
+      const fromInput = document.getElementById("phase2DateFromInput");
+      const toInput = document.getElementById("phase2DateToInput");
+      const rawFrom = fromInput ? fromInput.value.trim() : "";
+      const rawTo = toInput ? toInput.value.trim() : "";
+      const from = rawFrom ? normalizePhase2FilterDate(rawFrom) : "";
+      const to = rawTo ? normalizePhase2FilterDate(rawTo) : "";
+      if (rawFrom && !from) { window.alert("From date is invalid. Enter YYYY-MM-DD or DD/MM/YYYY."); if (fromInput) fromInput.focus(); return; }
+      if (rawTo && !to) { window.alert("To date is invalid. Enter YYYY-MM-DD or DD/MM/YYYY."); if (toInput) toInput.focus(); return; }
+      if (from && to && from > to) { window.alert("From date must be earlier than or equal to To date."); return; }
+      phase2DateFrom = from || "";
+      phase2DateTo = to || "";
+      renderPhase2Results();
+    }
+    function clearPhase2DateFilter() {
+      phase2DateFrom = ""; phase2DateTo = "";
+      renderPhase2Results();
+    }
+    window.setPhase2DateFilter = setPhase2DateFilter;
+    window.applyPhase2DateFilters = applyPhase2DateFilters;
+    window.clearPhase2DateFilter = clearPhase2DateFilter;
+    function phase2PeriodKey(date, mode) {
+      const y = date.getFullYear();
+      const m = date.getMonth() + 1;
+      if (mode === "yearly") return {key:String(y), label:String(y), sort:y};
+      if (mode === "quarterly") {
+        const q = Math.floor((m - 1) / 3) + 1;
+        return {key:`${y}-Q${q}`, label:`${y} Q${q}`, sort:y * 10 + q};
+      }
+      return {key:`${y}-${String(m).padStart(2,"0")}`, label:date.toLocaleString("en-US",{month:"short",year:"numeric"}), sort:y * 100 + m};
+    }
+    function phase2AggregateByPeriod(rows, mode) {
+      const grouped = new Map();
+      rows.forEach(row => {
+        const date = phase2Date(row.date);
+        const amount = phase2Number(row.amount);
+        if (!date || amount === null) return;
+        const p = phase2PeriodKey(date, mode);
+        const old = grouped.get(p.key) || {...p, amount:0, count:0, inflow:0, outflow:0, hasDirection:false};
+        old.count += 1;
+        if (phase2DirectionFieldsAvailable && (phase2Number(row.credit) !== null || phase2Number(row.debit) !== null)) {
+          const incoming = Math.abs(phase2Number(row.credit) ?? 0);
+          const outgoing = Math.abs(phase2Number(row.debit) ?? 0);
+          old.inflow += incoming;
+          old.outflow += outgoing;
+          // Blank debit/credit cells are treated as zero only when separate direction columns exist.
+          old.amount += incoming - outgoing;
+          old.hasDirection = true;
+        } else if (!phase2DirectionFieldsAvailable) {
+          old.amount += amount;
+        }
+        grouped.set(p.key,old);
+      });
+      return [...grouped.values()].sort((a,b)=>a.sort-b.sort);
+    }
+    function phase2RenderPeriodTable(items) {
+      const directional = items.filter(item => item.hasDirection);
+      if (!directional.length) return '<div class="phase2-empty">Income-versus-expense comparison needs separate Debit and Credit columns in the file.</div>';
+      return `<div class="phase2-table-wrap"><table class="phase2-table"><thead><tr><th>Period</th><th>Transactions</th><th>Inflows / Credit</th><th>Outflows / Debit</th><th>Net movement</th></tr></thead><tbody>${directional.slice(-12).map(item=>`<tr><td>${escapePhase2HTML(item.label)}</td><td>${phase2Format(item.count)}</td><td>${phase2Format(item.inflow,2)}</td><td>${phase2Format(item.outflow,2)}</td><td>${item.inflow-item.outflow>=0?'+':'−'}${phase2Format(Math.abs(item.inflow-item.outflow),2)}</td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function phase2AggregateBy(rows, field) {
+      const grouped = new Map();
+      rows.forEach(row => {
+        const label = phase2ValidLabel(row[field]);
+        let amount = phase2Number(row.amount);
+        if (phase2DirectionFieldsAvailable) amount = phase2Number(row.debit);
+        if (!label || amount === null || amount <= 0) return;
+        const old = grouped.get(label) || {label, amount:0, count:0};
+        old.amount += Math.abs(amount);
+        old.count += 1;
+        grouped.set(label,old);
+      });
+      return [...grouped.values()].sort((a,b)=>b.amount-a.amount || b.count-a.count);
+    }
+    function phase2RenderBars(items, emptyText) {
+      if (!items.length) return `<div class="phase2-empty">${escapePhase2HTML(emptyText)}</div>`;
+      const max = Math.max(...items.map(x=>Math.abs(x.amount)), 0) || 1;
+      return `<div class="phase2-chart">${items.map(item=>{
+        const width = Math.max(1, Math.min(100, Math.abs(item.amount) / max * 100));
+        return `<div class="phase2-bar-row"><span class="phase2-bar-label" title="${escapePhase2HTML(item.label)}">${escapePhase2HTML(item.label)}</span><div class="phase2-bar-track" aria-label="${escapePhase2HTML(item.label)} amount"><div class="phase2-bar-fill" style="width:${width}%"></div></div><span class="phase2-bar-value">${phase2Format(item.amount,2)}</span></div>`;
+      }).join("")}</div>`;
+    }
+    function phase2RenderTable(items, firstHeading) {
+      if (!items.length) return '<div class="phase2-empty">No usable data found for this grouping. Check the mapped source columns.</div>';
+      return `<div class="phase2-table-wrap"><table class="phase2-table"><thead><tr><th>${escapePhase2HTML(firstHeading)}</th><th>Transactions</th><th>Total amount</th></tr></thead><tbody>${items.slice(0,8).map(item=>`<tr><td>${escapePhase2HTML(item.label)}</td><td>${phase2Format(item.count)}</td><td>${phase2Format(item.amount,2)}</td></tr>`).join("")}</tbody></table></div>`;
+    }
+    function phase2CashFlow(rows) {
+      let inflow = 0, outflow = 0, hasDirection = false;
+      if (phase2DirectionFieldsAvailable) {
+        rows.forEach(row => {
+          const incoming = phase2Number(row.credit);
+          const outgoing = phase2Number(row.debit);
+          if (incoming !== null || outgoing !== null) hasDirection = true;
+          if (incoming !== null) inflow += Math.abs(incoming);
+          if (outgoing !== null) outflow += Math.abs(outgoing);
+        });
+      }
+      const dated = rows.map(row => ({row, date:phase2Date(row.date)})).filter(item => item.date).sort((a,b) => a.date-b.date || (a.row.row_index ?? 0)-(b.row.row_index ?? 0));
+      const balanceRows = dated.filter(item => phase2Number(item.row.balance) !== null);
+      let beginningCash = null, endingCash = null, beginningCashNote = "Opening balance data was not found.";
+      if (dated.length && phase2OpeningBalanceColumn) {
+        const openingRow = dated.find(item => phase2Number(item.row.opening_balance) !== null);
+        if (openingRow) {
+          beginningCash = phase2Number(openingRow.row.opening_balance);
+          beginningCashNote = "From the reported opening/beginning balance column.";
+        }
+      }
+      if (balanceRows.length) {
+        const first = balanceRows[0].row;
+        const last = balanceRows[balanceRows.length-1].row;
+        endingCash = phase2Number(last.balance);
+        if (beginningCash === null && phase2DirectionFieldsAvailable && phase2Number(first.balance) !== null) {
+          const firstIn = Math.abs(phase2Number(first.credit) ?? 0);
+          const firstOut = Math.abs(phase2Number(first.debit) ?? 0);
+          beginningCash = phase2Number(first.balance) - (firstIn - firstOut);
+          beginningCashNote = "Derived from the first reported running balance minus that transaction's net movement.";
+        }
+      }
+      const sumOptional = (field, column) => {
+        if (!column) return {available:false, total:null};
+        const values = rows.map(row => phase2Number(row[field])).filter(value => value !== null);
+        return {available:values.length>0, total:values.reduce((sum,value)=>sum+value,0)};
+      };
+      const receivables = sumOptional("receivables", phase2ReceivableColumn);
+      const payables = sumOptional("payables", phase2PayableColumn);
+      return {
+        available:hasDirection,
+        inflow, outflow, net:inflow-outflow,
+        beginningCash, endingCash,
+        beginningCashNote,
+        endingCashNote: endingCash === null ? "A running/closing balance column was not found." : "Last reported balance within the selected date range.",
+        receivablesAvailable:receivables.available, receivables:receivables.total,
+        payablesAvailable:payables.available, payables:payables.total
+      };
+    }
+    function openFinancialAnalysis() {
+      const item = {title:"Financial Analysis",description:"Phase 2 advanced analytics: review monthly, quarterly and yearly performance, spending concentrations, and cash-flow measures when the source data supports them."};
+      document.getElementById("homeContent").classList.add("hidden");
+      document.getElementById("workspaceView").classList.add("active");
+      document.getElementById("workspaceHeading").textContent = item.title;
+      document.getElementById("workspaceDescription").textContent = item.description;
+      const toolbar = document.querySelector("#workspaceView .workspace-toolbar");
+      if (toolbar) toolbar.innerHTML = '<button class="back-button" type="button" onclick="openWorkspace(\'finance\')">← Finance Workspace</button>';
+      const tools = document.getElementById("workspaceTools");
+      tools.replaceChildren();
+      tools.style.display = "none";
+      const extra = document.getElementById("workspaceExtra");
+      extra.innerHTML = `
+        <div class="phase2-shell">
+          <section class="phase2-hero">
+            <div class="eyebrow">PHASE 2 · ADVANCED FINANCIAL ANALYTICS</div>
+            <h3>Understand performance across time, categories and suppliers.</h3>
+            <p>Load a financial dataset to calculate monthly, quarterly and yearly performance, compare category and supplier totals, and show net cash movement trends when separate debit and credit values exist. This view stays in Phase 2; it does not send you to the Phase 1 upload screen.</p>
+          </section>
+          <section class="phase2-load" aria-label="Upload cash-flow data for advanced financial analysis">
+            <div class="field"><label for="phase2FileInput">Upload Cash Flow / Financial Transactions</label><input id="phase2FileInput" type="file" accept=".csv,.xls,.xlsx"><p class="phase2-upload-help">For cash-flow analysis, upload a CSV, XLS, or XLSX transaction file. For the clearest Cash In vs Cash Out results, include a date and separate Credit/Inflow and Debit/Outflow columns. If the file only has one amount column, cash-flow direction may be unavailable.</p></div>
+            
+            <div class="phase2-load-actions"><button class="btn btn-primary" id="phase2LoadButton" type="button" onclick="loadPhase2Data()">Run Advanced Analysis &amp; Generate KPIs →</button><button class="btn btn-ghost" id="phase2ResetButton" type="button" onclick="resetPhase2Analysis()">Reset Analysis ↻</button></div>
+            <p class="phase2-status" id="phase2Status" role="status" aria-live="polite">No data loaded. Upload a CSV, XLS, or XLSX file, then run advanced analysis. This local test does not call the Phase 1 API.</p>
+          </section>
+          <div id="phase2Results"><section class="phase2-panel"><div class="phase2-empty">Upload a financial file to begin analysis. KPI values and charts will appear after you run the analysis.</div></section></div>
+        </div>`;
+      window.scrollTo({top:document.getElementById("workspaceView").offsetTop - 75, behavior:"smooth"});
+    }
+    window.openFinancialAnalysis = openFinancialAnalysis;
+
+    function phase2NormalizeColumn(value) {
+      return String(value ?? "").toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+    }
+    function phase2FindSourceColumn(rows, aliases) {
+      if (!rows.length) return null;
+      const keys = Object.keys(rows[0] || {});
+      const normalized = new Map(keys.map(key => [phase2NormalizeColumn(key), key]));
+      for (const alias of aliases) {
+        const found = normalized.get(phase2NormalizeColumn(alias));
+        if (found !== undefined) return found;
+      }
+      return null;
+    }
+    function phase2ParseAmount(value) {
+      if (value === null || value === undefined || String(value).trim() === "") return null;
+      let text = String(value).trim().replace(/[,$£€₨\s]/g, "");
+      const negativeByParentheses = /^\(.*\)$/.test(text);
+      text = text.replace(/[()]/g, "");
+      const number = Number(text);
+      if (!Number.isFinite(number)) return null;
+      return negativeByParentheses ? -Math.abs(number) : number;
+    }
+    function phase2ParseCSV(text) {
+      const rows = [];
+      let row = [], field = "", quoted = false;
+      const input = String(text ?? "").replace(/^\uFEFF/, "");
+      for (let i = 0; i < input.length; i++) {
+        const ch = input[i];
+        if (quoted) {
+          if (ch === '"' && input[i + 1] === '"') { field += '"'; i++; }
+          else if (ch === '"') quoted = false;
+          else field += ch;
+        } else if (ch === '"') quoted = true;
+        else if (ch === ',') { row.push(field); field = ""; }
+        else if (ch === '\n' || ch === '\r') {
+          if (ch === '\r' && input[i + 1] === '\n') i++;
+          row.push(field); field = "";
+          if (row.some(cell => String(cell).trim() !== "")) rows.push(row);
+          row = [];
+        } else field += ch;
+      }
+      row.push(field);
+      if (row.some(cell => String(cell).trim() !== "")) rows.push(row);
+      if (rows.length < 2) throw new Error("The selected CSV has no transaction rows.");
+      const headers = rows[0].map((value, index) => String(value || `Column ${index + 1}`).trim());
+      return rows.slice(1).map(values => {
+        const record = {};
+        headers.forEach((header, index) => { record[header] = values[index] ?? ""; });
+        return record;
+      });
+    }
+    function phase2LoadExcelLibrary() {
+      if (window.XLSX) return Promise.resolve(window.XLSX);
+      return new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-phase2-xlsx="true"]');
+        if (existing) {
+          existing.addEventListener("load", () => window.XLSX ? resolve(window.XLSX) : reject(new Error("Spreadsheet parser loaded but is unavailable.")), {once:true});
+          existing.addEventListener("error", () => reject(new Error("Could not load the Excel reader. Try the CSV test file or check your internet connection.")), {once:true});
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+        script.async = true;
+        script.dataset.phase2Xlsx = "true";
+        script.onload = () => window.XLSX ? resolve(window.XLSX) : reject(new Error("Spreadsheet parser loaded but is unavailable."));
+        script.onerror = () => reject(new Error("Could not load the Excel reader. Try the CSV test file or check your internet connection."));
+        document.head.appendChild(script);
+      });
+    }
+    async function phase2ReadLocalFile(file) {
+      if (/\.csv$/i.test(file.name)) return phase2ParseCSV(await file.text());
+      const XLSX = await phase2LoadExcelLibrary();
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, {type:"array", cellDates:true});
+      const sheetName = workbook.SheetNames && workbook.SheetNames[0];
+      if (!sheetName) throw new Error("The selected Excel workbook has no worksheets.");
+      const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {defval:"", raw:false, dateNF:"yyyy-mm-dd"});
+      if (!rows.length) throw new Error("The first worksheet contains no transaction rows.");
+      return rows;
+    }
+    function phase2NormalizeSourceRows(sourceRows) {
+      if (!sourceRows.length) throw new Error("No transaction rows were found in this file.");
+      const dateCol = phase2FindSourceColumn(sourceRows, ["date","transaction date","txn date","posting date","value date","transaction_date"]);
+      const amountCol = phase2FindSourceColumn(sourceRows, ["amount","transaction amount","txn amount","transaction_amount","value"]);
+      const revenueCol = phase2FindSourceColumn(sourceRows, ["revenue","total revenue","sales revenue","sales","income revenue"]);
+      const expensesCol = phase2FindSourceColumn(sourceRows, ["expenses","expense","total expenses","total expense","operating expenses","costs","total costs"]);
+      const profitCol = phase2FindSourceColumn(sourceRows, ["net profit","net income","profit loss","profit/loss","profit","net_profit"]);
+      const debitCol = phase2FindSourceColumn(sourceRows, ["debit","debit amount","debit_amount","withdrawal","withdrawals","outflow","cash out","money out"]);
+      const creditCol = phase2FindSourceColumn(sourceRows, ["credit","credit amount","credit_amount","deposit","deposits","inflow","cash in","money in"]);
+      const balanceCol = phase2FindSourceColumn(sourceRows, ["balance","running balance","account balance","closing balance","available balance","ledger balance"]);
+      const openingBalanceCol = phase2FindSourceColumn(sourceRows, ["opening balance","beginning balance","beginning cash","opening cash","cash on hand start"]);
+      const receivableCol = phase2FindSourceColumn(sourceRows, ["accounts receivable","receivable amount","receivables amount","ar amount","ar balance"]);
+      const payableCol = phase2FindSourceColumn(sourceRows, ["accounts payable","payable amount","payables amount","ap amount","ap balance"]);
+      const categoryCol = phase2FindSourceColumn(sourceRows, ["category","expense category","account category","transaction category","type"]);
+      const supplierCol = phase2FindSourceColumn(sourceRows, ["supplier","supplier id","supplier name","vendor","vendor id","vendor name","payee","counterparty"]);
+      const descriptionCol = phase2FindSourceColumn(sourceRows, ["description","transaction description","details","narration","particulars","memo"]);
+      const transactionIdCol = phase2FindSourceColumn(sourceRows, ["transaction id","transaction_id","txn id","reference","reference number"]);
+      const invoiceCol = phase2FindSourceColumn(sourceRows, ["invoice id","invoice_id","invoice number","invoice no"]);
+      const paymentCol = phase2FindSourceColumn(sourceRows, ["payment method","payment_method","payment type","method"]);
+      const hasDirectionColumns = Boolean(debitCol && creditCol);
+      phase2DirectionFieldsAvailable = hasDirectionColumns;
+      phase2BalanceColumn = balanceCol;
+      phase2OpeningBalanceColumn = openingBalanceCol;
+      phase2ReceivableColumn = receivableCol;
+      phase2PayableColumn = payableCol;
+      phase2FinancialColumnMap = {revenue:revenueCol, expenses:expensesCol, profit:profitCol};
+      phase2SourceMapping = {date:dateCol, amount:amountCol, revenue:revenueCol, expenses:expensesCol, profit:profitCol, debit:debitCol, credit:creditCol, balance:balanceCol, opening_balance:openingBalanceCol, receivables:receivableCol, payables:payableCol, category:categoryCol, supplier:supplierCol};
+      const transactions = sourceRows.map((record, index) => {
+        const debitParsed = debitCol ? phase2ParseAmount(record[debitCol]) : null;
+        const creditParsed = creditCol ? phase2ParseAmount(record[creditCol]) : null;
+        const amountParsed = amountCol ? phase2ParseAmount(record[amountCol]) : null;
+        const debit = hasDirectionColumns ? Math.abs(debitParsed ?? 0) : null;
+        const credit = hasDirectionColumns ? Math.abs(creditParsed ?? 0) : null;
+        const amount = amountParsed !== null ? Math.abs(amountParsed) : hasDirectionColumns ? debit + credit : null;
+        return {
+          row_index:index,
+          transaction_id:transactionIdCol ? record[transactionIdCol] : `TX-${index + 1}`,
+          date:dateCol ? record[dateCol] : null,
+          amount,
+          revenue: revenueCol ? phase2ParseAmount(record[revenueCol]) : null,
+          expenses: expensesCol ? phase2ParseAmount(record[expensesCol]) : null,
+          profit: profitCol ? phase2ParseAmount(record[profitCol]) : null,
+          debit,
+          credit,
+          balance:balanceCol ? phase2ParseAmount(record[balanceCol]) : null,
+          opening_balance:openingBalanceCol ? phase2ParseAmount(record[openingBalanceCol]) : null,
+          receivables:receivableCol ? phase2ParseAmount(record[receivableCol]) : null,
+          payables:payableCol ? phase2ParseAmount(record[payableCol]) : null,
+          category:categoryCol ? record[categoryCol] : null,
+          supplier_id:supplierCol ? record[supplierCol] : null,
+          description:descriptionCol ? record[descriptionCol] : null,
+          invoice_id:invoiceCol ? record[invoiceCol] : null,
+          payment_method:paymentCol ? record[paymentCol] : null
+        };
+      });
+      return {success:true, transactions, source_columns:Object.keys(sourceRows[0] || {}), mapping:phase2SourceMapping, has_direction_columns:hasDirectionColumns};
+    }
+    let phase2DirectionFieldsAvailable = false;
+    let phase2FinancialColumnMap = {revenue:null, expenses:null, profit:null};
+    let phase2SourceMapping = null;
+    let phase2BalanceColumn = null;
+    let phase2OpeningBalanceColumn = null;
+    let phase2ReceivableColumn = null;
+    let phase2PayableColumn = null;
+
+    async function loadPhase2Data() {
+      const input = document.getElementById("phase2FileInput");
+      const status = document.getElementById("phase2Status");
+      const button = document.getElementById("phase2LoadButton");
+      const file = input && input.files && input.files[0];
+      if (!file) {
+        status.textContent = "Please select a CSV, XLS or XLSX file first.";
+        status.className = "phase2-status error";
+        return;
+      }
+      if (!/\.(csv|xls|xlsx)$/i.test(file.name)) {
+        status.textContent = "Unsupported file type. Use CSV, XLS or XLSX for transaction analysis.";
+        status.className = "phase2-status error";
+        return;
+      }
+      const oldText = button.textContent;
+      button.disabled = true;
+      button.textContent = "Reading file…";
+      status.textContent = "Reading the selected file in this browser. This test does not contact the Phase 1 API.";
+      status.className = "phase2-status";
+      try {
+        const sourceRows = await phase2ReadLocalFile(file);
+        const data = phase2NormalizeSourceRows(sourceRows);
+        const usable = data.transactions.filter(row => row.date || row.amount !== null);
+        if (!usable.length) throw new Error("The file was read, but no usable transaction date or amount values were found. Check the column headers.");
+        phase2AnalysisData = {...data, transactions:data.transactions};
+        phase2FileLabel = file.name;
+        phase2PeriodMode = "monthly";
+        const mapped = Object.entries(data.mapping).filter(([, value]) => value).map(([key, value]) => `${key}: ${value}`).join(" · ");
+        status.textContent = `Loaded ${phase2Format(data.transactions.length)} transaction rows locally. ${data.has_direction_columns ? "Separate debit and credit columns detected; cash-flow analysis is enabled." : "Separate debit and credit columns were not both found; cash flow will be marked unavailable."}${mapped ? ` Mapped columns — ${mapped}.` : ""}`;
+        status.className = "phase2-status success";
+        renderPhase2Results();
+      } catch (error) {
+        status.textContent = error && error.message ? error.message : "Unable to read this file for advanced analysis.";
+        status.className = "phase2-status error";
+      } finally {
+        button.disabled = false;
+        button.textContent = oldText;
+      }
+    }
+    window.loadPhase2Data = loadPhase2Data;
+
+    function resetPhase2Analysis() {
+      phase2AnalysisData = null;
+      phase2FileLabel = "";
+      phase2PeriodMode = "monthly";
+      phase2DateFrom = "";
+      phase2DateTo = "";
+      phase2DirectionFieldsAvailable = false;
+      phase2FinancialColumnMap = {revenue:null, expenses:null, profit:null};
+      phase2SourceMapping = null;
+      phase2BalanceColumn = null;
+      phase2OpeningBalanceColumn = null;
+      phase2ReceivableColumn = null;
+      phase2PayableColumn = null;
+
+      const input = document.getElementById("phase2FileInput");
+      if (input) input.value = "";
+      const status = document.getElementById("phase2Status");
+      if (status) {
+        status.textContent = "Analysis reset. No data loaded. Upload a new file to begin.";
+        status.className = "phase2-status";
+      }
+      const results = document.getElementById("phase2Results");
+      if (results) results.innerHTML = '<section class="phase2-panel"><div class="phase2-empty">Upload a financial file to begin analysis. KPI values and charts will appear after you run the analysis.</div></section>';
+      const loadButton = document.getElementById("phase2LoadButton");
+      if (loadButton) { loadButton.disabled = false; loadButton.textContent = "Run Advanced Analysis & Generate KPIs →"; }
+    }
+    window.resetPhase2Analysis = resetPhase2Analysis;
+
+    function setPhase2Period(mode) {
+      if (!["monthly","quarterly","yearly"].includes(mode)) return;
+      phase2PeriodMode = mode;
+      renderPhase2Results();
+    }
+    window.setPhase2Period = setPhase2Period;
+
+    function renderPhase2Results() {
+      const container = document.getElementById("phase2Results");
+      if (!container) return;
+      const allRows = phase2Transactions();
+      const rows = phase2ApplyDateFilter(allRows);
+      if (!phase2AnalysisData || !allRows.length) {
+        container.innerHTML = '<section class="phase2-panel"><div class="phase2-empty">No transaction rows were returned. Check the file and mapped columns, then try again.</div></section>';
+        return;
+      }
+      if (!rows.length) {
+        container.innerHTML = `<section class="phase2-panel"><p class="phase2-filter-status" role="status" aria-live="polite">No transactions match ${phase2DateFrom ? `from ${escapePhase2HTML(phase2DateFrom)}` : "the start of the available data"}${phase2DateTo ? ` through ${escapePhase2HTML(phase2DateTo)}` : ""}. The date filter is active.</p><div class="phase2-empty">No transactions match the selected date range. Choose a different date range or clear the dates.</div><button type="button" class="back-button" onclick="clearPhase2DateFilter()">Clear date filters</button></section>`;
+        return;
+      }
+      const amounts = rows.map(row=>phase2Number(row.amount)).filter(value=>value!==null);
+      const total = amounts.reduce((a,b)=>a+b,0);
+      const average = amounts.length ? total/amounts.length : null;
+      const dates = rows.map(row=>phase2Date(row.date)).filter(Boolean).sort((a,b)=>a-b);
+      const categories = phase2AggregateBy(rows,"category");
+      const suppliers = phase2AggregateBy(rows,"supplier_id");
+      const periods = phase2AggregateByPeriod(rows,phase2PeriodMode);
+      const cash = phase2CashFlow(rows);
+      const firstDate = dates.length ? dates[0].toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}) : "Not available";
+      const lastDate = dates.length ? dates[dates.length-1].toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}) : "Not available";
+      const periodLabel = phase2PeriodMode === "monthly" ? "Monthly" : phase2PeriodMode === "quarterly" ? "Quarterly" : "Yearly";
+      const cashPanel = cash.available
+        ? `<div class="phase2-metrics"><div class="phase2-metric"><span>Total inflows</span><strong>${phase2Format(cash.inflow,2)}</strong></div><div class="phase2-metric"><span>Total outflows</span><strong>${phase2Format(cash.outflow,2)}</strong></div><div class="phase2-metric"><span>Net cash movement</span><strong>${cash.net>=0?"+":"−"}${phase2Format(Math.abs(cash.net),2)}</strong></div></div><p class="phase2-note" style="margin-top:10px">Calculated from separate inflow/outflow fields returned by the data source. This is net movement, not necessarily the account closing balance.</p>`
+        : `<div class="phase2-cashflow-status"><strong>Cash flow needs separate debit and credit data.</strong>The current analysis API response provides a single transaction amount per row and does not return separate debit/credit or inflow/outflow values. Net cash flow is therefore not calculated here, to avoid presenting an unreliable result. The backend response must expose direction-specific values to enable this section.</div>`;
+      container.innerHTML = `
+        ${phase2DashboardHTML(rows,periods,categories,suppliers,cash)}
+        <section style="margin-top:14px">${phase2InsightsHTML(rows,periods,categories,suppliers,cash)}</section>
+        <div class="phase2-disclaimer"><strong>Local test mode:</strong> This test copy reads the selected file in your browser and does not call the remote Phase 1 API. Revenue, expenses and profit are shown only when explicit corresponding columns are found; profit can be calculated as revenue minus expenses only when both columns are provided. Cash inflows/outflows require separate credit and debit columns. Bank cash movement is not treated as accounting profit, and rule-based insights are not generated by a connected AI model.</div>`;
+    }
+
     function showHome() {
       document.getElementById("homeContent").classList.remove("hidden");
       document.getElementById("workspaceView").classList.remove("active");
@@ -713,20 +1411,43 @@
       document.getElementById("workspaceView").classList.add("active");
       document.getElementById("workspaceHeading").textContent = item.title;
       document.getElementById("workspaceDescription").textContent = item.description;
+      const toolbar = document.querySelector("#workspaceView .workspace-toolbar");
+      if (toolbar) toolbar.innerHTML = '<button class="back-button" type="button" onclick="showHome()">← Back to home</button><button class="btn btn-primary" type="button" onclick="openAnalysis()">Analyze Data ↗</button>';
       const tools = document.getElementById("workspaceTools");
+      tools.style.display = "";
       tools.replaceChildren();
       item.tools.forEach(([title,description]) => {
+        const isFinancialAnalysisCard = key === "finance" && title === "Financial Analysis";
         const card = document.createElement("article");
-        card.className = "tool-card";
+        card.className = isFinancialAnalysisCard ? "tool-card tool-card-action" : "tool-card";
         const h3 = document.createElement("h3"); h3.textContent = title;
         const p = document.createElement("p"); p.textContent = description;
-        card.append(h3,p); tools.appendChild(card);
+        card.append(h3,p);
+        if (isFinancialAnalysisCard) {
+          card.setAttribute("role", "button");
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("aria-label", "Open Phase 2 advanced Financial Analysis workspace");
+          const actionLabel = document.createElement("span");
+          actionLabel.className = "tool-card-action-label";
+          actionLabel.textContent = "Open Advanced Analysis →";
+          card.appendChild(actionLabel);
+          card.addEventListener("click", openFinancialAnalysis);
+          card.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openFinancialAnalysis();
+            }
+          });
+        }
+        tools.appendChild(card);
       });
       const extra = document.getElementById("workspaceExtra");
       extra.replaceChildren();
-      if (item.analysis) {
+      if (key === "finance") {
+        extra.innerHTML = '<div class="config-panel"><h3>Phase 2 · Advanced Financial Analysis</h3><p class="muted">Use Monthly, Quarterly and Yearly performance views, category and supplier totals, and cash-flow analysis when direction-specific data is available.</p><button class="btn btn-primary" type="button" onclick="openFinancialAnalysis()">Open Advanced Analysis ↗</button></div>';
+      } else if (item.analysis) {
         const panel = document.createElement("div"); panel.className = "config-panel";
-        panel.innerHTML = '<h3>Open the Phase 1 analysis workflow</h3><p class="muted">Upload a bank statement, general ledger, cash book, or supported other financial transaction export and review results returned by the backend.</p><button class="btn btn-primary" type="button" onclick="openAnalysis()">Go to Analyze Data ↗</button>';
+        panel.innerHTML = '<h3>Analysis tools</h3><p class="muted">Use this workspace to review relevant data and findings. The available workflow depends on the features connected to your account.</p><button class="btn btn-primary" type="button" onclick="openAnalysis()">Go to Analyze Data ↗</button>';
         extra.appendChild(panel);
       } else if (item.extra === "standards") {
         extra.innerHTML = '<div class="config-panel"><h3>Reporting framework guide</h3><p class="muted">Choose the framework applicable to your company. A framework selection does not itself confirm compliance.</p><div class="config-grid"><div class="field"><label for="standardsFramework">Reporting framework</label><select id="standardsFramework"><option>IFRS</option><option>US GAAP</option><option>Local / National GAAP</option><option>Other</option></select></div><div class="field"><label for="standardsCountry">Jurisdiction</label><select id="standardsCountry"><option value="">Select country / jurisdiction</option><option>Pakistan</option><option>United States</option><option>United Kingdom</option><option>United Arab Emirates</option><option>India</option><option>Other</option></select></div></div><p class="help-note">These selections are interface-only until connected to a company-settings endpoint. Regulatory updates require a reliable external source.</p></div>';
@@ -944,8 +1665,6 @@
   </script>
 
   <!-- Keep the existing Phase 1 JavaScript. This root version assumes script.js sits beside index.html. -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="./script.js"></script>
 </body>
 </html>
