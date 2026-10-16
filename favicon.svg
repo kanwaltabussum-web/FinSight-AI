@@ -1,0 +1,38 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#19364A"/>
+      <stop offset="100%" stop-color="#081421"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D8FFF8"/>
+      <stop offset="48%" stop-color="#43E0CC"/>
+      <stop offset="100%" stop-color="#079AA6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+
+  <!-- Main four-point spark -->
+  <path
+    d="M30 7
+       C32.5 22 37 26.5 53 30
+       C37 33.5 32.5 38 30 53
+       C27.5 38 23 33.5 7 30
+       C23 26.5 27.5 22 30 7Z"
+    fill="url(#spark)"/>
+
+  <!-- Subtle AI neural connection -->
+  <g stroke="#F1FFFC" stroke-width="1.5"
+     stroke-linecap="round" fill="none">
+    <path d="M39 17L45 12L50 17"/>
+    <path d="M45 12V9"/>
+  </g>
+  <g fill="#FFFFFF">
+    <circle cx="39" cy="17" r="1.8"/>
+    <circle cx="45" cy="12" r="2"/>
+    <circle cx="50" cy="17" r="1.8"/>
+    <circle cx="45" cy="9" r="1.5"/>
+  </g>
+</svg>
