@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <meta name="theme-color" content="#090b18">
   <meta name="description" content="FinSight AI — a 3D financial intelligence companion for analysis, risk signals and clearer financial decisions.">
   <title>FinSight AI — Financial Intelligence Companion</title>
@@ -1106,7 +1105,7 @@
       };
     }
     function openFinancialAnalysis() {
-      const item = {title:"Financial Analysis",description:"Phase 2 advanced analytics: review monthly, quarterly and yearly performance, spending concentrations, and cash-flow measures when the source data supports them."};
+      const item = {title:"Financial Analysis",description:"Phase 2 advanced financial analytics: explore performance trends, financial measures, and cash-flow indicators when the uploaded data supports them."};
       document.getElementById("homeContent").classList.add("hidden");
       document.getElementById("workspaceView").classList.add("active");
       document.getElementById("workspaceHeading").textContent = item.title;
@@ -1121,16 +1120,17 @@
         <div class="phase2-shell">
           <section class="phase2-hero">
             <div class="eyebrow">PHASE 2 · ADVANCED FINANCIAL ANALYTICS</div>
-            <h3>Understand performance across time, categories and suppliers.</h3>
-            <p>Load a financial dataset to calculate monthly, quarterly and yearly performance, compare category and supplier totals, and show net cash movement trends when separate debit and credit values exist. This view stays in Phase 2; it does not send you to the Phase 1 upload screen.</p>
+            <h3>Analyze financial performance across your business.</h3>
+            <p>Explore monthly, quarterly and yearly performance, analyze revenue, expenses, profitability and cash flow, and compare results across business units, products, categories, customers and suppliers. Identify financial trends and evaluate performance using the data available in your uploaded dataset.</p>
+            <p>This analysis stays within Phase 2 and does not redirect you to the Phase 1 upload screen.</p>
           </section>
-          <section class="phase2-load" aria-label="Upload cash-flow data for advanced financial analysis">
-            <div class="field"><label for="phase2FileInput">Upload Cash Flow / Financial Transactions</label><input id="phase2FileInput" type="file" accept=".csv,.xls,.xlsx"><p class="phase2-upload-help">For cash-flow analysis, upload a CSV, XLS, or XLSX transaction file. For the clearest Cash In vs Cash Out results, include a date and separate Credit/Inflow and Debit/Outflow columns. If the file only has one amount column, cash-flow direction may be unavailable.</p></div>
+          <section class="phase2-load" aria-label="Upload financial data for advanced financial analysis">
+            <div class="field"><label for="phase2FileInput">Upload Financial Data / Transactions</label><input id="phase2FileInput" type="file" accept=".csv,.xls,.xlsx"><p class="phase2-upload-help">Upload a CSV, XLS, or XLSX file containing transaction dates, amounts, and relevant categories or account details. For cash-flow analysis, include separate Credit/Inflow and Debit/Outflow columns where available. Revenue, expenses, and profit insights require appropriate financial columns in your file.</p></div>
             
-            <div class="phase2-load-actions"><button class="btn btn-primary" id="phase2LoadButton" type="button" onclick="loadPhase2Data()">Run Advanced Analysis &amp; Generate KPIs →</button><button class="btn btn-ghost" id="phase2ResetButton" type="button" onclick="resetPhase2Analysis()">Reset Analysis ↻</button></div>
-            <p class="phase2-status" id="phase2Status" role="status" aria-live="polite">No data loaded. Upload a CSV, XLS, or XLSX file, then run advanced analysis. This local test does not call the Phase 1 API.</p>
+            <div class="phase2-load-actions"><button class="btn btn-primary" id="phase2LoadButton" type="button" onclick="loadPhase2Data()">Run Financial Analysis &amp; Generate KPIs →</button><button class="btn btn-ghost" id="phase2ResetButton" type="button" onclick="resetPhase2Analysis()">Reset Analysis ↻</button></div>
+            <p class="phase2-status" id="phase2Status" role="status" aria-live="polite">No data loaded. Upload a CSV, XLS, or XLSX file, then run financial analysis. Files are processed locally in this browser by this Phase 2 workflow.</p>
           </section>
-          <div id="phase2Results"><section class="phase2-panel"><div class="phase2-empty">Upload a financial file to begin analysis. KPI values and charts will appear after you run the analysis.</div></section></div>
+          <div id="phase2Results"><section class="phase2-panel"><div class="phase2-empty">Upload a financial file to begin analysis. Available KPI values and charts will depend on the data and columns in your file.</div></section></div>
         </div>`;
       window.scrollTo({top:document.getElementById("workspaceView").offsetTop - 75, behavior:"smooth"});
     }
