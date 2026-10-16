@@ -1501,13 +1501,13 @@
           </div>
           <div id="fsGroupFields" class="config-grid" hidden>
             <div class="field"><label for="fsParent">Parent entity name</label><input id="fsParent" placeholder="Parent company"></div>
-            <div class="field"><label for="fsEntities">Subsidiaries / associates / joint ventures</label><input id="fsEntities" placeholder="List entities separated by commas"></div>
+            <div class="field"><label for="fsEntities">Group entities / investees</label><input id="fsEntities" placeholder="Subsidiaries, associates, JVs, branches, SPVs, foreign entities…"><small class="muted">Include all relevant entities and investees.</small></div>
             <div class="field"><label for="fsOwnership">Ownership / interest notes</label><input id="fsOwnership" placeholder="Entity and ownership % / influence"></div>
             <div class="field"><label for="fsIntercompany">Intercompany eliminations</label><select id="fsIntercompany"><option value="unknown">Not provided / not yet reconciled</option><option value="provided">Elimination data is included in uploaded file</option><option value="none">Confirmed no material intragroup balances</option></select></div>
           </div>
           <div class="fs-section-label">2. Upload source data</div>
           <p class="muted">Upload a CSV containing an account name and an amount or debit/credit columns. For Excel, export the relevant sheet to CSV first. This first version reads CSV locally in your browser; files are not sent to the API by this statement workflow.</p>
-          <div class="config-grid"><div class="field"><label for="fsUpload">CSV financial data</label><input id="fsUpload" type="file" accept=".csv,text/csv"></div><div class="field"><label for="fsEntityColumn">Entity column (group files, if present)</label><input id="fsEntityColumn" placeholder="e.g. Entity / Company"></div></div>
+          <div class="config-grid"><div class="field"><label for="fsUpload">CSV financial data</label><input id="fsUpload" type="file" accept=".csv,text/csv"></div><div class="field"><label for="fsEntityColumn">Entity / company column</label><input id="fsEntityColumn" placeholder="e.g. Entity / Company"></div><div class="field"><label for="fsEntityTypeColumn">Entity type column (optional)</label><input id="fsEntityTypeColumn" placeholder="Parent, subsidiary, associate, JV, branch, SPV…"></div><div class="field"><label for="fsOwnershipColumn">Ownership % column (optional)</label><input id="fsOwnershipColumn" placeholder="e.g. Ownership %"></div></div>
           <div class="fs-choice-row"><button type="button" class="btn btn-primary" id="fsProcessBtn">Review uploaded data ↗</button><button type="button" class="btn btn-ghost" id="fsResetBtn">Clear / Reset</button></div>
           <div id="fsStatus" class="fs-status" role="status" aria-live="polite">No file loaded. Upload a CSV to begin. No sample figures are presented as real company results.</div>
           <div id="fsResults" hidden>
@@ -1517,7 +1517,8 @@
               <button class="fs-tab" type="button" data-fs-tab="balance">Balance Sheet</button>
               <button class="fs-tab" type="button" data-fs-tab="cash">Cash Flow Statement</button>
               <button class="fs-tab" type="button" data-fs-tab="equity">Changes in Equity</button>
-              <button class="fs-tab" type="button" data-fs-tab="notes">Notes to Financial Statements</button>
+              <button class="fs-tab" type="button" data-fs-tab="comprehensive">Comprehensive Income</button>
+              <button class="fs-tab" type="button" data-fs-tab="notes">Notes & Supporting Schedules</button>
               <button class="fs-tab" type="button" id="fsExportBtn" style="margin-left:auto">Export current view ↓</button>
             </div>
             <div id="fsStatementOutput" class="config-panel"><div class="fs-empty">Upload data to view supported statement information.</div></div>
@@ -1606,7 +1607,9 @@
       const dateKey = fsFindKey(first,[/^date$/, /transaction date/, /period ending/, /reporting date/]);
       const descriptionKey = fsFindKey(first,[/^(transaction description|description|memo|details|narration|particulars)$/,/transaction description/,/narration/,/memo/]);
       const cashflowKey = fsFindKey(first,[/^(cash flow category|cashflow category|activity type|cash flow activity)$/,/cash flow category/,/activity type/]);
-      const entityKey = fsFindKey(first,[/^entity$/, /^company$/, /entity name/, /subsidiary/]) || (document.getElementById("fsEntityColumn")?.value.trim() && keys.find(k => fsNorm(k) === fsNorm(document.getElementById("fsEntityColumn").value.trim()))) || null;
+      const entityKey = (document.getElementById("fsEntityColumn")?.value.trim() && keys.find(k => fsNorm(k) === fsNorm(document.getElementById("fsEntityColumn").value.trim()))) || fsFindKey(first,[/^entity$/, /^company$/, /entity name/, /subsidiary/, /company name/]) || null;
+      const entityTypeKey = (document.getElementById("fsEntityTypeColumn")?.value.trim() && keys.find(k => fsNorm(k) === fsNorm(document.getElementById("fsEntityTypeColumn").value.trim()))) || fsFindKey(first,[/^entity type$/, /^relationship$/, /relationship type/, /consolidation type/, /investment type/]) || null;
+      const ownershipKey = (document.getElementById("fsOwnershipColumn")?.value.trim() && keys.find(k => fsNorm(k) === fsNorm(document.getElementById("fsOwnershipColumn").value.trim()))) || fsFindKey(first,[/^ownership %$/, /ownership percentage/, /shareholding/, /interest percentage/]) || null;
       if (!accountKey) { status.textContent = `Loaded ${fsFileName}, but no clear account/name column was found. Available columns: ${keys.join(", ")}. Rename a column to Account, Account Name, Description or Particulars, then upload again.`; return; }
       if (!amountKey && !debitKey && !creditKey) { status.textContent = `Account column found (${accountKey}), but no amount, balance, debit or credit column was found. Available columns: ${keys.join(", ")}. No statement totals were calculated.`; return; }
       fsParsedRows = fsParsedRows.map(row => {
@@ -1623,36 +1626,53 @@
         const desc = descriptionKey ? String(row[descriptionKey] || "") : "";
         const explicitActivity = cashflowKey ? String(row[cashflowKey] || "") : "";
         const activityText = fsNorm(explicitActivity + " " + desc + " " + account);
+        // Opening/closing balance lines are balances, not period cash flows.
+        // Exclude them from activity mapping so opening PPE/share capital/loan balances are not treated as current-period cash movements.
+        const isBalanceLine = /opening balance|opening cash|beginning balance|beginning cash|brought forward|balance b f|balance brought forward|closing balance|ending balance|closing cash|ending cash/.test(activityText);
         let cashflowClass = "";
-        if (/investing/.test(fsNorm(explicitActivity)) || /equipment|property plant|fixed asset|capital expenditure|asset purchase|asset sale|disposal of asset/.test(activityText)) cashflowClass = "investing";
-        else if (/financing/.test(fsNorm(explicitActivity)) || /loan received|additional loan|borrowings received|loan repayment|principal repaid|share capital|capital contribution|dividend paid/.test(activityText)) cashflowClass = "financing";
-        else if (/operating/.test(fsNorm(explicitActivity)) || /customer|sales|revenue received|service income|salary|salaries|payroll|rent paid|utilities paid|supplier payment|inventory purchased|cost of goods|cogs|tax paid|operating expense/.test(activityText)) cashflowClass = "operating";
+        if (!isBalanceLine) {
+          // Explicit activity category/section labels take priority. Also support generic activity-detail test rows.
+          const explicitNorm = fsNorm(explicitActivity);
+          if (/investing/.test(explicitNorm) || /investing activity detail|equipment purchase|purchase of equipment|property plant.*purchased|fixed asset purchase|capital expenditure|asset purchase|asset sale|disposal of asset/.test(activityText) || cls === "investingCash") cashflowClass = "investing";
+          else if (/financing/.test(explicitNorm) || /financing activity detail|loan received|additional loan|borrowings received|loan repayment|principal repaid|share capital issued|capital contribution|dividend paid/.test(activityText) || cls === "financingCash") cashflowClass = "financing";
+          else if (/operating/.test(explicitNorm) || /operating activity detail|customer payment|cash received from sales|sales revenue|revenue received|service income received|service revenue received|salary|salaries|payroll|rent paid|utilities paid|supplier payment|cash paid to supplier|inventory purchased|cost of goods|cogs|tax paid|operating expense/.test(activityText) || cls === "operatingCash") cashflowClass = "operating";
+        }
         if (!explicitActivity && /inventory purchased|supplier purchase|goods purchased/.test(activityText) && /on credit|credit purchase|payable/.test(activityText)) cashflowClass = "";
         const isCashAccount = /^(cash|cash at bank|bank|bank account|cash and cash equivalents|cash equivalents)$/.test(fsNorm(account));
         let cashflowAmount = null;
         if (cashflowClass) {
-          if (isCashAccount && (debitKey || creditKey)) cashflowAmount = debit-credit;
+          // Generic activity-detail rows are already signed cash impacts in the source; preserve their signs.
+          // If amount is absent but separate debit/credit values exist, derive the signed movement.
+          if (/operating activity detail|investing activity detail|financing activity detail/.test(activityText)) {
+            const sourceValue = mappedAmount ?? amount ?? ((debitKey || creditKey) ? credit-debit : null);
+            // Activity-detail sample rows can carry positive ledger amounts even when the narrative is a cash outflow.
+            // Use explicit transaction meaning for unambiguous purchases/repayments; otherwise preserve the source sign.
+            if (/equipment purchase|purchase of equipment|asset purchase|capital expenditure|loan principal repaid|loan repayment|principal repaid|supplier payments?|payroll paid|rent paid|utilities paid|income tax paid|tax paid/.test(activityText)) cashflowAmount = sourceValue === null ? null : -Math.abs(Number(sourceValue));
+            else if (/cash received|received in cash|cash proceeds|loan received|capital issued|share capital issued|customer receipts/.test(activityText)) cashflowAmount = sourceValue === null ? null : Math.abs(Number(sourceValue));
+            else cashflowAmount = sourceValue;
+          }
+          else if (isCashAccount && (debitKey || creditKey)) cashflowAmount = debit-credit;
           else if (/investing/.test(fsNorm(explicitActivity)) || /equipment|property plant|fixed asset|capital expenditure|asset purchase/.test(activityText)) cashflowAmount = -Math.abs(mappedAmount ?? debit ?? credit ?? 0);
           else if (/financing/.test(fsNorm(explicitActivity)) || /loan received|additional loan|borrowings received|capital contribution|share capital/.test(activityText)) cashflowAmount = Math.abs(mappedAmount ?? credit ?? debit ?? 0);
           else if (/loan repayment|principal repaid|dividend paid|salary|salaries|payroll|rent paid|utilities paid|supplier payment|inventory purchased|cost of goods|cogs|tax paid/.test(activityText)) cashflowAmount = -Math.abs(mappedAmount ?? debit ?? credit ?? 0);
           else cashflowAmount = Math.abs(mappedAmount ?? credit ?? debit ?? 0);
         }
-        return {...row, __account:account, __type:typeKey ? String(row[typeKey] || "") : "", __amount:mappedAmount, __debit:debit, __credit:credit, __class:cls, __cashflowClass:cashflowClass, __cashflowAmount:cashflowAmount, __description:desc, __explicitCashflow:explicitActivity, __isCashAccount:isCashAccount, __date:dateKey ? row[dateKey] : "", __entity:entityKey ? row[entityKey] : ""};
+        return {...row, __account:account, __type:typeKey ? String(row[typeKey] || "") : "", __amount:mappedAmount, __debit:debit, __credit:credit, __class:cls, __cashflowClass:cashflowClass, __cashflowAmount:cashflowAmount, __description:desc, __explicitCashflow:explicitActivity, __isCashAccount:isCashAccount, __isBalanceLine:isBalanceLine, __date:dateKey ? row[dateKey] : "", __entity:entityKey ? String(row[entityKey] || "").trim() : "Unspecified entity", __entityType:entityTypeKey ? String(row[entityTypeKey] || "").trim() : "", __ownership:ownershipKey ? String(row[ownershipKey] || "").trim() : ""};
       }).filter(r => r.__account);
       const scope = document.querySelector('input[name="fsReportingType"]:checked')?.value || "single";
       const notes = [];
       if (!typeKey) notes.push("No explicit account-type/classification column was found; account-name keyword mapping is indicative and requires user review.");
       if (!dateKey) notes.push("No date/period column was found; period comparisons cannot be prepared.");
       if (scope === "consolidated") {
-        if (!entityKey) notes.push("No entity/company column was detected. Parent and group entities cannot be separated from this file.");
+        if (!entityKey) notes.push("No entity/company column was detected. Parent and group entities cannot be separated from this file. Include all relevant entity types (parent, controlled subsidiaries, partially owned subsidiaries, associates, joint ventures, joint operations, branches, SPVs/SPEs, investment entities and domestic/foreign entities) where applicable.");
         const elim = document.getElementById("fsIntercompany")?.value;
         if (elim !== "provided" && elim !== "none") notes.push("Intercompany elimination data is not confirmed. Consolidated totals must not be treated as finalized.");
         notes.push("Subsidiaries generally require line-by-line consolidation and intragroup eliminations; associates and joint ventures may require a different treatment under the selected framework.");
       }
       notes.push("Framework selection is recorded as context only. This browser workflow does not apply or certify all IFRS, GAAP or local-framework recognition, measurement, presentation and disclosure requirements.");
-      window.fsReportContext = {scope, framework:document.getElementById("fsFramework").value, jurisdiction:document.getElementById("fsJurisdiction").value, period:document.getElementById("fsPeriod").value, accountKey,typeKey,amountKey,debitKey,creditKey,dateKey,descriptionKey,cashflowKey,entityKey,notes,fileName:fsFileName, parent:document.getElementById("fsParent")?.value || "", entities:document.getElementById("fsEntities")?.value || "", ownership:document.getElementById("fsOwnership")?.value || ""};
+      window.fsReportContext = {scope, framework:document.getElementById("fsFramework").value, jurisdiction:document.getElementById("fsJurisdiction").value, period:document.getElementById("fsPeriod").value, accountKey,typeKey,amountKey,debitKey,creditKey,dateKey,descriptionKey,cashflowKey,entityKey,entityTypeKey,ownershipKey,notes,fileName:fsFileName, parent:document.getElementById("fsParent")?.value || "", entities:document.getElementById("fsEntities")?.value || "", ownership:document.getElementById("fsOwnership")?.value || ""};
       if (!cashflowKey) notes.push("Cash-flow categories are inferred from account names and transaction descriptions where wording is clear. Review classification and duplicate journal lines before use.");
-      status.textContent = `Reviewed ${fsFileName}: ${fsParsedRows.length} account rows mapped. Found ${[accountKey,typeKey,amountKey,debitKey,creditKey,dateKey,descriptionKey,cashflowKey,entityKey].filter(Boolean).length} relevant field(s). Review each statement tab and the notes for mapping limitations before relying on the results.`;
+      status.textContent = `Reviewed ${fsFileName}: ${fsParsedRows.length} account rows mapped. Found ${[accountKey,typeKey,amountKey,debitKey,creditKey,dateKey,descriptionKey,cashflowKey,entityKey,entityTypeKey,ownershipKey].filter(Boolean).length} relevant field(s). Review each statement tab and the notes for mapping limitations before relying on the results.`;
       document.getElementById("fsResults").hidden = false;
       fsCurrentStatement = "income";
       document.querySelectorAll("[data-fs-tab]").forEach(b => b.classList.toggle("active", b.dataset.fsTab === "income"));
@@ -1664,6 +1684,71 @@
       if (!rows.length) return '<div class="fs-empty">No supported rows were identified for this statement section. Check account labels, account types and required fields.</div>';
       return `<div class="fs-table-wrap"><table class="fs-table"><thead><tr><th>${labelHeader}</th><th>${amountHeader}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${String(r.label ?? r.__account ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}</td><td>${r.value===null||r.value===undefined?"Not available":fsMoney(r.value)}</td></tr>`).join("")}</tbody></table></div>`;
     }
+    function fsEscape(value) { return String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;", "'":"&#39;"}[c])); }
+    function fsEntityComparison() {
+      const ctx = window.fsReportContext;
+      if (!ctx || ctx.scope !== "consolidated") return "";
+      const entityRows = [...new Set(fsParsedRows.map(r => r.__entity || "Unspecified entity"))]
+        .filter(name => !/^(group|consolidated group|group total|consolidated total)$/i.test(String(name).trim()));
+      if (!entityRows.length) return "";
+      const types = {};
+      fsParsedRows.forEach(r => { const n = r.__entity || "Unspecified entity"; if (!types[n]) types[n] = r.__entityType || "Unspecified"; });
+      const metricDefs = fsCurrentStatement === "income" ? [
+        ["Revenue / income", ["revenue"]], ["Cost of sales", ["cogs"]], ["Gross profit (calculated)", ["grossprofit"]], ["Expenses", ["expense"]], ["Mapped profit / loss (indicative)", ["revenue","cogs","expense"]]
+      ] : fsCurrentStatement === "balance" ? [["Assets",["asset"]],["Liabilities",["liability"]],["Equity",["equity"]]] : fsCurrentStatement === "cash" ? [["cash:operating",["cash:operating"]],["cash:investing",["cash:investing"]],["cash:financing",["cash:financing"]],["cash:all",["cash:all"]]] : fsCurrentStatement === "equity" ? [["Equity accounts / movements",["equity"]]] : fsCurrentStatement === "comprehensive" ? [["Profit / loss",["pl"]],["Other comprehensive income / loss",["oci"]],["Total comprehensive income (indicative)",["totalcomprehensive"]]] : [];
+      if (!metricDefs.length) return `<section class="config-panel"><h3>Entity-wise reporting</h3><p class="muted">${entityRows.length} entity labels detected. See source rows and notes below.</p></section>`;
+      const getVal = (entity, def) => {
+        const rows = fsParsedRows.filter(r => (r.__entity || "Unspecified entity") === entity);
+        const profitLossRows = rows.filter(r=>["revenue","cogs","expense"].includes(r.__class) && r.__amount !== null && r.__amount !== undefined);
+        const profitLoss = () => profitLossRows.length ? profitLossRows.reduce((n,r)=>n + (r.__class === "revenue" ? 1 : -1) * Number(r.__amount || 0),0) : null;
+        const ociRows = () => rows.filter(r=>/other comprehensive income|\boci\b|foreign currency translation reserve|cash flow hedge reserve|revaluation surplus|remeasurement of defined benefit|actuarial gain|actuarial loss|fair value through oci/.test(fsNorm(r.__account)) && r.__amount !== null);
+        if (def[1][0] === "grossprofit") {
+          const revRows = rows.filter(r=>r.__class === "revenue" && r.__amount !== null && r.__amount !== undefined);
+          const cogsRows = rows.filter(r=>r.__class === "cogs" && r.__amount !== null && r.__amount !== undefined);
+          if (!revRows.length || !cogsRows.length) return null;
+          return revRows.reduce((n,r)=>n+Number(r.__amount||0),0)-cogsRows.reduce((n,r)=>n+Number(r.__amount||0),0);
+        }
+        if (def[0] === "Mapped profit / loss (indicative)" || def[1][0] === "pl") return profitLoss();
+        if (def[1][0] === "oci") { const found=ociRows(); return found.length ? found.reduce((n,r)=>n+Number(r.__amount||0),0) : null; }
+        if (def[1][0] === "totalcomprehensive") { const pl=profitLoss(), found=ociRows(); return pl === null || !found.length ? null : pl+found.reduce((n,r)=>n+Number(r.__amount||0),0); }
+        if (def[0].startsWith("cash:")) { const c=def[0].slice(5); const found=rows.filter(r=>c === "all" ? !!r.__cashflowClass && r.__cashflowAmount !== null : r.__cashflowClass === c && r.__cashflowAmount !== null); return found.length ? found.reduce((n,r)=>n+Number(r.__cashflowAmount||0),0) : null; }
+        const found = rows.filter(r=>def[1].includes(r.__class) && r.__amount !== null && r.__amount !== undefined);
+        return found.length ? found.reduce((n,r)=>n+Number(r.__amount||0),0) : null;
+      };
+      const lineItems = metricDefs.map(def => {
+        const cells = entityRows.map(name => { const value = getVal(name,def); return `<td>${value === null || value === undefined ? '<span class="muted">Not available</span>' : fsMoney(value)}</td>`; }).join("");
+        const consolidationEligible = entityRows.filter(name => { const t=fsNorm(types[name]); return /(parent|subsidiary|controlled)/.test(t) && !/(associate|joint venture|\bjv\b|investment entity|joint operation)/.test(t); });
+        const availableEligibleValues = consolidationEligible.map(name=>getVal(name,def)).filter(value=>value !== null && value !== undefined && Number.isFinite(Number(value)));
+        const preElim = availableEligibleValues.length ? availableEligibleValues.reduce((n,value)=>n+Number(value),0) : null;
+        // Cash-flow sample rows explicitly assigned to Group/Group-wide are group-level data, not entity-level data.
+        // Prefer these explicit group rows for cash-flow display; do not invent a parent/subsidiary allocation.
+        let explicitGroupCash = null;
+        if (fsCurrentStatement === "cash" && def[0].startsWith("cash:")) {
+          const cashKind = def[0].slice(5);
+          const groupRows = fsParsedRows.filter(r => /^(group|consolidated group|group total|consolidated total)$/i.test(String(r.__entity || "").trim()) && (cashKind === "all" ? !!r.__cashflowClass && r.__cashflowAmount !== null : r.__cashflowClass === cashKind && r.__cashflowAmount !== null));
+          if (groupRows.length) explicitGroupCash = groupRows.reduce((n,r)=>n+Number(r.__cashflowAmount||0),0);
+        }
+        // If entity-level totals cannot be built because the source only supplies Group-labelled
+        // cash activity rows (or entity types are missing), use the classified source cash rows
+        // as an indicative group total rather than leaving a known calculable amount as Review required.
+        let groupValue = explicitGroupCash !== null ? explicitGroupCash : preElim;
+        if (fsCurrentStatement === "cash" && def[0].startsWith("cash:") && groupValue === null) {
+          const cashKind = def[0].slice(5);
+          const classifiedCashRows = fsParsedRows.filter(r =>
+            !!r.__cashflowClass && r.__cashflowAmount !== null && r.__cashflowAmount !== undefined &&
+            (cashKind === "all" || r.__cashflowClass === cashKind) &&
+            !r.__isBalanceLine
+          );
+          if (classifiedCashRows.length) groupValue = classifiedCashRows.reduce((n,r)=>n+Number(r.__cashflowAmount||0),0);
+        }
+        const groupDisplay = groupValue === null ? '<span class="muted">Review required</span>' : fsMoney(groupValue);
+        const metricLabel = ({"cash:operating":"Operating cash flow","cash:investing":"Investing cash flow","cash:financing":"Financing cash flow","cash:all":"Net classified cash movement"})[def[0]] || def[0];
+        return `<tr><th>${fsEscape(metricLabel)}</th>${cells}<td>${groupDisplay}</td></tr>`;
+      }).join("");
+      const entityHeads = entityRows.map(name => `<th>${fsEscape(name)}<br><small>${fsEscape(types[name])}</small></th>`).join("");
+      return `<section class="config-panel" style="margin-top:16px"><h3>Entity-wise comparison & group view</h3><p class="muted">Separate figures are shown for each entity, including calculated gross profit (revenue minus cost of sales) where both categories are mapped. Group figures are derived from entities explicitly identified as parent, subsidiary or controlled entity and are preliminary before eliminations. Associates, joint ventures, investment entities, joint operations and untyped entities are not automatically added line by line. If entity types or required amounts are missing, the group value is marked Review required rather than incorrectly showing 0.00. This is not a finalized consolidated total; branch treatment and special cases must be reviewed.</p><div class="fs-table-wrap"><table class="fs-table"><thead><tr><th>Metric</th>${entityHeads}<th>Group (pre-elimination; before eliminations)</th></tr></thead><tbody>${lineItems}</tbody></table></div><div class="fs-status">For reliable group reporting, provide entity name and entity type for every row, ownership/control information, acquisition/disposal dates where relevant, and intercompany elimination entries. If entity type is missing, the workflow cannot reliably distinguish subsidiaries from associates or joint ventures. Where cash-flow source rows are explicitly labelled Group/Group-wide, the group column uses those group-level activity rows; entity columns remain Not available unless those cash movements are attributed to individual entities in the source. Equipment purchases and loan repayments are treated as cash outflows based on clear descriptions. Review source references and reconcile opening/closing cash before relying on totals.</div></section>`;
+    }
+
     function fsExportCurrentStatement() {
       const table = document.querySelector("#fsStatementOutput table");
       const status = document.getElementById("fsStatus");
@@ -1700,16 +1785,25 @@
         const total=arr=>arr.reduce((n,r)=>n+Number(r.__cashflowAmount||0),0);
         const rows=[]; if(op.length) rows.push({label:"Net cash from operating activities (indicative)",value:total(op)}); if(inv.length) rows.push({label:"Net cash from investing activities (indicative)",value:total(inv)}); if(fin.length) rows.push({label:"Net cash from financing activities (indicative)",value:total(fin)}); if(cfRows.length) rows.push({label:"Net movement from classified rows (indicative)",value:total(cfRows)});
         const detailRows=cfRows.map(r=>({label:`${r.__cashflowClass.toUpperCase()} · ${r.__account}${r.__description?" — "+r.__description:""}`,value:r.__cashflowAmount}));
-        html=`<h3>Cash Flow Statement</h3><p class="muted">Indicative mapping uses an explicit Cash Flow Category / Activity Type column when available, otherwise clear account labels and transaction descriptions. Review classifications and possible duplicate journal entries.</p>${fsBuildTable(rows,"Activity section","Indicative net cash")}${detailRows.length?`<h4>Classified source rows</h4>${fsBuildTable(detailRows,"Source row","Indicative cash impact")}`:'<div class="fs-status">No clear cash-flow activity was identified. Add a Cash Flow Category column with Operating, Investing or Financing, or improve the transaction descriptions.</div>'}<div class="fs-status">This is an indicative review, not a finalized cash-flow statement. Opening cash, closing cash, non-cash transactions and duplicate journal legs still require reconciliation.</div>`;
+        html=`<h3>Cash Flow Statement</h3><p class="muted">Opening/closing balance lines are excluded from period activity totals. Mapping uses an explicit Cash Flow Category / Activity Type when available, otherwise clear transaction descriptions and account labels. Review classifications and possible duplicate journal entries.</p>${fsBuildTable(rows,"Activity section","Indicative net cash")}${detailRows.length?`<h4>Classified source rows</h4>${fsBuildTable(detailRows,"Source row","Indicative cash impact")}`:'<div class="fs-status">No clear cash-flow activity was identified. Add a Cash Flow Category column with Operating, Investing or Financing, or improve the transaction descriptions.</div>'}<div class="fs-status">This is an indicative review, not a finalized cash-flow statement. Opening/closing balance lines are excluded from activity totals, but opening cash, closing cash, non-cash transactions and duplicate journal legs still require reconciliation. For reliable automated reconciliation, provide a transaction/reference ID and a clearly identified cash/bank line for each cash movement.</div>`;
       } else if (fsCurrentStatement === "equity") {
         const eq=fsRowsForClass(["equity"]); const rows=eq.map(r=>({label:r.__account,value:r.__amount}));
         html=`<h3>Statement of Changes in Equity</h3><p class="muted">This statement normally needs opening equity, profit/loss, owner contributions, dividends and other movements for the period.</p>${fsBuildTable(rows)}<div class="fs-status">${eq.length?"Equity-labelled balances are shown, but opening-to-closing movement cannot be derived unless movement types and comparative balances are supplied.":"No equity-classified accounts were identified. Provide share capital, retained earnings and relevant movement rows to prepare this statement."}</div>`;
+      } else if (fsCurrentStatement === "comprehensive") {
+        const profitLossRows = fsParsedRows.filter(r => /profit|loss|net income|net earnings|profit for the period|profit for the year/.test(fsNorm(r.__account)) && r.__amount !== null);
+        const ociRows = fsParsedRows.filter(r => /other comprehensive income|\boci\b|foreign currency translation reserve|cash flow hedge reserve|revaluation surplus|remeasurement of defined benefit|actuarial gain|actuarial loss|fair value through oci/.test(fsNorm(r.__account)) && r.__amount !== null);
+        const rows = [];
+        if (profitLossRows.length) rows.push({label:"Profit or loss (source-labelled rows; review for double counting)",value:fsSum(profitLossRows)});
+        if (ociRows.length) rows.push({label:"Other comprehensive income / (loss) (identified rows)",value:fsSum(ociRows)});
+        if (profitLossRows.length && ociRows.length) rows.push({label:"Total comprehensive income (indicative)",value:fsSum(profitLossRows)+fsSum(ociRows)});
+        html = `<h3>Statement of Comprehensive Income</h3><p class="muted">Shows identified profit/loss and other comprehensive income rows when present in the source. This keyword-based mapping is indicative; provide explicit statement line types and verify tax, reclassification adjustments and ownership attribution.</p>${fsBuildTable(rows,"Component","Indicative amount")}${ociRows.length ? fsBuildTable(ociRows.map(r=>({label:r.__account,value:r.__amount})),"Identified OCI source line","Amount") : '<div class="fs-status">No clear other-comprehensive-income lines were identified. This does not prove OCI is zero; check the source statement and account mapping.</div>'}`;
       } else {
         const all = fsParsedRows.map(r=>({label:r.__account,value:r.__amount}));
         const counts = {}; fsParsedRows.forEach(r=>counts[r.__class]=(counts[r.__class]||0)+1);
         const cashCounts = {}; fsParsedRows.forEach(r=>{if(r.__cashflowClass) cashCounts[r.__cashflowClass]=(cashCounts[r.__cashflowClass]||0)+1;});
-        html=`<h3>Notes to Financial Statements</h3><p class="muted">Source and preparation notes for reviewer follow-up.</p><div class="fs-status"><strong>Source:</strong> ${ctx.fileName}<br><strong>Reporting scope:</strong> ${ctx.scope === "single" ? "Single / Standalone" : "Consolidated / Group"}<br><strong>Framework selected:</strong> ${ctx.framework}${ctx.jurisdiction?" · "+ctx.jurisdiction:""}<br><strong>Rows retained:</strong> ${fsParsedRows.length}<br><strong>Detected classes:</strong> ${Object.entries(counts).map(([k,v])=>`${k}: ${v}`).join("; ") || "None"}<br><strong>Cash-flow activity candidates:</strong> ${Object.entries(cashCounts).map(([k,v])=>`${k}: ${v}`).join("; ") || "None"}<br><strong>Parent entity:</strong> ${ctx.parent || "Not specified"}<br><strong>Group entities:</strong> ${ctx.entities || "Not specified"}<br><strong>Ownership notes:</strong> ${ctx.ownership || "Not specified"}</div>${fsBuildTable(all,"Source account / line","Source amount")}${ctx.notes.map(n=>`<div class="fs-status">${n}</div>`).join("")}<div class="fs-status">This is a source review and indicative mapping workflow, not an audit opinion or a framework-compliance certification.</div>`;
+        html=`<h3>Notes to Financial Statements</h3><p class="muted">Source and preparation notes for reviewer follow-up.</p><div class="fs-status"><strong>Source:</strong> ${ctx.fileName}<br><strong>Reporting scope:</strong> ${ctx.scope === "single" ? "Single / Standalone" : "Consolidated / Group"}<br><strong>Framework selected:</strong> ${ctx.framework}${ctx.jurisdiction?" · "+ctx.jurisdiction:""}<br><strong>Rows retained:</strong> ${fsParsedRows.length}<br><strong>Detected classes:</strong> ${Object.entries(counts).map(([k,v])=>`${k}: ${v}`).join("; ") || "None"}<br><strong>Cash-flow activity candidates:</strong> ${Object.entries(cashCounts).map(([k,v])=>`${k}: ${v}`).join("; ") || "None"}<br><strong>Parent entity:</strong> ${ctx.parent || "Not specified"}<br><strong>Group entities:</strong> ${ctx.entities || "Not specified"}<br><strong>Detected entity type column:</strong> ${ctx.entityTypeKey || "Not detected"}<br><strong>Detected ownership column:</strong> ${ctx.ownershipKey || "Not detected"}<br><strong>Ownership notes:</strong> ${ctx.ownership || "Not specified"}</div>${fsBuildTable(all,"Source account / line","Source amount")}${ctx.notes.map(n=>`<div class="fs-status">${n}</div>`).join("")}<div class="fs-status">This is a source review and indicative mapping workflow, not an audit opinion or a framework-compliance certification.</div>`;
       }
+      if (ctx.scope === "consolidated") html += fsEntityComparison();
       out.innerHTML = html;
     }
 
