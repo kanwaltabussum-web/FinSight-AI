@@ -6,8 +6,6 @@
   <meta name="theme-color" content="#090b18">
   <meta name="description" content="FinSight AI — a 3D financial intelligence companion for analysis, risk signals and clearer financial decisions.">
   <title>FinSight AI — Financial Intelligence Companion</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="shortcut icon" type="image/png" href="favicon.png">
   <style>
     :root {
       --ink:#090b18; --ink-2:#101327; --panel:#151a31; --panel-2:#1b2140;
@@ -150,6 +148,23 @@
     .tool-card-action:focus-visible { outline:2px solid rgba(130,217,255,.9); outline-offset:3px; }
     .tool-card-action-label { display:inline-flex; margin-top:14px; color:#9fe7ff; font-size:11px; font-weight:800; letter-spacing:.03em; }
     .workspace-extra { margin-top:17px; }
+
+    .fs-workflow { margin-top:18px; }
+    .fs-choice-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+    .fs-choice { display:flex; align-items:center; gap:8px; padding:11px 13px; border:1px solid rgba(180,191,255,.18); border-radius:12px; background:rgba(9,13,29,.6); color:var(--text); font-size:12px; }
+    .fs-choice input { accent-color:#82d9ff; }
+    .fs-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 12px; }
+    .fs-tab { border:1px solid rgba(180,191,255,.18); background:#10152c; color:#dbe3ff; border-radius:10px; padding:9px 12px; cursor:pointer; font-size:11px; }
+    .fs-tab.active { background:linear-gradient(110deg,rgba(130,217,255,.18),rgba(162,140,255,.18)); border-color:rgba(130,217,255,.55); color:#fff; }
+    .fs-status { margin-top:12px; padding:12px 14px; border:1px solid rgba(130,217,255,.2); background:rgba(22,40,66,.4); border-radius:12px; color:#cbd8f6; font-size:12px; line-height:1.65; }
+    .fs-table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:12px; }
+    .fs-table { width:100%; border-collapse:collapse; font-size:12px; min-width:320px; }
+    .fs-table th,.fs-table td { text-align:left; padding:10px 12px; border-bottom:1px solid rgba(180,191,255,.1); }
+    .fs-table th { color:#b6c6ed; background:rgba(130,217,255,.06); font-weight:750; }
+    .fs-table td:last-child,.fs-table th:last-child { text-align:right; font-variant-numeric:tabular-nums; }
+    .fs-empty { color:#9fa9c9; padding:18px 4px; font-size:12px; line-height:1.7; }
+    .fs-section-label { margin-top:18px; font-size:11px; color:#9ce6f6; text-transform:uppercase; letter-spacing:.1em; font-weight:800; }
+
     .config-panel { padding:22px; border:1px solid var(--line); border-radius:18px; background:rgba(18,22,45,.78); }
     .config-panel h3 { margin:0 0 8px; }
     .config-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:18px; }
@@ -1421,24 +1436,26 @@
       tools.replaceChildren();
       item.tools.forEach(([title,description]) => {
         const isFinancialAnalysisCard = key === "finance" && title === "Financial Analysis";
+        const isFinancialStatementsCard = key === "finance" && title === "Financial Statements";
         const card = document.createElement("article");
-        card.className = isFinancialAnalysisCard ? "tool-card tool-card-action" : "tool-card";
+        card.className = (isFinancialAnalysisCard || isFinancialStatementsCard) ? "tool-card tool-card-action" : "tool-card";
         const h3 = document.createElement("h3"); h3.textContent = title;
         const p = document.createElement("p"); p.textContent = description;
         card.append(h3,p);
-        if (isFinancialAnalysisCard) {
+        if (isFinancialAnalysisCard || isFinancialStatementsCard) {
           card.setAttribute("role", "button");
           card.setAttribute("tabindex", "0");
-          card.setAttribute("aria-label", "Open Phase 2 advanced Financial Analysis workspace");
+          card.setAttribute("aria-label", isFinancialAnalysisCard ? "Open Phase 2 advanced Financial Analysis workspace" : "Open Financial Statements workspace");
           const actionLabel = document.createElement("span");
           actionLabel.className = "tool-card-action-label";
-          actionLabel.textContent = "Open Advanced Analysis →";
+          actionLabel.textContent = isFinancialAnalysisCard ? "Open Advanced Analysis →" : "Open Financial Statements →";
           card.appendChild(actionLabel);
-          card.addEventListener("click", openFinancialAnalysis);
+          const action = isFinancialAnalysisCard ? openFinancialAnalysis : openFinancialStatements;
+          card.addEventListener("click", action);
           card.addEventListener("keydown", event => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
-              openFinancialAnalysis();
+              action();
             }
           });
         }
@@ -1459,6 +1476,241 @@
       }
       closeMobileMenu();
       window.scrollTo({top:0,behavior:"smooth"});
+    }
+
+    let fsParsedRows = [];
+    let fsCurrentStatement = "income";
+    let fsFileName = "";
+
+    function openFinancialStatements() {
+      openWorkspace("finance");
+      document.getElementById("workspaceHeading").textContent = "Financial Statements";
+      document.getElementById("workspaceDescription").textContent = "Prepare and review five financial statements from mapped source data. Select reporting scope and framework, upload a supported CSV, then review what the available fields can and cannot support.";
+      document.getElementById("workspaceTools").style.display = "none";
+      const extra = document.getElementById("workspaceExtra");
+      extra.innerHTML = `
+        <section class="config-panel fs-workflow" aria-labelledby="fsSetupHeading">
+          <div class="eyebrow">Financial statements · Guided workflow</div>
+          <h3 id="fsSetupHeading">1. Reporting setup</h3>
+          <p class="muted">Choose the reporting scope and accounting framework. Selection alone does not certify compliance with a framework.</p>
+          <div class="config-grid">
+            <div class="field"><label>Reporting type</label><div class="fs-choice-row"><label class="fs-choice"><input type="radio" name="fsReportingType" value="single" checked> Single / Standalone</label><label class="fs-choice"><input type="radio" name="fsReportingType" value="consolidated"> Consolidated / Group</label></div></div>
+            <div class="field"><label for="fsFramework">Accounting framework</label><select id="fsFramework"><option value="IFRS">IFRS</option><option value="GAAP">GAAP — select jurisdiction below</option><option value="LOCAL">Applicable local / other accounting framework</option></select></div>
+            <div class="field"><label for="fsJurisdiction">Jurisdiction / framework detail</label><select id="fsJurisdiction"><option value="">Select jurisdiction / detail</option><option>Pakistan — applicable adopted standards</option><option>United States — US GAAP</option><option>United Kingdom — applicable UK framework</option><option>European Union — applicable adopted IFRS</option><option>Other / specify in notes</option></select></div>
+            <div class="field"><label for="fsPeriod">Reporting period</label><select id="fsPeriod"><option value="all">All dates found in source</option><option value="monthly">Monthly grouping (where dates exist)</option><option value="quarterly">Quarterly grouping (where dates exist)</option><option value="yearly">Yearly grouping (where dates exist)</option><option value="point">Specific reporting date (balance sheet)</option></select></div>
+          </div>
+          <div id="fsGroupFields" class="config-grid" hidden>
+            <div class="field"><label for="fsParent">Parent entity name</label><input id="fsParent" placeholder="Parent company"></div>
+            <div class="field"><label for="fsEntities">Subsidiaries / associates / joint ventures</label><input id="fsEntities" placeholder="List entities separated by commas"></div>
+            <div class="field"><label for="fsOwnership">Ownership / interest notes</label><input id="fsOwnership" placeholder="Entity and ownership % / influence"></div>
+            <div class="field"><label for="fsIntercompany">Intercompany eliminations</label><select id="fsIntercompany"><option value="unknown">Not provided / not yet reconciled</option><option value="provided">Elimination data is included in uploaded file</option><option value="none">Confirmed no material intragroup balances</option></select></div>
+          </div>
+          <div class="fs-section-label">2. Upload source data</div>
+          <p class="muted">Upload a CSV containing an account name and an amount or debit/credit columns. For Excel, export the relevant sheet to CSV first. This first version reads CSV locally in your browser; files are not sent to the API by this statement workflow.</p>
+          <div class="config-grid"><div class="field"><label for="fsUpload">CSV financial data</label><input id="fsUpload" type="file" accept=".csv,text/csv"></div><div class="field"><label for="fsEntityColumn">Entity column (group files, if present)</label><input id="fsEntityColumn" placeholder="e.g. Entity / Company"></div></div>
+          <div class="fs-choice-row"><button type="button" class="btn btn-primary" id="fsProcessBtn">Review uploaded data ↗</button><button type="button" class="btn btn-ghost" id="fsResetBtn">Clear / Reset</button></div>
+          <div id="fsStatus" class="fs-status" role="status" aria-live="polite">No file loaded. Upload a CSV to begin. No sample figures are presented as real company results.</div>
+          <div id="fsResults" hidden>
+            <div class="fs-section-label">3. Statement review</div>
+            <div class="fs-tabs" role="tablist" aria-label="Financial statements">
+              <button class="fs-tab active" type="button" data-fs-tab="income">Income Statement</button>
+              <button class="fs-tab" type="button" data-fs-tab="balance">Balance Sheet</button>
+              <button class="fs-tab" type="button" data-fs-tab="cash">Cash Flow Statement</button>
+              <button class="fs-tab" type="button" data-fs-tab="equity">Changes in Equity</button>
+              <button class="fs-tab" type="button" data-fs-tab="notes">Notes to Financial Statements</button>
+              <button class="fs-tab" type="button" id="fsExportBtn" style="margin-left:auto">Export current view ↓</button>
+            </div>
+            <div id="fsStatementOutput" class="config-panel"><div class="fs-empty">Upload data to view supported statement information.</div></div>
+          </div>
+        </section>`;
+      document.querySelectorAll('input[name="fsReportingType"]').forEach(r => r.addEventListener("change", () => {
+        document.getElementById("fsGroupFields").hidden = r.value !== "consolidated" || !r.checked;
+      }));
+      document.getElementById("fsUpload").addEventListener("change", () => {
+        const file = document.getElementById("fsUpload").files[0];
+        if (!file) return;
+        fsFileName = file.name;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try { fsParsedRows = fsParseCSV(String(reader.result || ""));
+            document.getElementById("fsStatus").textContent = fsParsedRows.length ? `Loaded ${file.name}: ${fsParsedRows.length} data rows. Select “Review uploaded data” to inspect available fields and generate only supported summaries.` : "The CSV has no readable data rows. Check the file and try again.";
+          } catch (e) { fsParsedRows = []; document.getElementById("fsStatus").textContent = "Could not read this CSV. Please export it as UTF-8 CSV and try again."; }
+        };
+        reader.onerror = () => { fsParsedRows = []; document.getElementById("fsStatus").textContent = "The selected file could not be read."; };
+        reader.readAsText(file);
+      });
+      document.getElementById("fsProcessBtn").addEventListener("click", fsReviewData);
+      document.getElementById("fsExportBtn").addEventListener("click", fsExportCurrentStatement);
+      document.getElementById("fsResetBtn").addEventListener("click", () => {
+        fsParsedRows = []; fsFileName = "";
+        document.getElementById("fsUpload").value = "";
+        document.getElementById("fsResults").hidden = true;
+        document.getElementById("fsStatus").textContent = "Cleared. Upload a CSV to begin. No sample figures are presented as real company results.";
+      });
+      document.querySelectorAll("[data-fs-tab]").forEach(btn => btn.addEventListener("click", () => {
+        fsCurrentStatement = btn.dataset.fsTab;
+        document.querySelectorAll("[data-fs-tab]").forEach(b => b.classList.toggle("active", b === btn));
+        fsRenderStatement();
+      }));
+    }
+
+    function fsParseCSV(text) {
+      text = text.replace(/^\uFEFF/, "");
+      const lines = []; let row = [], cell = "", quoted = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '"' && quoted && text[i+1] === '"') { cell += '"'; i++; }
+        else if (ch === '"') quoted = !quoted;
+        else if (ch === "," && !quoted) { row.push(cell); cell = ""; }
+        else if ((ch === "\n" || ch === "\r") && !quoted) { if (ch === "\r" && text[i+1] === "\n") i++; row.push(cell); if (row.some(v => String(v).trim())) lines.push(row); row = []; cell = ""; }
+        else cell += ch;
+      }
+      if (cell.length || row.length) { row.push(cell); if (row.some(v => String(v).trim())) lines.push(row); }
+      if (lines.length < 2) return [];
+      const headers = lines.shift().map((h,i) => String(h || `Column ${i+1}`).trim());
+      return lines.map(values => Object.fromEntries(headers.map((h,i) => [h, values[i] ?? ""]))).filter(r => Object.values(r).some(v => String(v).trim()));
+    }
+
+    function fsNorm(value) { return String(value ?? "").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," "); }
+    function fsFindKey(row, patterns) { return Object.keys(row || {}).find(k => patterns.some(p => p.test(fsNorm(k)))); }
+    function fsAmount(value) {
+      if (value === null || value === undefined || String(value).trim() === "") return null;
+      let t = String(value).trim().replace(/[,$£€₨\s]/g, ""); const neg = /^\(.*\)$/.test(t); t = t.replace(/[()]/g, "");
+      if (t.includes(",") && !t.includes(".")) t = t.replace(/,/g, "");
+      const n = Number(t); return Number.isFinite(n) ? (neg ? -Math.abs(n) : n) : null;
+    }
+    function fsMoney(n) { return new Intl.NumberFormat(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}).format(n); }
+    function fsClassify(account, explicitType) {
+      const a = fsNorm(account), t = fsNorm(explicitType);
+      const joined = `${t} ${a}`;
+      if (/revenue|sales|income|turnover|service fee|interest income/.test(joined) && !/expense|tax payable/.test(joined)) return "revenue";
+      if (/cost of sales|cost of goods|cogs|direct cost/.test(joined)) return "cogs";
+      if (/expense|depreciation|amortization|payroll|salary|rent|utilities|interest expense|income tax/.test(joined)) return "expense";
+      if (/asset|cash|bank|receivable|inventory|stock|property|equipment|plant|prepayment|fixed asset/.test(joined)) return "asset";
+      if (/liabilit|payable|loan|borrow|debt|accrual|deferred income|tax payable/.test(joined)) return "liability";
+      if (/equity|capital|retained earning|share premium|reserves|dividend/.test(joined)) return "equity";
+      if (/operating activity|operating cash/.test(joined)) return "operatingCash";
+      if (/investing activity|investing cash/.test(joined)) return "investingCash";
+      if (/financing activity|financing cash/.test(joined)) return "financingCash";
+      return "unclassified";
+    }
+    function fsReviewData() {
+      const status = document.getElementById("fsStatus");
+      if (!fsParsedRows.length) { status.textContent = "Please choose a readable CSV file first."; return; }
+      const first = fsParsedRows[0], keys = Object.keys(first);
+      const accountKey = fsFindKey(first,[/^(account|account name|ledger account|gl account|description|particulars|item|line item|name)$/,/account name/,/ledger/]);
+      const typeKey = fsFindKey(first,[/^(account type|category|classification|statement|type)$/,/account type/,/classification/]);
+      const amountKey = fsFindKey(first,[/^(amount|balance|net amount|value|closing balance|period amount)$/,/amount/,/balance/]);
+      const debitKey = fsFindKey(first,[/^debit(s)?$/, /^dr$/, /debit amount/]);
+      const creditKey = fsFindKey(first,[/^credit(s)?$/, /^cr$/, /credit amount/]);
+      const dateKey = fsFindKey(first,[/^date$/, /transaction date/, /period ending/, /reporting date/]);
+      const descriptionKey = fsFindKey(first,[/^(transaction description|description|memo|details|narration|particulars)$/,/transaction description/,/narration/,/memo/]);
+      const cashflowKey = fsFindKey(first,[/^(cash flow category|cashflow category|activity type|cash flow activity)$/,/cash flow category/,/activity type/]);
+      const entityKey = fsFindKey(first,[/^entity$/, /^company$/, /entity name/, /subsidiary/]) || (document.getElementById("fsEntityColumn")?.value.trim() && keys.find(k => fsNorm(k) === fsNorm(document.getElementById("fsEntityColumn").value.trim()))) || null;
+      if (!accountKey) { status.textContent = `Loaded ${fsFileName}, but no clear account/name column was found. Available columns: ${keys.join(", ")}. Rename a column to Account, Account Name, Description or Particulars, then upload again.`; return; }
+      if (!amountKey && !debitKey && !creditKey) { status.textContent = `Account column found (${accountKey}), but no amount, balance, debit or credit column was found. Available columns: ${keys.join(", ")}. No statement totals were calculated.`; return; }
+      fsParsedRows = fsParsedRows.map(row => {
+        const amount = amountKey ? fsAmount(row[amountKey]) : null;
+        const debit = debitKey ? (fsAmount(row[debitKey]) || 0) : 0;
+        const credit = creditKey ? (fsAmount(row[creditKey]) || 0) : 0;
+        const cls = fsClassify(row[accountKey], typeKey ? row[typeKey] : "");
+        let mappedAmount = amount;
+        if (mappedAmount === null && (debitKey || creditKey)) {
+          const debitNormal = ["asset","expense","cogs"].includes(cls);
+          mappedAmount = debitNormal ? debit-credit : credit-debit;
+        }
+        const account = String(row[accountKey] || "").trim();
+        const desc = descriptionKey ? String(row[descriptionKey] || "") : "";
+        const explicitActivity = cashflowKey ? String(row[cashflowKey] || "") : "";
+        const activityText = fsNorm(explicitActivity + " " + desc + " " + account);
+        let cashflowClass = "";
+        if (/investing/.test(fsNorm(explicitActivity)) || /equipment|property plant|fixed asset|capital expenditure|asset purchase|asset sale|disposal of asset/.test(activityText)) cashflowClass = "investing";
+        else if (/financing/.test(fsNorm(explicitActivity)) || /loan received|additional loan|borrowings received|loan repayment|principal repaid|share capital|capital contribution|dividend paid/.test(activityText)) cashflowClass = "financing";
+        else if (/operating/.test(fsNorm(explicitActivity)) || /customer|sales|revenue received|service income|salary|salaries|payroll|rent paid|utilities paid|supplier payment|inventory purchased|cost of goods|cogs|tax paid|operating expense/.test(activityText)) cashflowClass = "operating";
+        if (!explicitActivity && /inventory purchased|supplier purchase|goods purchased/.test(activityText) && /on credit|credit purchase|payable/.test(activityText)) cashflowClass = "";
+        const isCashAccount = /^(cash|cash at bank|bank|bank account|cash and cash equivalents|cash equivalents)$/.test(fsNorm(account));
+        let cashflowAmount = null;
+        if (cashflowClass) {
+          if (isCashAccount && (debitKey || creditKey)) cashflowAmount = debit-credit;
+          else if (/investing/.test(fsNorm(explicitActivity)) || /equipment|property plant|fixed asset|capital expenditure|asset purchase/.test(activityText)) cashflowAmount = -Math.abs(mappedAmount ?? debit ?? credit ?? 0);
+          else if (/financing/.test(fsNorm(explicitActivity)) || /loan received|additional loan|borrowings received|capital contribution|share capital/.test(activityText)) cashflowAmount = Math.abs(mappedAmount ?? credit ?? debit ?? 0);
+          else if (/loan repayment|principal repaid|dividend paid|salary|salaries|payroll|rent paid|utilities paid|supplier payment|inventory purchased|cost of goods|cogs|tax paid/.test(activityText)) cashflowAmount = -Math.abs(mappedAmount ?? debit ?? credit ?? 0);
+          else cashflowAmount = Math.abs(mappedAmount ?? credit ?? debit ?? 0);
+        }
+        return {...row, __account:account, __type:typeKey ? String(row[typeKey] || "") : "", __amount:mappedAmount, __debit:debit, __credit:credit, __class:cls, __cashflowClass:cashflowClass, __cashflowAmount:cashflowAmount, __description:desc, __explicitCashflow:explicitActivity, __isCashAccount:isCashAccount, __date:dateKey ? row[dateKey] : "", __entity:entityKey ? row[entityKey] : ""};
+      }).filter(r => r.__account);
+      const scope = document.querySelector('input[name="fsReportingType"]:checked')?.value || "single";
+      const notes = [];
+      if (!typeKey) notes.push("No explicit account-type/classification column was found; account-name keyword mapping is indicative and requires user review.");
+      if (!dateKey) notes.push("No date/period column was found; period comparisons cannot be prepared.");
+      if (scope === "consolidated") {
+        if (!entityKey) notes.push("No entity/company column was detected. Parent and group entities cannot be separated from this file.");
+        const elim = document.getElementById("fsIntercompany")?.value;
+        if (elim !== "provided" && elim !== "none") notes.push("Intercompany elimination data is not confirmed. Consolidated totals must not be treated as finalized.");
+        notes.push("Subsidiaries generally require line-by-line consolidation and intragroup eliminations; associates and joint ventures may require a different treatment under the selected framework.");
+      }
+      notes.push("Framework selection is recorded as context only. This browser workflow does not apply or certify all IFRS, GAAP or local-framework recognition, measurement, presentation and disclosure requirements.");
+      window.fsReportContext = {scope, framework:document.getElementById("fsFramework").value, jurisdiction:document.getElementById("fsJurisdiction").value, period:document.getElementById("fsPeriod").value, accountKey,typeKey,amountKey,debitKey,creditKey,dateKey,descriptionKey,cashflowKey,entityKey,notes,fileName:fsFileName, parent:document.getElementById("fsParent")?.value || "", entities:document.getElementById("fsEntities")?.value || "", ownership:document.getElementById("fsOwnership")?.value || ""};
+      if (!cashflowKey) notes.push("Cash-flow categories are inferred from account names and transaction descriptions where wording is clear. Review classification and duplicate journal lines before use.");
+      status.textContent = `Reviewed ${fsFileName}: ${fsParsedRows.length} account rows mapped. Found ${[accountKey,typeKey,amountKey,debitKey,creditKey,dateKey,descriptionKey,cashflowKey,entityKey].filter(Boolean).length} relevant field(s). Review each statement tab and the notes for mapping limitations before relying on the results.`;
+      document.getElementById("fsResults").hidden = false;
+      fsCurrentStatement = "income";
+      document.querySelectorAll("[data-fs-tab]").forEach(b => b.classList.toggle("active", b.dataset.fsTab === "income"));
+      fsRenderStatement();
+    }
+    function fsRowsForClass(classes) { return fsParsedRows.filter(r => classes.includes(r.__class) && r.__amount !== null); }
+    function fsSum(rows) { return rows.reduce((sum,r) => sum + (r.__amount || 0),0); }
+    function fsBuildTable(rows, labelHeader="Account", amountHeader="Amount") {
+      if (!rows.length) return '<div class="fs-empty">No supported rows were identified for this statement section. Check account labels, account types and required fields.</div>';
+      return `<div class="fs-table-wrap"><table class="fs-table"><thead><tr><th>${labelHeader}</th><th>${amountHeader}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${String(r.label ?? r.__account ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}</td><td>${r.value===null||r.value===undefined?"Not available":fsMoney(r.value)}</td></tr>`).join("")}</tbody></table></div>`;
+    }
+    function fsExportCurrentStatement() {
+      const table = document.querySelector("#fsStatementOutput table");
+      const status = document.getElementById("fsStatus");
+      if (!table) { if (status) status.textContent = "There is no statement table to export in this view yet."; return; }
+      const csv = Array.from(table.rows).map(row => Array.from(row.cells).map(cell => '"' + cell.innerText.replace(/"/g,'""') + '"').join(",")).join("\r\n");
+      const blob = new Blob(["\uFEFF" + csv], {type:"text/csv;charset=utf-8;"});
+      const url = URL.createObjectURL(blob); const a = document.createElement("a");
+      a.href = url; a.download = `FinSight_${fsCurrentStatement}_statement_review.csv`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      if (status) status.textContent = "Exported the current statement review as CSV. Please review source mappings and limitations before using it as a formal financial statement.";
+    }
+
+    function fsRenderStatement() {
+      const out = document.getElementById("fsStatementOutput"); if (!out || !window.fsReportContext) return;
+      const ctx = window.fsReportContext; let html = "";
+      if (fsCurrentStatement === "income") {
+        const rev=fsRowsForClass(["revenue"]), cogs=fsRowsForClass(["cogs"]), exp=fsRowsForClass(["expense"]);
+        const rows=[]; if(rev.length) rows.push({label:"Revenue / income (mapped rows)",value:fsSum(rev)}); if(cogs.length) rows.push({label:"Cost of sales (mapped rows)",value:fsSum(cogs)}); if(rev.length && cogs.length) rows.push({label:"Gross profit (calculated)",value:fsSum(rev)-fsSum(cogs)}); if(exp.length) rows.push({label:"Expenses (mapped rows)",value:fsSum(exp)}); if(rev.length && (cogs.length || exp.length)) rows.push({label:"Indicative result from mapped rows",value:fsSum(rev)-fsSum(cogs)-fsSum(exp)});
+        html = `<h3>Income Statement</h3><p class="muted">Mapped account totals only. The sign convention and completeness of the trial balance must be verified before interpreting profit or loss.</p>${fsBuildTable(rows)}${(!rev.length||(!exp.length&&!cogs.length))?'<div class="fs-status">Revenue and/or expense categories were not sufficiently identified. No complete profit/loss figure is presented.</div>':''}`;
+      } else if (fsCurrentStatement === "balance") {
+        const a=fsRowsForClass(["asset"]), l=fsRowsForClass(["liability"]), e=fsRowsForClass(["equity"]); const rows=[];
+        if(a.length) rows.push({label:"Assets (mapped rows)",value:fsSum(a)}); if(l.length) rows.push({label:"Liabilities (mapped rows)",value:fsSum(l)}); if(e.length) rows.push({label:"Equity (mapped rows)",value:fsSum(e)});
+        const complete=a.length&&l.length&&e.length; if(complete) rows.push({label:"Assets − Liabilities − Equity (check only)",value:fsSum(a)-fsSum(l)-fsSum(e)});
+        html=`<h3>Balance Sheet</h3><p class="muted">Statement of financial position at the date represented by the source data. Opening/closing balances and debit/credit sign conventions must be confirmed.</p>${fsBuildTable(rows)}${complete?'<div class="fs-status">The equation check is a diagnostic only. A zero difference does not prove that classifications or balances are correct.</div>':'<div class="fs-status">Assets, liabilities and equity were not all identified. The accounting equation cannot be checked with the current fields.</div>'}`;
+      } else if (fsCurrentStatement === "cash") {
+        let cfRows = fsParsedRows.filter(r => r.__cashflowClass && r.__cashflowAmount !== null && Number.isFinite(Number(r.__cashflowAmount)));
+        // Where the source has both a cash/bank line and its counterpart on the same date/activity,
+        // prefer the cash/bank line to reduce obvious double-counting. This is a heuristic, not a ledger reconciliation.
+        cfRows = cfRows.filter(r => {
+          if (r.__isCashAccount) return true;
+          const sameDateCash = fsParsedRows.some(c => c.__isCashAccount && c.__date === r.__date && c.__cashflowClass === r.__cashflowClass);
+          return !sameDateCash;
+        });
+        const op=cfRows.filter(r=>r.__cashflowClass==="operating"), inv=cfRows.filter(r=>r.__cashflowClass==="investing"), fin=cfRows.filter(r=>r.__cashflowClass==="financing");
+        const total=arr=>arr.reduce((n,r)=>n+Number(r.__cashflowAmount||0),0);
+        const rows=[]; if(op.length) rows.push({label:"Net cash from operating activities (indicative)",value:total(op)}); if(inv.length) rows.push({label:"Net cash from investing activities (indicative)",value:total(inv)}); if(fin.length) rows.push({label:"Net cash from financing activities (indicative)",value:total(fin)}); if(cfRows.length) rows.push({label:"Net movement from classified rows (indicative)",value:total(cfRows)});
+        const detailRows=cfRows.map(r=>({label:`${r.__cashflowClass.toUpperCase()} · ${r.__account}${r.__description?" — "+r.__description:""}`,value:r.__cashflowAmount}));
+        html=`<h3>Cash Flow Statement</h3><p class="muted">Indicative mapping uses an explicit Cash Flow Category / Activity Type column when available, otherwise clear account labels and transaction descriptions. Review classifications and possible duplicate journal entries.</p>${fsBuildTable(rows,"Activity section","Indicative net cash")}${detailRows.length?`<h4>Classified source rows</h4>${fsBuildTable(detailRows,"Source row","Indicative cash impact")}`:'<div class="fs-status">No clear cash-flow activity was identified. Add a Cash Flow Category column with Operating, Investing or Financing, or improve the transaction descriptions.</div>'}<div class="fs-status">This is an indicative review, not a finalized cash-flow statement. Opening cash, closing cash, non-cash transactions and duplicate journal legs still require reconciliation.</div>`;
+      } else if (fsCurrentStatement === "equity") {
+        const eq=fsRowsForClass(["equity"]); const rows=eq.map(r=>({label:r.__account,value:r.__amount}));
+        html=`<h3>Statement of Changes in Equity</h3><p class="muted">This statement normally needs opening equity, profit/loss, owner contributions, dividends and other movements for the period.</p>${fsBuildTable(rows)}<div class="fs-status">${eq.length?"Equity-labelled balances are shown, but opening-to-closing movement cannot be derived unless movement types and comparative balances are supplied.":"No equity-classified accounts were identified. Provide share capital, retained earnings and relevant movement rows to prepare this statement."}</div>`;
+      } else {
+        const all = fsParsedRows.map(r=>({label:r.__account,value:r.__amount}));
+        const counts = {}; fsParsedRows.forEach(r=>counts[r.__class]=(counts[r.__class]||0)+1);
+        const cashCounts = {}; fsParsedRows.forEach(r=>{if(r.__cashflowClass) cashCounts[r.__cashflowClass]=(cashCounts[r.__cashflowClass]||0)+1;});
+        html=`<h3>Notes to Financial Statements</h3><p class="muted">Source and preparation notes for reviewer follow-up.</p><div class="fs-status"><strong>Source:</strong> ${ctx.fileName}<br><strong>Reporting scope:</strong> ${ctx.scope === "single" ? "Single / Standalone" : "Consolidated / Group"}<br><strong>Framework selected:</strong> ${ctx.framework}${ctx.jurisdiction?" · "+ctx.jurisdiction:""}<br><strong>Rows retained:</strong> ${fsParsedRows.length}<br><strong>Detected classes:</strong> ${Object.entries(counts).map(([k,v])=>`${k}: ${v}`).join("; ") || "None"}<br><strong>Cash-flow activity candidates:</strong> ${Object.entries(cashCounts).map(([k,v])=>`${k}: ${v}`).join("; ") || "None"}<br><strong>Parent entity:</strong> ${ctx.parent || "Not specified"}<br><strong>Group entities:</strong> ${ctx.entities || "Not specified"}<br><strong>Ownership notes:</strong> ${ctx.ownership || "Not specified"}</div>${fsBuildTable(all,"Source account / line","Source amount")}${ctx.notes.map(n=>`<div class="fs-status">${n}</div>`).join("")}<div class="fs-status">This is a source review and indicative mapping workflow, not an audit opinion or a framework-compliance certification.</div>`;
+      }
+      out.innerHTML = html;
     }
 
     function closeMobileMenu() {
